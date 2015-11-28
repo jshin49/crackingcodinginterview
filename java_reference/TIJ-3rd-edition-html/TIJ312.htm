@@ -1,0 +1,888 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<!--
+This document was converted from RTF source: 
+By r2net 5.8 r2netcmd Windows 
+See http://www.logictran.com
+-->
+<head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Thinking in Java, 3rd ed. Revision 4.0: 10: Detecting Types</title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css"></head>
+
+<body >
+   <CENTER>     <a href="http://www.MindView.net">     <img src="mindview.gif" alt="MindView Inc." BORDER = "0"></a>     <Font FACE="Verdana, Tahoma, Arial, Helvetica, Sans">     <h2>Thinking in Java, 3<sup>rd</sup> ed. Revision 4.0</h2>     <FONT size = "-1"><br>     [ <a href="README.txt">Viewing Hints</a> ]     [ <a href="http://www.mindview.net/Books/TIJ/">Book Home Page</a> ]     [ <a href="http://www.mindview.net/Etc/MailingList.html">Free Newsletter</a> ] <br>     [ <a href="http://www.mindview.net/Seminars">Seminars</a> ]     [ <a href="http://www.mindview.net/CDs">Seminars on CD ROM</a> ]     [ <a href="http://www.mindview.net/Services">Consulting</a> ] <br><br>     </FONT></FONT>   </CENTER> 
+<font face="Georgia"><div align="CENTER"><a href="TIJ311.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ313.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+<hr>
+
+<h1>
+<a name="_Toc24272649"></a><a name="_Toc24775724"></a><a name="Heading9461"></a>10:
+Detecting Types</h1>
+<p class="Intro">The idea of run-time type identification (RTTI) seems fairly simple at first: It lets you find the exact type of an object when you have only a reference to the base type. <br></p>
+<p>However, the <i>need</i> for RTTI uncovers a whole plethora of interesting (and often perplexing) OO design issues, and raises fundamental questions of how you should structure your programs. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1828" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This chapter looks at the ways that Java allows you to discover information about objects and classes at run time. This takes two forms: &#147;Traditional&#148; RTTI, which assumes that you have all the types available at compile time and run time, and the &#147;reflection&#148; mechanism, which allows you to discover class information solely at run time. The &#147;traditional&#148; RTTI will be covered first, followed by a discussion of reflection. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1829" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545405"></a><a name="_Toc24775725"></a><a name="Heading9465"></a>The
+need for RTTI</h2>
+<p>Consider the now familiar example of a class hierarchy that uses polymorphism. The generic type is the base class <b>Shape</b>, and the specific derived types are <a name="Index879"></a><a name="Index880"></a><b>Circle</b>, <b>Square</b>, and <b>Triangle</b>:<br></p>
+<p align="center"><img src="TIJ324.png" 	alt="TIJ324.png" border="0" ><br></p>
+<p>This is a typical class hierarchy diagram, with the base class at the top and the derived classes growing downward. The normal goal in object-oriented programming is for your code to manipulate references to the base type (<a name="Index881"></a><a name="Index882"></a><b>Shape</b>, in this case), so if you decide to extend the program by adding a new class (such as <b>Rhomboid</b>, derived from <b>Shape</b>), the bulk of the code is not affected. In this example, the dynamically bound method in the <b>Shape</b> interface is <b>draw(&#160;)</b>, so the intent is for the client programmer to call <b>draw(&#160;)</b> through a generic <b>Shape</b> reference. In all of the derived classes, <b>draw(&#160;)</b> is overridden, and because it is a dynamically bound method, the proper behavior will occur even though it is called through a generic <b>Shape</b> reference. That&#146;s polymorphism. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1830" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index883"></a>Thus, you generally create a specific object (<b>Circle</b>, <b>Square</b>, or <b>Triangle</b>), upcast it to a <b>Shape</b> (forgetting the specific type of the object), and use that anonymous <b>Shape </b>reference in the rest of the program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1831" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As a brief review of polymorphism and upcasting, you might code the preceding example as follows:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:Shapes.java</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Shape {
+  <font color=#0000ff>void</font> draw() { System.out.println(<font color=#0000ff>this</font> + <font color=#004488>".draw()"</font>); }
+}
+
+<font color=#0000ff>class</font> Circle <font color=#0000ff>extends</font> Shape {
+  <font color=#0000ff>public</font> String toString() { <font color=#0000ff>return</font> <font color=#004488>"Circle"</font>; }
+}
+
+<font color=#0000ff>class</font> Square <font color=#0000ff>extends</font> Shape {
+  <font color=#0000ff>public</font> String toString() { <font color=#0000ff>return</font> <font color=#004488>"Square"</font>; }
+}
+
+<font color=#0000ff>class</font> Triangle <font color=#0000ff>extends</font> Shape {
+  <font color=#0000ff>public</font> String toString() { <font color=#0000ff>return</font> <font color=#004488>"Triangle"</font>; }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Shapes {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#009900>// Array of Object, not Shape:</font>
+    Object[] shapeList = {
+      <font color=#0000ff>new</font> Circle(),
+      <font color=#0000ff>new</font> Square(),
+      <font color=#0000ff>new</font> Triangle()
+    };
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; shapeList.length; i++)
+      ((Shape)shapeList[i]).draw(); <font color=#009900>// Must cast</font>
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Circle.draw()"</font>,
+      <font color=#004488>"Square.draw()"</font>,
+      <font color=#004488>"Triangle.draw()"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The base class contains a <b>draw(&#160;)</b> method that indirectly uses <b>toString(&#160;) </b>to print an identifier for the class by passing <b>this</b> to <b>System.out.println(&#160;)</b>. If that method sees an object, it automatically calls the <b>toString(&#160;)</b> method to produce a <b>String</b> representation. Each of the derived classes overrides the <b>toString(&#160;)</b> method (from <b>Object</b>) so that <b>draw(&#160;)</b> ends up (polymorphically) printing something different in each case. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1832" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In <b>main(&#160;)</b>, specific types of <b>Shape</b> are created and added to an array. This array is a bit odd because it isn&#146;t an array of <b>Shape </b>(although it could be), but instead an array of the root class <b>Object</b>. The reason for this is to start preparing you for Chapter 11, which presents tools called <i>collections</i> (also called <i>containers</i>), whose sole job is to hold and manage other objects for you. However, to be generally useful these collections need to hold anything. Therefore they hold <b>Object</b>s. So an array of <b>Object</b> will demonstrate an important issue that you will encounter in the Chapter 11 collections. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0479" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In this example, the upcast occurs when the shape is placed in the array of <b>Object</b>s. Since everything in Java (with the exception of primitives) is an <b>Object</b>, an array of <b>Object</b>s<b> </b>can also hold <b>Shape</b> objects. But during the upcast to <b>Object</b>,<b> </b>the fact is lost that the objects are <b>Shape</b>s. To the array, they are just <b>Object</b>s. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1833" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>At the point that you fetch an element out of the array with the index operator, things get a little busy. Since the array holds only <b>Object</b>s, indexing naturally produces an <b>Object </b>reference. But we know it&#146;s really a <b>Shape</b> reference, and we want to send <b>Shape</b> messages to that object. So a cast to <a name="Index885"></a><a name="Index886"></a><b>Shape </b>is necessary using the traditional &#147;<b>(Shape)</b>&#148; cast. This is the most basic form of RTTI, because all casts are checked at run time for correctness. That&#146;s exactly what RTTI means: at run time, the type of an object is identified. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1834" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In this case, the RTTI cast is only partial: The <b>Object</b> is cast to a <b>Shape</b>, and not all the way to a <b>Circle</b>, <b>Square</b>, or <b>Triangle</b>. That&#146;s because the only thing we <i>know</i> at this point is that the array is full of <b>Shape</b>s. At compile time, this is enforced only by your own self-imposed rules, but at run time the cast ensures it. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1835" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Now polymorphism takes over and the exact code that&#146;s executed for the <b>Shape</b> is determined by whether the reference is for a <b>Circle</b>, <b>Square</b>, or <b>Triangle</b>. And in general, this is how it should be; you want the bulk of your code to know as little as possible about <i>specific</i> types of objects, and to just deal with the general representation of a family of objects (in this case, <b>Shape</b>). As a result, your code will be easier to write, read, and maintain, and your designs will be easier to implement, understand, and change. So polymorphism is a general goal in object-oriented programming. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1836" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>But what if you have a special programming problem that&#146;s easiest to solve if you know the exact type of a generic reference? For example, suppose you want to allow your users to highlight all the shapes of any particular type by turning them purple. This way, they can find all the triangles on the screen by highlighting them. Or perhaps your method needs to &#147;rotate&#148; a list of shapes, but it makes no sense to rotate a circle so you&#146;d like to skip only the circle, objects. With RTTI, you can ask a <a name="Index887"></a><a name="Index888"></a><b>Shape</b> reference the exact type that it&#146;s referring to, and thus select and isolate special cases. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1837" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc312374135"></a><a name="_Toc375545406"></a><a name="_Toc24775726"></a><a name="Heading9516"></a>The
+<b>Class</b> object</h3>
+<p>To understand how RTTI works in Java, you must first know how type information is represented at run time. This is accomplished through a special kind of object called the <a name="Index889"></a><a name="Index890"></a><a name="Index891"></a><i>Class object,</i> which contains information about the class. In fact, the <b>Class</b> object is used to create all of the &#147;regular&#148; objects of your class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1838" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There&#146;s a <b>Class</b> object for each class that is part of your program. That is, each time you write and compile a new class, a single <b>Class</b> object is also created (and stored, appropriately enough, in an identically named <b>.class </b>file). At run time, when you want to make an object of that class, the Java Virtual Machine (JVM) that&#146;s executing your program first checks to see if the <a name="Index892"></a><a name="Index893"></a><b>Class</b> object for that type is loaded. If not, the JVM loads it by finding the <b>.class </b>file with that name. Thus, a Java program isn&#146;t completely loaded before it begins, which is different from many traditional languages. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1839" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Once the <b>Class</b> object for that type is in memory, it is used to create all objects of that type. If this seems shadowy or if you don&#146;t really believe it, here&#146;s a demonstration program to prove it: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1840" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:SweetShop.java</font>
+<font color=#009900>// Examination of the way the class loader works.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Candy {
+  <font color=#0000ff>static</font> {
+    System.out.println(<font color=#004488>"Loading Candy"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Gum {
+  <font color=#0000ff>static</font> {
+    System.out.println(<font color=#004488>"Loading Gum"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Cookie {
+  <font color=#0000ff>static</font> {
+    System.out.println(<font color=#004488>"Loading Cookie"</font>);
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SweetShop {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    System.out.println(<font color=#004488>"inside main"</font>);
+    <font color=#0000ff>new</font> Candy();
+    System.out.println(<font color=#004488>"After creating Candy"</font>);
+    <font color=#0000ff>try</font> {
+      Class.forName(<font color=#004488>"Gum"</font>);
+    } <font color=#0000ff>catch</font>(ClassNotFoundException e) {
+      System.out.println(<font color=#004488>"Couldn't find Gum"</font>);
+    }
+    System.out.println(<font color=#004488>"After Class.forName(\"</font>Gum\<font color=#004488>")"</font>);
+    <font color=#0000ff>new</font> Cookie();
+    System.out.println(<font color=#004488>"After creating Cookie"</font>);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"inside main"</font>,
+      <font color=#004488>"Loading Candy"</font>,
+      <font color=#004488>"After creating Candy"</font>,
+      <font color=#004488>"Loading Gum"</font>,
+      <font color=#004488>"After Class.forName(\"</font>Gum\<font color=#004488>")"</font>,
+      <font color=#004488>"Loading Cookie"</font>,
+      <font color=#004488>"After creating Cookie"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Each of the classes <b>Candy</b>, <b>Gum</b>, and <b>Cookie</b> have a <a name="Index894"></a><b>static</b> clause that is executed as the class is loaded for the first time. Information will be printed to tell you when loading occurs for that class. In <b>main(&#160;)</b>, the object creations are spread out between print statements to help detect the time of loading. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1841" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can see from the output that each <b>Class</b> object is loaded only when it&#146;s needed, and the <b>static</b> initialization is performed upon class loading. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1843" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A particularly interesting line is:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>Class.forName(<font color=#004488>"Gum"</font>);</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This method is a <b>static</b> member of <b>Class</b> (to which all <b>Class</b> objects belong). A <b>Class</b> object is like any other object, so you can get and manipulate a reference to it (that&#146;s what the loader does). One of the ways to get a reference to the <b>Class</b> object is <a name="Index895"></a><a name="Index896"></a><b>forName(&#160;)</b>, which takes a <b>String</b> containing the textual name (watch the spelling and capitalization!) of the particular class you want a reference for. It returns a <b>Class</b> reference, which is being ignored here; the call to <b>forName(&#160;) </b>is being made for its side effect, which is to load the class <b>Gum</b> if it isn&#146;t already loaded. In the process of loading, <b>Gum</b>&#146;s <b>static</b> clause is executed. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1842" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In the preceding example, if <b>Class.forName(&#160;)</b> fails because it can&#146;t find the class you&#146;re trying to load, it will throw a <b>ClassNotFoundException</b> (ideally, exception names tell you just about everything you need to know about the problem). Here, we simply report the problem and move on, but in more sophisticated programs, you might try to fix the problem inside the exception handler. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0482" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading9575"></a>Class literals</h4>
+<p>Java provides a second way to produce the reference to the <b>Class</b> object: the <a name="Index897"></a><a name="Index898"></a><i>class literal</i>. In the preceding program this would look like:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>Gum.<font color=#0000ff>class</font>;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>which is not only simpler, but also safer since it&#146;s checked at compile time. Because it eliminates the method call, it&#146;s also more efficient. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1844" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Class literals work with regular classes as well as interfaces, arrays, and primitive types. In addition, there&#146;s a standard field called <a name="Index899"></a><b>TYPE</b> that exists for each of the primitive wrapper classes. The <b>TYPE</b> field produces a reference to the <b>Class</b> object for the associated primitive type, such that:<br></p>
+<div align="center" style="position:relative; left: 0"><table border="1">
+<tr valign="top">
+<th width="311.999922" colspan="2" rowspan="1" valign="top">
+<p class="Table" align="center"><b>... is equivalent to ...</b><br></p>
+</th>
+</tr>
+<tr valign="top">
+<td width="149.333296" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>boolean.class</b><br></p>
+</td>
+<td width="161.333293" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>Boolean.TYPE</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="149.333296" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>char.class</b><br></p>
+</td>
+<td width="161.333293" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>Character.TYPE</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="149.333296" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>byte.class</b><br></p>
+</td>
+<td width="161.333293" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>Byte.TYPE</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="149.333296" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>short.class</b><br></p>
+</td>
+<td width="161.333293" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>Short.TYPE</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="149.333296" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>int.class</b><br></p>
+</td>
+<td width="161.333293" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>Integer.TYPE</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="149.333296" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>long.class</b><br></p>
+</td>
+<td width="161.333293" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>Long.TYPE</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="149.333296" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>float.class</b><br></p>
+</td>
+<td width="161.333293" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>Float.TYPE</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="149.333296" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>double.class</b><br></p>
+</td>
+<td width="161.333293" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>Double.TYPE</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="149.333296" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>void.class</b><br></p>
+</td>
+<td width="161.333293" colspan="1" rowspan="1" valign="top">
+<p align="center"><b>Void.TYPE</b><br></p>
+</td>
+</tr>
+</table></div>
+<p class="TableFollower"><a name="_Toc375545408"></a>My preference is to use the &#147;<b>.class</b>&#148; versions if you can, since they&#146;re more consistent with regular classes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1845" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775727"></a><a name="Heading9601"></a>Checking before a cast</h3>
+<p>So far, you&#146;ve seen RTTI forms including:<br></p>
+<ol>
+<li>The classic cast; e.g., &#147;<b>(Shape),</b>&#148; which uses RTTI to
+make sure the cast is correct. This will throw a <b>ClassCastException</b> if
+you&#146;ve performed a bad cast.</li>
+<li>The <b>Class</b> object representing the type of your object. The
+<b>Class</b> object can be queried for useful run time information. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1846"
+title="Send BackTalk
+Comment">Feedback</a></font></li></ol><p>In C++, the classic cast &#147;<b>(Shape)</b>&#148; does <i>not </i>perform RTTI. It simply tells the compiler to treat the object as the new type. In Java, which does perform the type check, this cast is often called a &#147;type safe downcast.&#148; The reason for the term &#147;downcast&#148; is the historical arrangement of the class hierarchy diagram. If casting a <a name="Index900"></a><a name="Index901"></a><a name="Index902"></a><b>Circle</b> to a <b>Shape</b> is an upcast, then casting a <b>Shape</b> to a <b>Circle</b> is a downcast. However, you know a <b>Circle</b> is also a <b>Shape</b>, and the compiler freely allows an upcast assignment, but you <i>don&#146;t</i> know that a <b>Shape</b> is necessarily a <b>Circle</b>, so the compiler doesn&#146;t allow you to perform a downcast assignment without using an explicit cast. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1847" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index903"></a><a name="Index904"></a>There&#146;s a third form of RTTI in Java. This is the keyword <a name="Index905"></a><a name="Index906"></a><b>instanceof</b>, which tells you if an object is an instance of a particular type. It returns a <b>boolean </b>so you use it in the form of a question, like this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>if</font>(x <font color=#0000ff>instanceof</font> Dog)
+  ((Dog)x).bark();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>if</b> statement checks to see if the object <b>x</b> belongs to the class <b>Dog</b> <i>before</i> casting <b>x</b> to a <b>Dog</b>. It&#146;s important to use <b>instanceof</b> before a downcast when you don&#146;t have other information that tells you the type of the object; otherwise, you&#146;ll end up with a <a name="Index907"></a><a name="Index908"></a><b>ClassCastException</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1848" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Ordinarily, you might be hunting for one type (triangles to turn purple, for example), but you can easily tally <i>all</i> of the objects by using <b>instanceof</b>. Suppose you have a family of <b>Pet</b> classes:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:Pet.java</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Pet {} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:Dog.java</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Dog <font color=#0000ff>extends</font> Pet {} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:Pug.java</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Pug <font color=#0000ff>extends</font> Dog {} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:Cat.java</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Cat <font color=#0000ff>extends</font> Pet {} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:Rodent.java</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Rodent <font color=#0000ff>extends</font> Pet {} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:Gerbil.java</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Gerbil <font color=#0000ff>extends</font> Rodent {} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:Hamster.java</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Hamster <font color=#0000ff>extends</font> Rodent {} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In the coming example, we want to keep track of the number of any particular type of <b>Pet</b>, so we&#146;ll need a class that holds this number in an <b>int</b>. You can think of it as a modifiable <b>Integer</b>: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1849" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:Counter.java</font>
+<font color=#0000ff>package</font> c10;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Counter {
+  <font color=#0000ff>int</font> i;
+  <font color=#0000ff>public</font> String toString() { <font color=#0000ff>return</font> Integer.toString(i); }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Next, we need a tool that holds two things together: an indicator of the <b>Pet</b> type and a <b>Counter</b> to hold the pet quantity. That is, we want to be able to say &#147;how may <b>Gerbil</b> objects are there?&#148; An ordinary array won&#146;t work here, because you refer to objects in an array by their index numbers. What we want to do here is refer to the objects in the array by their <b>Pet</b> type. We want to <i>associate</i> <b>Counter</b> objects with <b>Pet</b> objects. There is a standard data structure , called an <i>associative array</i>, for doing exactly this kind of thing. Here is an extremely simple version: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0483" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:AssociativeArray.java</font>
+<font color=#009900>// Associates keys with values.</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> AssociativeArray {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> Object[][] pairs;
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> index;
+  <font color=#0000ff>public</font> AssociativeArray(<font color=#0000ff>int</font> length) {
+    pairs = <font color=#0000ff>new</font> Object[length][2];
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> put(Object key, Object value) {
+    <font color=#0000ff>if</font>(index &gt;= pairs.length)
+      <font color=#0000ff>throw</font> <font color=#0000ff>new</font> ArrayIndexOutOfBoundsException();
+    pairs[index++] = <font color=#0000ff>new</font> Object[] { key, value };
+  }
+  <font color=#0000ff>public</font> Object get(Object key) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; index; i++)
+      <font color=#0000ff>if</font>(key.equals(pairs[i][0]))
+        <font color=#0000ff>return</font> pairs[i][1];
+    <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(<font color=#004488>"Failed to find key"</font>);
+  }
+  <font color=#0000ff>public</font> String toString() {
+    String result = <font color=#004488>""</font>;
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; index; i++) {
+      result += pairs[i][0] + <font color=#004488>" : "</font> + pairs[i][1];
+      <font color=#0000ff>if</font>(i &lt; index - 1) result += <font color=#004488>"\n"</font>;
+    }
+    <font color=#0000ff>return</font> result;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    AssociativeArray map = <font color=#0000ff>new</font> AssociativeArray(6);
+    map.put(<font color=#004488>"sky"</font>, <font color=#004488>"blue"</font>);
+    map.put(<font color=#004488>"grass"</font>, <font color=#004488>"green"</font>);
+    map.put(<font color=#004488>"ocean"</font>, <font color=#004488>"dancing"</font>);
+    map.put(<font color=#004488>"tree"</font>, <font color=#004488>"tall"</font>);
+    map.put(<font color=#004488>"earth"</font>, <font color=#004488>"brown"</font>);
+    map.put(<font color=#004488>"sun"</font>, <font color=#004488>"warm"</font>);
+    <font color=#0000ff>try</font> {
+      map.put(<font color=#004488>"extra"</font>, <font color=#004488>"object"</font>); <font color=#009900>// Past the end</font>
+    } <font color=#0000ff>catch</font>(ArrayIndexOutOfBoundsException e) {
+      System.out.println(<font color=#004488>"Too many objects!"</font>);
+    }
+    System.out.println(map);
+    System.out.println(map.get(<font color=#004488>"ocean"</font>));
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Too many objects!"</font>,
+      <font color=#004488>"sky : blue"</font>,
+      <font color=#004488>"grass : green"</font>,
+      <font color=#004488>"ocean : dancing"</font>,
+      <font color=#004488>"tree : tall"</font>,
+      <font color=#004488>"earth : brown"</font>,
+      <font color=#004488>"sun : warm"</font>,
+      <font color=#004488>"dancing"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Your first observation might be that this appears to be a general-purpose tool, so why not put it in a package like <b>com.bruceeckel.tools</b>? Well, it is indeed a general-purpose tool&#151;so useful, in fact, that <b>java.util</b> contains a number of associative arrays (which are also called <i>maps</i>) that do a lot more than this one does, and do it a lot faster. A large portion of Chapter 11 is devoted to associative arrays, but they are significantly more complicated, so using this one will keep things simple and at the same time begin to familiarize you with the value of associative arrays. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0484" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In an associative array, the &#147;indexer&#148; is called a <i>key</i>, and the associated object is called a <i>value</i>. Here, we associate keys and values by putting them in an array of two-element arrays, which you see here as <b>pairs</b>. This will just be a fixed-length array that is created in the constructor, so we need <b>index</b> to make sure we don&#146;t run off the end. When you <b>put(&#160;)</b> in a new key-value pair, a new two-element array is created and inserted at the next available location in <b>pairs</b>. If <b>index</b> is greater than or equal to the length of <b>pairs</b>, then an exception is thrown. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0485" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To use the <b>get(&#160;)</b> method, you pass in the <b>key</b> that you want it to look up, and it produces the associated value as the result or throws an exception if it can&#146;t be found. The <b>get(&#160;)</b> method is using what is possibly the least efficient approach imaginable to locate the value: starting at the top of the array and using <b>equals(&#160;)</b> to compare keys. But the point here is simplicity, not efficiency, and the real maps in Chapter 11 have solved the performance problems, so we don&#146;t need to worry about it here. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0487" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The essential methods in an associative array are <b>put(&#160;)</b> and <b>get(&#160;)</b>, but for easy display, <b>toString(&#160;)</b> has been overridden to print the key-value pairs. To show that it works, <b>main(&#160;)</b> loads an <b>AssociativeArray</b> with pairs of strings and prints the resulting map, followed by a <b>get(&#160;)</b> of one of the values. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0488" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Now that all the tools are in place, we can use <b>instanceof</b> to count <b>Pet</b>s:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:PetCount.java</font>
+<font color=#009900>// Using instanceof.</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> PetCount {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Random rand = <font color=#0000ff>new</font> Random();
+  <font color=#0000ff>static</font> String[] typenames = {
+    <font color=#004488>"Pet"</font>, <font color=#004488>"Dog"</font>, <font color=#004488>"Pug"</font>, <font color=#004488>"Cat"</font>,
+    <font color=#004488>"Rodent"</font>, <font color=#004488>"Gerbil"</font>, <font color=#004488>"Hamster"</font>,
+  };
+  <font color=#009900>// Exceptions thrown to console:</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Object[] pets = <font color=#0000ff>new</font> Object[15];
+    <font color=#0000ff>try</font> {
+      Class[] petTypes = {
+        Class.forName(<font color=#004488>"c10.Dog"</font>),
+        Class.forName(<font color=#004488>"c10.Pug"</font>),
+        Class.forName(<font color=#004488>"c10.Cat"</font>),
+        Class.forName(<font color=#004488>"c10.Rodent"</font>),
+        Class.forName(<font color=#004488>"c10.Gerbil"</font>),
+        Class.forName(<font color=#004488>"c10.Hamster"</font>),
+      };
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; pets.length; i++)
+        pets[i] = petTypes[rand.nextInt(petTypes.length)]
+          .newInstance();
+    } <font color=#0000ff>catch</font>(InstantiationException e) {
+      System.out.println(<font color=#004488>"Cannot instantiate"</font>);
+      System.exit(1);
+    } <font color=#0000ff>catch</font>(IllegalAccessException e) {
+      System.out.println(<font color=#004488>"Cannot access"</font>);
+      System.exit(1);
+    } <font color=#0000ff>catch</font>(ClassNotFoundException e) {
+      System.out.println(<font color=#004488>"Cannot find class"</font>);
+      System.exit(1);
+    }
+    AssociativeArray map =
+      <font color=#0000ff>new</font> AssociativeArray(typenames.length);
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; typenames.length; i++)
+      map.put(typenames[i], <font color=#0000ff>new</font> Counter());
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; pets.length; i++) {
+      Object o = pets[i];
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Pet)
+        ((Counter)map.get(<font color=#004488>"Pet"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Dog)
+        ((Counter)map.get(<font color=#004488>"Dog"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Pug)
+        ((Counter)map.get(<font color=#004488>"Pug"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Cat)
+        ((Counter)map.get(<font color=#004488>"Cat"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Rodent)
+        ((Counter)map.get(<font color=#004488>"Rodent"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Gerbil)
+        ((Counter)map.get(<font color=#004488>"Gerbil"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Hamster)
+        ((Counter)map.get(<font color=#004488>"Hamster"</font>)).i++;
+    }
+    <font color=#009900>// List each individual pet:</font>
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; pets.length; i++)
+      System.out.println(pets[i].getClass());
+    <font color=#009900>// Show the counts:</font>
+    System.out.println(map);
+    monitor.expect(<font color=#0000ff>new</font> Object[] {
+      <font color=#0000ff>new</font> TestExpression(<font color=#004488>"%% class c10\\."</font>+
+        <font color=#004488>"(Dog|Pug|Cat|Rodent|Gerbil|Hamster)"</font>,
+        pets.length),
+      <font color=#0000ff>new</font> TestExpression(
+        <font color=#004488>"%% (Pet|Dog|Pug|Cat|Rodent|Gerbil|Hamster)"</font> +
+        <font color=#004488>" : \\d+"</font>, typenames.length)
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><a name="_Toc305593310"></a><a name="_Toc305628782"></a>In <b>main(&#160;)</b> an array <b>petTypes </b>of <b>Class</b> objects is created using <b>Class.forName(&#160;)</b>. Since the <b>Pet</b> objects are in package <b>c09</b>, the package name must be used when naming the classes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0489" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Next, the <b>pets</b> array is filled by randomly indexing into <b>petTypes </b>and using the selected <b>Class</b> object to generate a new instance of that class with <b>Class.newInstance(&#160;)</b>, which uses the default (no-arg) class constructor to generate the new object. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0490" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Both <b>forName(&#160;)</b> and <b>newInstance(&#160;)</b> can generate exceptions, which you can see handled in the <b>catch</b> clauses following the <b>try</b> block. Again, the names of the exceptions are relatively useful explanations of what went wrong (<b>IllegalAccessException</b> relates to a violation of the Java security mechanism). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0491" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>After creating the <b>AssociativeArray</b>, it is filled with key-value pairs of pet names and <b>Counter</b> objects. Then each <b>Pet</b> in the randomly-generated array is tested and counted using <b>instanceof</b>. The array and <b>AssociativeArray</b> are printed so you can compare the results. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0492" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There&#146;s a rather narrow restriction on <b>instanceof</b>: You can compare it to a named type only, and not to a <b>Class</b> object. In the preceding example you might feel that it&#146;s tedious to write out all of those <b>instanceof</b> expressions, and you&#146;re right. But there is no way to cleverly automate <b>instanceof </b>by creating an array of <b>Class</b> objects and comparing it to those instead (stay tuned&#151;you&#146;ll see an alternative). This isn&#146;t as great a restriction as you might think, because you&#146;ll eventually understand that your design is probably flawed if you end up writing a lot of <b>instanceof</b> expressions. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1850" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Of course, this example is contrived&#151;you&#146;d probably put a <b>static</b> field in each type and increment it in the constructor to keep track of the counts. You would do something like that <i>if</i> you had control of the source code for the class and could change it. Since this is not always the case, RTTI can come in handy. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1851" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading9795"></a>Using class literals</h4>
+<p>It&#146;s interesting to see how the <b>PetCount.java</b> example can be rewritten using class literals. The result is cleaner in many ways:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:PetCount2.java</font>
+<font color=#009900>// Using class literals.</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> PetCount2 {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Random rand = <font color=#0000ff>new</font> Random();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Object[] pets = <font color=#0000ff>new</font> Object[15];
+    Class[] petTypes = {
+      <font color=#009900>// Class literals:</font>
+      Pet.<font color=#0000ff>class</font>,
+      Dog.<font color=#0000ff>class</font>,
+      Pug.<font color=#0000ff>class</font>,
+      Cat.<font color=#0000ff>class</font>,
+      Rodent.<font color=#0000ff>class</font>,
+      Gerbil.<font color=#0000ff>class</font>,
+      Hamster.<font color=#0000ff>class</font>,
+    };
+    <font color=#0000ff>try</font> {
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; pets.length; i++) {
+        <font color=#009900>// Offset by one to eliminate Pet.class:</font>
+        <font color=#0000ff>int</font> rnd = 1 + rand.nextInt(petTypes.length - 1);
+        pets[i] = petTypes[rnd].newInstance();
+      }
+    } <font color=#0000ff>catch</font>(InstantiationException e) {
+      System.out.println(<font color=#004488>"Cannot instantiate"</font>);
+      System.exit(1);
+    } <font color=#0000ff>catch</font>(IllegalAccessException e) {
+      System.out.println(<font color=#004488>"Cannot access"</font>);
+      System.exit(1);
+    }
+    AssociativeArray map =
+      <font color=#0000ff>new</font> AssociativeArray(petTypes.length);
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; petTypes.length; i++)
+      map.put(petTypes[i].toString(), <font color=#0000ff>new</font> Counter());
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; pets.length; i++) {
+      Object o = pets[i];
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Pet)
+        ((Counter)map.get(<font color=#004488>"class c10.Pet"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Dog)
+        ((Counter)map.get(<font color=#004488>"class c10.Dog"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Pug)
+        ((Counter)map.get(<font color=#004488>"class c10.Pug"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Cat)
+        ((Counter)map.get(<font color=#004488>"class c10.Cat"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Rodent)
+        ((Counter)map.get(<font color=#004488>"class c10.Rodent"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Gerbil)
+        ((Counter)map.get(<font color=#004488>"class c10.Gerbil"</font>)).i++;
+      <font color=#0000ff>if</font>(o <font color=#0000ff>instanceof</font> Hamster)
+        ((Counter)map.get(<font color=#004488>"class c10.Hamster"</font>)).i++;
+    }
+    <font color=#009900>// List each individual pet:</font>
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; pets.length; i++)
+      System.out.println(pets[i].getClass());
+    <font color=#009900>// Show the counts:</font>
+    System.out.println(map);
+    monitor.expect(<font color=#0000ff>new</font> Object[] {
+      <font color=#0000ff>new</font> TestExpression(<font color=#004488>"%% class c10\\."</font> +
+        <font color=#004488>"(Dog|Pug|Cat|Rodent|Gerbil|Hamster)"</font>,
+        pets.length),
+      <font color=#0000ff>new</font> TestExpression(<font color=#004488>"%% class c10\\."</font> +
+        <font color=#004488>"(Pet|Dog|Pug|Cat|Rodent|Gerbil|Hamster) : \\d+"</font>,
+        petTypes.length)
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Here, the <b>typenames</b> array has been removed in favor of getting the type name strings from the <b>Class</b> object. Notice that the system can distinguish between classes and interfaces. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1852" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can also see that the creation of <b>petTypes</b> does not need to be surrounded by a <b>try</b> block since it&#146;s evaluated at compile time and thus won&#146;t throw any exceptions, unlike <b>Class.forName(&#160;)</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1853" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When the <b>Pet</b> objects are dynamically created, you can see that the random number is restricted so it is between one and <b>petTypes.length</b> and does not include zero. That&#146;s because zero refers to <b>Pet.class</b>, and presumably a generic <b>Pet</b> object is not interesting. However, since <b>Pet.class</b> is part of <b>petTypes</b>, the result is that all of the pets get counted. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1854" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading9871"></a>A dynamic <b>instanceof</b><br></h4>
+<p><a name="Index911"></a>The <b>Class.isInstance</b><a name="Index912"></a><a name="Index913"></a><a name="Index914"></a> method provides a way to dynamically call the <b>instanceof</b> operator. Thus, all those tedious <b>instanceof</b> statements can be removed in the <b>PetCount</b> example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:PetCount3.java</font>
+<font color=#009900>// Using isInstance()</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> PetCount3 {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Random rand = <font color=#0000ff>new</font> Random();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Object[] pets = <font color=#0000ff>new</font> Object[15];
+    Class[] petTypes = {
+      <font color=#009900>// Class literals:</font>
+      Pet.<font color=#0000ff>class</font>,
+      Dog.<font color=#0000ff>class</font>,
+      Pug.<font color=#0000ff>class</font>,
+      Cat.<font color=#0000ff>class</font>,
+      Rodent.<font color=#0000ff>class</font>,
+      Gerbil.<font color=#0000ff>class</font>,
+      Hamster.<font color=#0000ff>class</font>,
+    };
+    <font color=#0000ff>try</font> {
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; pets.length; i++) {
+        <font color=#009900>// Offset by one to eliminate Pet.class:</font>
+        <font color=#0000ff>int</font> rnd = 1 + rand.nextInt(petTypes.length - 1);
+        pets[i] = petTypes[rnd].newInstance();
+      }
+    } <font color=#0000ff>catch</font>(InstantiationException e) {
+      System.out.println(<font color=#004488>"Cannot instantiate"</font>);
+      System.exit(1);
+    } <font color=#0000ff>catch</font>(IllegalAccessException e) {
+      System.out.println(<font color=#004488>"Cannot access"</font>);
+      System.exit(1);
+    }
+    AssociativeArray map =
+      <font color=#0000ff>new</font> AssociativeArray(petTypes.length);
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; petTypes.length; i++)
+      map.put(petTypes[i].toString(), <font color=#0000ff>new</font> Counter());
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; pets.length; i++) {
+      Object o = pets[i];
+      <font color=#009900>// Using Class.isInstance() to eliminate</font>
+      <font color=#009900>// individual instanceof expressions:</font>
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 0; j &lt; petTypes.length; ++j)
+        <font color=#0000ff>if</font>(petTypes[j].isInstance(o))
+          ((Counter)map.get(petTypes[j].toString())).i++;
+    }
+    <font color=#009900>// List each individual pet:</font>
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; pets.length; i++)
+      System.out.println(pets[i].getClass());
+    <font color=#009900>// Show the counts:</font>
+    System.out.println(map);
+    monitor.expect(<font color=#0000ff>new</font> Object[] {
+      <font color=#0000ff>new</font> TestExpression(<font color=#004488>"%% class c10\\."</font> +
+        <font color=#004488>"(Dog|Pug|Cat|Rodent|Gerbil|Hamster)"</font>,
+        pets.length),
+      <font color=#0000ff>new</font> TestExpression(<font color=#004488>"%% class c10\\."</font> +
+        <font color=#004488>"(Pet|Dog|Pug|Cat|Rodent|Gerbil|Hamster) : \\d+"</font>,
+        petTypes.length)
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that the <b>isInstance(&#160;)</b> method has eliminated the need for the <b>instanceof</b> expressions. In addition, this means that you can add new types of pets simply by changing the <b>petTypes</b> array; the rest of the program does not need modification (as it did when using the <b>instanceof</b> expressions). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1855" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading9936"></a><b>instanceof</b> vs. <b>Class</b>
+equivalence<br></h4>
+<p><a name="Index915"></a>When querying for type information, there&#146;s an important difference between either form of <b>instanceof</b> (that is, <b>instanceof</b> or <b>isInstance(&#160;)</b>, which produce equivalent results) and the direct comparison of the <b>Class</b> objects. Here&#146;s an example that demonstrates the difference:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:FamilyVsExactType.java</font>
+<font color=#009900>// The difference between instanceof and class</font>
+<font color=#0000ff>package</font> c10;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Base {}
+<font color=#0000ff>class</font> Derived <font color=#0000ff>extends</font> Base {}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> FamilyVsExactType {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> test(Object x) {
+    System.out.println(<font color=#004488>"Testing x of type "</font> +
+      x.getClass());
+    System.out.println(<font color=#004488>"x instanceof Base "</font> +
+      (x <font color=#0000ff>instanceof</font> Base));
+    System.out.println(<font color=#004488>"x instanceof Derived "</font> +
+      (x <font color=#0000ff>instanceof</font> Derived));
+    System.out.println(<font color=#004488>"Base.isInstance(x) "</font> +
+      Base.<font color=#0000ff>class</font>.isInstance(x));
+    System.out.println(<font color=#004488>"Derived.isInstance(x) "</font> +
+      Derived.<font color=#0000ff>class</font>.isInstance(x));
+    System.out.println(<font color=#004488>"x.getClass() == Base.class "</font> +
+      (x.getClass() == Base.<font color=#0000ff>class</font>));
+    System.out.println(<font color=#004488>"x.getClass() == Derived.class "</font> +
+      (x.getClass() == Derived.<font color=#0000ff>class</font>));
+    System.out.println(<font color=#004488>"x.getClass().equals(Base.class)) "</font>+
+      (x.getClass().equals(Base.<font color=#0000ff>class</font>)));
+    System.out.println(
+      <font color=#004488>"x.getClass().equals(Derived.class)) "</font> +
+      (x.getClass().equals(Derived.<font color=#0000ff>class</font>)));
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    test(<font color=#0000ff>new</font> Base());
+    test(<font color=#0000ff>new</font> Derived());
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Testing x of type class c10.Base"</font>,
+      <font color=#004488>"x instanceof Base true"</font>,
+      <font color=#004488>"x instanceof Derived false"</font>,
+      <font color=#004488>"Base.isInstance(x) true"</font>,
+      <font color=#004488>"Derived.isInstance(x) false"</font>,
+      <font color=#004488>"x.getClass() == Base.class true"</font>,
+      <font color=#004488>"x.getClass() == Derived.class false"</font>,
+      <font color=#004488>"x.getClass().equals(Base.class)) true"</font>,
+      <font color=#004488>"x.getClass().equals(Derived.class)) false"</font>,
+      <font color=#004488>"Testing x of type class c10.Derived"</font>,
+      <font color=#004488>"x instanceof Base true"</font>,
+      <font color=#004488>"x instanceof Derived true"</font>,
+      <font color=#004488>"Base.isInstance(x) true"</font>,
+      <font color=#004488>"Derived.isInstance(x) true"</font>,
+      <font color=#004488>"x.getClass() == Base.class false"</font>,
+      <font color=#004488>"x.getClass() == Derived.class true"</font>,
+      <font color=#004488>"x.getClass().equals(Base.class)) false"</font>,
+      <font color=#004488>"x.getClass().equals(Derived.class)) true"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>test(&#160;)</b> method performs type checking with its argument using both forms of <b>instanceof</b>. It then gets the <b>Class</b> reference and uses <b>==</b> and <b>equals(&#160;) </b>to test for equality of the <b>Class</b> objects. Reassuringly, <b>instanceof </b>and <b>isInstance(&#160;)</b> produce exactly the same results, as do <b>equals(&#160;)</b> and <b>==</b>. But the tests themselves draw different conclusions. In keeping with the concept of type, <b>instanceof</b> says &#147;are you this class, or a class derived from this class?&#148; On the other hand, if you compare the actual <b>Class</b> objects using <b>==</b>, there is no concern with inheritance&#151;it&#146;s either the exact type or it isn&#146;t. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1856" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc305593313"></a><a name="_Toc305628785"></a><a name="_Toc312374146"></a><a name="_Toc375545409"></a><a name="_Toc375545407"></a><a name="_Toc24775728"></a><a name="Heading9996"></a>RTTI
+syntax</h2>
+<p>Java performs its RTTI using the <a name="Index916"></a><a name="Index917"></a><b>Class</b> object, even if you&#146;re doing something like a cast. The class <b>Class</b> also has a number of other ways you can use RTTI. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1857" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>First, you must get a reference to the appropriate <b>Class</b> object. One way to do this, as shown in the previous example, is to use a string and the <b>Class.forName(&#160;)</b> method. This is convenient because you don&#146;t need an object of that type in order to get the <b>Class</b> reference. However, if you do already have an object of the type you&#146;re interested in, you can fetch the <b>Class</b> reference by calling a method that&#146;s part of the <b>Object</b> root class:<b> </b><a name="Index918"></a><a name="Index919"></a><b>getClass(&#160;)</b>. This returns the <b>Class</b> reference representing the actual type of the object. <b>Class</b> has many interesting methods demonstrated in the following example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0493" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:ToyTest.java</font>
+<font color=#009900>// Testing class Class.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>interface</font> HasBatteries {}
+<font color=#0000ff>interface</font> Waterproof {}
+<font color=#0000ff>interface</font> Shoots {}
+<font color=#0000ff>class</font> Toy {
+  <font color=#009900>// Comment out the following default constructor</font>
+  <font color=#009900>// to see NoSuchMethodError from (*1*)</font>
+  Toy() {}
+  Toy(<font color=#0000ff>int</font> i) {}
+}
+
+<font color=#0000ff>class</font> FancyToy <font color=#0000ff>extends</font> Toy
+<font color=#0000ff>implements</font> HasBatteries, Waterproof, Shoots {
+  FancyToy() { <font color=#0000ff>super</font>(1); }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ToyTest {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> printInfo(Class cc) {
+    System.out.println(<font color=#004488>"Class name: "</font> + cc.getName() +
+      <font color=#004488>" is interface? ["</font> + cc.isInterface() + <font color=#004488>"]"</font>);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Class c = <font color=#0000ff>null</font>;
+    <font color=#0000ff>try</font> {
+      c = Class.forName(<font color=#004488>"FancyToy"</font>);
+    } <font color=#0000ff>catch</font>(ClassNotFoundException e) {
+      System.out.println(<font color=#004488>"Can't find FancyToy"</font>);
+      System.exit(1);
+    }
+    printInfo(c);
+    Class[] faces = c.getInterfaces();
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; faces.length; i++)
+      printInfo(faces[i]);
+    Class cy = c.getSuperclass();
+    Object o = <font color=#0000ff>null</font>;
+    <font color=#0000ff>try</font> {
+      <font color=#009900>// Requires default constructor:</font>
+      o = cy.newInstance(); <font color=#009900>// (*1*)</font>
+    } <font color=#0000ff>catch</font>(InstantiationException e) {
+      System.out.println(<font color=#004488>"Cannot instantiate"</font>);
+      System.exit(1);
+    } <font color=#0000ff>catch</font>(IllegalAccessException e) {
+      System.out.println(<font color=#004488>"Cannot access"</font>);
+      System.exit(1);
+    }
+    printInfo(o.getClass());
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Class name: FancyToy is interface? [false]"</font>,
+      <font color=#004488>"Class name: HasBatteries is interface? [true]"</font>,
+      <font color=#004488>"Class name: Waterproof is interface? [true]"</font>,
+      <font color=#004488>"Class name: Shoots is interface? [true]"</font>,
+      <font color=#004488>"Class name: Toy is interface? [false]"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that <b>class FancyToy</b> is quite complicated, since it inherits from <b>Toy</b> and <b>implements</b> the <b>interface</b>s <b>HasBatteries</b>, <b>Waterproof</b>, and <b>Shoots</b>. In <b>main(&#160;)</b>, a <b>Class</b> reference is created and initialized to the <b>FancyToy</b> <b>Class</b> using <b>forName(&#160;)</b> inside an appropriate <b>try</b> block. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1858" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The <b>Class.getInterfaces(&#160;)</b> method returns an array of <a name="Index920"></a><a name="Index921"></a><b>Class</b> objects representing the interfaces that are contained in the <b>Class</b> object of interest. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1859" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you have a <b>Class</b> object, you can also ask it for its direct base class using <a name="Index922"></a><a name="Index923"></a><b>getSuperclass(&#160;)</b>. This, of course, returns a <b>Class</b> reference that you can further query. This means that at run time, you can discover an object&#146;s entire class hierarchy. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1860" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The <a name="Index924"></a><a name="Index925"></a><b>newInstance(&#160;)</b> method of <b>Class</b> can, at first, seem like just another way to <b>clone(&#160;)</b> an object. However, you can create a new object with <b>newInstance(&#160;)</b> <i>without</i> an existing object, as seen here, because there is no <b>Toy</b> object&#151;only <b>cy</b>, which is a reference to <b>y</b>&#146;s <b>Class</b> object. This is a way to implement a &#147;virtual constructor,&#148; which allows you to say &#147;I don&#146;t know exactly what type you are, but create yourself properly anyway.&#148; In the preceding example, <b>cy</b> is just a <b>Class</b> reference with no further type information known at compile time. And when you create a new instance, you get back an <b>Object reference</b>. But that reference is pointing to a <b>Toy</b> object. Of course, before you can send any messages other than those accepted by <b>Object</b>, you have to investigate it a bit and do some casting. In addition, the class that&#146;s being created with <b>newInstance(&#160;)</b> must have a default constructor. In the next section, you&#146;ll see how<b> </b>to dynamically create objects of classes using any constructor, with the Java <i>reflection</i> API (Application Programmer Interface). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1861" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The final method in the listing is <a name="Index926"></a><a name="Index927"></a><b>printInfo(&#160;),</b> which takes a <b>Class</b> reference and gets its name with <a name="Index928"></a><a name="Index929"></a><b>getName(&#160;),</b> and finds out whether it&#146;s an interface with <a name="Index930"></a><a name="Index931"></a><b>isInterface(&#160;)</b>. Thus, with the <b>Class</b> object you can find out just about everything you want to know about an object. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1862" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc312374147"></a><a name="_Toc375545410"></a><a name="_Toc24775729"></a><a name="Heading10064"></a>Reflection:
+run time <br>class information<br></h2>
+<p><a name="Index932"></a><a name="Index933"></a>If you don&#146;t know the precise type of an object, RTTI will tell you. However, there&#146;s a limitation: The type must be known at compile time in order for you to be able to detect it using RTTI and do something useful with the information. Put another way, the compiler must know about all the classes you&#146;re working with for RTTI. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1864" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This doesn&#146;t seem like that much of a limitation at first, but suppose you&#146;re given a reference to an object that&#146;s not in your program space. In fact, the class of the object isn&#146;t even available to your program at compile time. For example, suppose you get a bunch of bytes from a disk file or from a network connection, and you&#146;re told that those bytes represent a class. Since the compiler can&#146;t know about this class that shows up later while it&#146;s compiling the code for your program, how can you possibly use such a class? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1865" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In a traditional programming environment, this seems like a far-fetched scenario. But as we move into a larger programming world, there are important cases in which this happens. The first is component-based programming, in which you build projects using <a name="Index934"></a><i>Rapid Application Development</i> (RAD) in an application builder tool. This is a visual approach to creating a program (which you see on the screen as a &#147;form&#148;) by moving icons that represent components onto the form. These components are then configured by setting some of their values at program time. This design-time configuration requires that any component be instantiable, that it exposes parts of itself, and that it allows its values to be read and set. In addition, components that handle GUI events must expose information about appropriate methods so that the RAD environment can assist the programmer in overriding these event-handling methods. Reflection provides the mechanism to detect the available methods and produce the method names. Java provides a structure for component-based programming through JavaBeans (described in Chapter 14). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1866" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index935"></a>Another compelling motivation for discovering class information at run time is to provide the ability to create and execute objects on remote platforms across a network. This is called <i>Remote Method Invocation</i> (RMI), and it allows a Java program to have objects distributed across many machines. This distribution can happen for a number of reasons. For example, perhaps you&#146;re doing a computation-intensive task, and in order to speed things up, you want to break it up and put pieces on machines that are idle. In other situations you might want to place code that handles particular types of tasks (e.g., &#147;Business Rules&#148; in a multitier client/server architecture) on a particular machine, so that machine becomes a common repository describing those actions, and it can be easily changed to affect everyone in the system. (This is an interesting development, since the machine exists solely to make software changes easy!) Along these lines, distributed computing also supports specialized hardware that might be good at a particular task&#151;matrix inversions, for example&#151;but inappropriate or too expensive for general-purpose programming. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1867" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The class <b>Class</b> (described previously in this chapter) supports the concept of <i>reflection</i>, and there&#146;s an additional library, <b>java.lang.reflect, </b>with classes <a name="Index936"></a><a name="Index937"></a><b>Field</b>, <a name="Index938"></a><a name="Index939"></a><b>Method</b>, and <a name="Index940"></a><a name="Index941"></a><b>Constructor </b>(each of which implement the <b>Member interface</b>). Objects of these types are created by the JVM at run time to represent the corresponding member in the unknown class. You can then use the <b>Constructor</b>s to create new objects, the <b>get(&#160;)</b> and <b>set(&#160;)</b> methods to read and modify the fields associated with <b>Field</b> objects, and the <b>invoke(&#160;)</b> method to call a method associated with a <b>Method</b> object. In addition, you can call the convenience methods <b>getFields(&#160;)</b>, <b>getMethods(&#160;)</b>, <b>getConstructors(&#160;)</b>, etc., to return arrays of the objects representing the fields, methods, and constructors. (You can find out more by looking up the class <b>Class</b> in the JDK documentation.)<b> </b>Thus, the class information for anonymous objects can be completely determined at run time, and nothing need be known at compile time. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1868" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>It&#146;s important to realize that there&#146;s nothing magic about reflection. When you&#146;re using reflection to interact with an object of an unknown type, the JVM will simply look at the object and see that it belongs to a particular class (just like ordinary RTTI), but then, before it can do anything else, the <b>Class</b> object must be loaded. Thus, the <b>.class</b> file for that particular type must still be available to the JVM, either on the local machine or across the network. So the true difference between RTTI and reflection is that with RTTI, the compiler opens and examines the <a name="Index942"></a><a name="Index943"></a><b>.class</b> file at compile time. Put another way, you can call all the methods of an object in the &#147;normal&#148; way. With reflection, the <b>.class</b> file is unavailable at compile time; it is opened and examined by the run-time environment. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1869" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775730"></a><a name="Heading10071"></a>A class method
+extractor</h3>
+<p>You&#146;ll rarely need to use the reflection tools directly; they&#146;re in the language to support other Java features, such as object serialization (Chapter 12) and JavaBeans (Chapter 14). However, there are times when it&#146;s quite useful to be able to dynamically extract information about a class. One extremely useful tool is a class method extractor. As mentioned before, looking at a class definition source code or JDK documentation shows only the methods that are defined or overridden <i>within that class definition</i>. But there could be dozens more available to you that have come from base classes. To locate these is both tedious and time consuming.<sup><a name="fnB50" href="#fn50">[50]</a></sup> Fortunately, reflection provides a way to write a simple tool that will automatically show you the entire interface. Here&#146;s the way it works:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c10:ShowMethods.java</font>
+<font color=#009900>// Using reflection to show all the methods of a class,</font>
+<font color=#009900>// even if the methods are defined in the base class.</font>
+<font color=#009900>// {Args: ShowMethods}</font>
+<font color=#0000ff>import</font> java.lang.reflect.*;
+<font color=#0000ff>import</font> java.util.regex.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ShowMethods {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> <font color=#0000ff>final</font> String usage =
+    <font color=#004488>"usage: \n"</font> +
+    <font color=#004488>"ShowMethods qualified.class.name\n"</font> +
+    <font color=#004488>"To show all methods in class or: \n"</font> +
+    <font color=#004488>"ShowMethods qualified.class.name word\n"</font> +
+    <font color=#004488>"To search for methods involving 'word'"</font>;
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Pattern p = Pattern.compile(<font color=#004488>"\\w+\\."</font>);
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>if</font>(args.length &lt; 1) {
+      System.out.println(usage);
+      System.exit(0);
+    }
+    <font color=#0000ff>int</font> lines = 0;
+    <font color=#0000ff>try</font> {
+      Class c = Class.forName(args[0]);
+      Method[] m = c.getMethods();
+      Constructor[] ctor = c.getConstructors();
+      <font color=#0000ff>if</font>(args.length == 1) {
+        <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; m.length; i++)
+          System.out.println(
+            p.matcher(m[i].toString()).replaceAll(<font color=#004488>""</font>));
+        <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; ctor.length; i++)
+          System.out.println(
+            p.matcher(ctor[i].toString()).replaceAll(<font color=#004488>""</font>));
+        lines = m.length + ctor.length;
+      } <font color=#0000ff>else</font> {
+        <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; m.length; i++)
+          <font color=#0000ff>if</font>(m[i].toString().indexOf(args[1]) != -1) {
+            System.out.println(
+              p.matcher(m[i].toString()).replaceAll(<font color=#004488>""</font>));
+            lines++;
+          }
+        <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; ctor.length; i++)
+          <font color=#0000ff>if</font>(ctor[i].toString().indexOf(args[1]) != -1) {
+            System.out.println(p.matcher(
+              ctor[i].toString()).replaceAll(<font color=#004488>""</font>));
+            lines++;
+          }
+      }
+    } <font color=#0000ff>catch</font>(ClassNotFoundException e) {
+      System.out.println(<font color=#004488>"No such class: "</font> + e);
+    }
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>Class</b> methods <a name="Index944"></a><a name="Index945"></a><b>getMethods(&#160;)</b> and <a name="Index946"></a><a name="Index947"></a><b>getConstructors(&#160;)</b> return an array of <b>Method</b> and array of <b>Constructor</b>, respectively. Each of these classes has further methods to dissect the names, arguments, and return values of the methods they represent. But you can also just use <b>toString(&#160;)</b>, as is done here, to produce a <b>String</b> with the entire method signature. The rest of the code extracts the command line information, determines if a particular signature matches your target string (using <a name="Index948"></a><a name="Index949"></a><b>indexOf(&#160;)</b>), and strips off the name qualifiers. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1870" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To strip the name qualifiers like &#147;<b>java.lang.</b>&#148; from &#147;<b>java.lang.String</b>,&#148; Java JDK 1.4 <i>regular expressions</i> offer a powerful and succinct tool that has been available in some languages for many years. You&#146;ve already seen simple usage of regular expressions inside the <b>expect(&#160;)</b> statements of the <b>com.bruceeckel.simpletest.Test</b> class. In the preceding example, you can see the basic coding steps necessary to use regular expressions in your own programs. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0495" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>After importing <b>java.util.regex</b>, you first compile the regular expression by using the <b>static</b> <b>Pattern.compile(&#160;)</b> method, which produces a <b>Pattern</b> object using the string argument. In this case, the argument is<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#004488>"\\w+\\."</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>To understand this or any other regular expression, look at the JDK documentation under <b>java.util.regex.Pattern</b>. For this one, you&#146;ll find that &#145;<b>\w</b>&#146; means &#147;a word character: [a-zA-Z_0-9].&#148; The &#145;+&#146; means &#147;one or more of the preceding expression&#148;&#151;so in this case, one or more word characters&#151;and the &#145;\.&#146; produces a literal period (rather than the period operator, which means &#147;any character&#148; in a regular expression). So this expression will match any sequence of word characters followed by a period, which is exactly what we need to strip off the qualifiers. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0496" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>After you have a compiled <b>Pattern</b> object, you use it by calling the <b>matcher(&#160;)</b> method, passing the string that you want to search. The <b>matcher(&#160;)</b> method produces a <b>Matcher</b> object, which has a set of operations to choose from (you can see all of these in the JDK documentation for <b>java.util.regex.Matcher</b>). Here, the <b>replaceAll(&#160;)</b> method is used to replace all the matches with empty strings&#151;that is, to delete the matches. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0497" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As a more compact alternative, you can use the regular expressions built into the <b>String</b> class. For example, the last use of <b>replaceAll(&#160;)</b> in the preceding program could be rewritten from:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>p.matcher(ctor[i].toString()).replaceAll(<font color=#004488>""</font>)</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>to<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>ctor[i].toString().replaceAll(<font color=#004488>"\\w+\\."</font>, <font color=#004488>""</font>)</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>without precompiling the regular expression. This form is good for single-shot uses of regular expressions, but the precompiled form is significantly more efficient if you need to use the regular expression more than once, as is the case with this example. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0494" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This example shows reflection in action, since the result produced by <b>Class.forName(&#160;)</b> cannot be known at compile time, and therefore all the method signature information is being extracted at run time. If you investigate the JDK documentation on reflection, you&#146;ll see that there is enough support to actually set up and make a method call on an object that&#146;s totally unknown at compile time (there will be examples of this later in this book). Although initially this is something you may not think you&#146;ll ever need, the value of full reflection can be quite surprising. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1871" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>An enlightening experiment is to run <br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>java ShowMethods ShowMethods</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This produces a listing that includes a <b>public</b> default constructor, even though you can see from the code that no constructor was defined. The constructor you see is the one that&#146;s automatically synthesized by the compiler. If you then make <b>ShowMethods</b> a non-<b>public</b> class (that is, package access), the synthesized default constructor no longer shows up in the output. The synthesized default constructor is automatically given the same access as the class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1872" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index950"></a><a name="Index951"></a>Another interesting experiment is to invoke <b>java ShowMethods java.lang.String</b> with an extra argument of <b>char</b>, <b>int</b>, <b>String</b>, etc.<br></p>
+<p>This tool can be a real time-saver while you&#146;re programming, when you can&#146;t remember if a class has a particular method and you don&#146;t want to go hunting through the index or class hierarchy in the JDK documentation, or if you don&#146;t know whether that class can do anything with, for example, <b>Color</b> objects. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1875" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Chapter 14 contains a GUI version of this program (customized to extract information for Swing components) so you can leave it running while you&#146;re writing code, to allow quick lookups. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1876" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545411"></a><a name="_Toc24775731"></a><a name="Heading10149"></a>Summary<br></h2>
+<p><a name="Index952"></a>RTTI allows you to discover type information from an anonymous base-class reference. Thus, it&#146;s ripe for misuse by the novice, since it might make sense before polymorphic method calls do. For many people coming from a procedural background, it&#146;s difficult not to organize their programs into sets of <a name="Index953"></a><b>switch</b> statements. They could accomplish this with RTTI and thus lose the important value of polymorphism in code development and maintenance. The intent of Java is that you use polymorphic method calls throughout your code, and you use RTTI only when you must. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1877" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index954"></a>However, using polymorphic method calls as they are intended requires that you have control of the base-class definition, because at some point in the extension of your program you might discover that the base class doesn&#146;t include the method you need. If the base class comes from a library or is otherwise controlled by someone else, one solution to the problem is RTTI: you can inherit a new type and add your extra method. Elsewhere in the code you can detect your particular type and call that special method. This doesn&#146;t destroy the polymorphism and extensibility of the program, because adding a new type will not require you to hunt for switch statements in your program. However, when you add new code in your main body that requires your new feature, you must use RTTI to detect your particular type. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1878" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Putting a feature in a base class might mean that, for the benefit of one particular class, all of the other classes derived from that base require some meaningless stub of a method. This makes the interface less clear and annoys those who must override abstract methods when they derive from that base class. For example, consider a class hierarchy representing musical instruments. Suppose you wanted to clear the spit valves of all the appropriate instruments in your orchestra. One option is to put a <b>clearSpitValve(&#160;) </b>method in the base class <b>Instrument</b>, but this is confusing because it implies that <b>Percussion</b> and <b>Electronic</b> instruments also have spit valves. RTTI provides a much more reasonable solution in this case because you can place the method in the specific class (<b>Wind </b>in this case), where it&#146;s appropriate. However, a more appropriate solution is to put a <b>prepareInstrument(&#160;)</b> method in the base class, but you might not see this when you&#146;re first solving the problem and could mistakenly assume that you must use RTTI. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1879" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Finally, RTTI will sometimes solve efficiency problems. Suppose your code nicely uses polymorphism, but it turns out that one of your objects reacts to this general purpose code in a horribly inefficient way. You can pick out that type using RTTI and write case-specific code to improve the efficiency. Be wary, however, of programming for efficiency too soon. It&#146;s a seductive trap. It&#146;s best to get the program working <i>first</i>, then decide if it&#146;s running fast enough, and only then should you attack efficiency issues&#151;with a profiler (see Chapter 15). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1880" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775732"></a><a name="Heading10154"></a>Exercises</h2>
+<p>Solutions to selected exercises can be found in the electronic document <i>The Thinking in Java Annotated Solution Guide</i>, available for a small fee from <i>www.BruceEckel.com</i>.<br></p>
+<ol>
+<li>	Add <b>Rhomboid </b>to <b>Shapes.java</b>. Create a <b>Rhomboid</b>, upcast
+it to a <b>Shape</b>, then downcast it back to a <b>Rhomboid</b>. Try
+downcasting to a <b>Circle</b> and see what happens. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1881" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify Exercise 1 so that it uses <b>instanceof</b> to check the type
+before performing the downcast. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1882" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify <b>Shapes.java</b> so that it can &#147;highlight&#148; (set a
+flag) in all shapes of a particular type. The <b>toString(&#160;)</b> method for
+each derived <b>Shape</b> should indicate whether that <b>Shape </b>is
+&#147;highlighted.&#148; <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1883" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify <b>SweetShop.java</b> so that each type of object creation is
+controlled by a command-line argument. That is, if your command line is
+&#147;<b>java SweetShop Candy</b>,&#148; then only the <b>Candy</b> object is
+created. Notice how you can control which <b>Class</b> objects are loaded via
+the command-line argument. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1884" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Add a new type of <b>Pet</b> to <b>PetCount3.java</b>. Verify that it is
+created and counted correctly in <b>main(&#160;)</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1885" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Write a method that takes an object and recursively prints all the classes
+in that object&#146;s hierarchy. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1886" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify Exercise 6 so that it uses <b>Class. getDeclaredFields(&#160;)</b>
+to also display information about the fields in a class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1887" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	In <b>ToyTest.java</b>, comment out <b>Toy</b>&#146;s default constructor
+and explain what happens. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1888" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Incorporate a new kind of <b>interface</b> into <b>ToyTest.java</b> and
+verify that it is detected and displayed properly. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1889" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Write a program to determine whether an array of <b>char</b> is a primitive
+type or a true object. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1891" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Implement <b>clearSpitValve(&#160;)</b> as described in the summary. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1892"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Implement the <b>rotate(Shape)</b> method described in this chapter, such
+that it checks to see if it is rotating a <b>Circle</b> (and, if so,
+doesn&#146;t perform the operation). <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1893" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	In <b>ToyTest.java</b>, use reflection to create a <b>Toy</b> object using
+the nondefault constructor. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1896" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Look up the interface for <b>java.lang.Class</b> in the JDK documentation
+from <i>java.sun.com</i>. Write a program that takes the name of a class as a
+command-line argument, then uses the <b>Class</b> methods to dump all the
+information available for that class. Test your program with a standard library
+class and a class you create. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap12_1897" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify the regular expression in <b>ShowMethods.java</b> to additionally
+strip off the keywords <b>native</b> and <b>final</b> (hint: use the
+&#147;or&#148; operator &#145;<b>|</b>&#146;).</li></ol><p><br></p>
+<hr><p class="footnote text"><sup><a name="fn50" href="#fnB50">[50]</a></sup> Especially in the past. However, Sun has greatly improved its HTML Java documentation so that it&#146;s easier to see base-class methods.<br></p>
+
+<!-- <hr><b>Placeholder</b> -->
+
+<hr>
+
+<div align="CENTER"><a href="TIJ311.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ313.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+
+</font></body>
+
+</html>

@@ -1,0 +1,1469 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<!--
+This document was converted from RTF source: 
+By r2net 5.8 r2netcmd Windows 
+See http://www.logictran.com
+-->
+<head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Thinking in Java, 3rd ed. Revision 4.0: 4: Initialization  &amp; Cleanup</title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css"></head>
+
+<body >
+   <CENTER>     <a href="http://www.MindView.net">     <img src="mindview.gif" alt="MindView Inc." BORDER = "0"></a>     <Font FACE="Verdana, Tahoma, Arial, Helvetica, Sans">     <h2>Thinking in Java, 3<sup>rd</sup> ed. Revision 4.0</h2>     <FONT size = "-1"><br>     [ <a href="README.txt">Viewing Hints</a> ]     [ <a href="http://www.mindview.net/Books/TIJ/">Book Home Page</a> ]     [ <a href="http://www.mindview.net/Etc/MailingList.html">Free Newsletter</a> ] <br>     [ <a href="http://www.mindview.net/Seminars">Seminars</a> ]     [ <a href="http://www.mindview.net/CDs">Seminars on CD ROM</a> ]     [ <a href="http://www.mindview.net/Services">Consulting</a> ] <br><br>     </FONT></FONT>   </CENTER> 
+<font face="Georgia"><div align="CENTER"><a href="TIJ305.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ307.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+<hr>
+
+<h1>
+<a name="_Toc375545274"></a><a name="_Toc24272643"></a><a name="_Toc24775599"></a><a name="Heading3344"></a>4:
+Initialization <br>&amp; Cleanup</h1>
+<p class="Intro">As the computer revolution progresses, &#147;unsafe&#148; programming has become one of the major culprits that makes programming expensive.<br></p>
+<p>Two of these safety issues are <i>initialization</i> and <i>cleanup</i>. Many C bugs occur when the programmer forgets to initialize a variable. This is especially true with libraries when users don&#146;t know how to initialize a library component, or even that they must. Cleanup is a special problem because it&#146;s easy to forget about an element when you&#146;re done with it, since it no longer concerns you. Thus, the resources used by that element are retained and you can easily end up running out of resources (most notably, memory). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_647" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>C++ introduced the concept of a <i>constructor</i>, a special method automatically called when an object is created. Java also adopted the constructor, and in addition has a garbage collector that automatically releases memory resources when they&#146;re no longer being used. This chapter examines the issues of initialization and cleanup, and their support in Java. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_648" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc312373853"></a><a name="_Toc375545275"></a><a name="_Toc24775600"></a><a name="Heading3348"></a>Guaranteed
+initialization <br>with the constructor</h2>
+<p>You can imagine creating a method called <b>initialize(&#160;)</b> for every class you write. The name is a hint that it should be called before using the object. Unfortunately, this means the user must remember to call the method. In Java, the class designer can guarantee initialization of every object by providing a special method called a <i>constructor</i>. If a class has a constructor, Java automatically calls that constructor when an object is created, before users can even get their hands on it. So initialization is guaranteed. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_649" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index324"></a><a name="Index325"></a>The next challenge is what to name this method. There are two issues. The first is that any name you use could clash with a name you might like to use as a member in the class. The second is that because the compiler is responsible for calling the constructor, it must always know which method to call. The C++ solution seems the easiest and most logical, so it&#146;s also used in Java: The name of the constructor is the same as the name of the class. It makes sense that such a method will be called automatically on initialization. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_650" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index326"></a>Here&#146;s a simple class with a constructor:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:SimpleConstructor.java</font>
+<font color=#009900>// Demonstration of a simple constructor.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Rock {
+  Rock() { <font color=#009900>// This is the constructor</font>
+    System.out.println(<font color=#004488>"Creating Rock"</font>);
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SimpleConstructor {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 10; i++)
+      <font color=#0000ff>new</font> Rock();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Creating Rock"</font>,
+      <font color=#004488>"Creating Rock"</font>,
+      <font color=#004488>"Creating Rock"</font>,
+      <font color=#004488>"Creating Rock"</font>,
+      <font color=#004488>"Creating Rock"</font>,
+      <font color=#004488>"Creating Rock"</font>,
+      <font color=#004488>"Creating Rock"</font>,
+      <font color=#004488>"Creating Rock"</font>,
+      <font color=#004488>"Creating Rock"</font>,
+      <font color=#004488>"Creating Rock"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Now, when an object is created: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_651" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>new</font> Rock();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>storage is allocated and the constructor is called. It is guaranteed that the object will be properly initialized before you can get your hands on it. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_652" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Note that the coding style of making the first letter of all methods lowercase does not apply to constructors, since the name of the constructor must match the name of the class <i>exactly</i>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_653" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Like any method, the constructor can have arguments to allow you to specify <a name="Index328"></a><a name="Index329"></a><i>how</i> an object is created. The preceding example can easily be changed so the constructor takes an argument:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:SimpleConstructor2.java</font>
+<font color=#009900>// Constructors can have arguments.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Rock2 {
+  Rock2(<font color=#0000ff>int</font> i) {
+    System.out.println(<font color=#004488>"Creating Rock number "</font> + i);
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SimpleConstructor2 {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 10; i++)
+      <font color=#0000ff>new</font> Rock2(i);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Creating Rock number 0"</font>,
+      <font color=#004488>"Creating Rock number 1"</font>,
+      <font color=#004488>"Creating Rock number 2"</font>,
+      <font color=#004488>"Creating Rock number 3"</font>,
+      <font color=#004488>"Creating Rock number 4"</font>,
+      <font color=#004488>"Creating Rock number 5"</font>,
+      <font color=#004488>"Creating Rock number 6"</font>,
+      <font color=#004488>"Creating Rock number 7"</font>,
+      <font color=#004488>"Creating Rock number 8"</font>,
+      <font color=#004488>"Creating Rock number 9"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Constructor arguments provide you with a way to provide parameters for the initialization of an object. For example, if the class <b>Tree</b> has a constructor that takes a single integer argument denoting the height of the tree, you would create a <b>Tree</b> object like this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_654" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>Tree t = <font color=#0000ff>new</font> Tree(12);  <font color=#009900>// 12-foot tree</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>If <b>Tree(int)</b> is your only constructor, then the compiler won&#146;t let you create a <b>Tree</b> object any other way. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_655" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Constructors eliminate a large class of problems and make the code easier to read. In the preceding code fragment, for example, you don&#146;t see an explicit call to some <b>initialize(&#160;)</b> method that is conceptually separate from creation. In Java, creation and initialization are unified concepts&#151;you can&#146;t have one without the other. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_656" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The constructor is an unusual type of method because it has no return value. This is distinctly different from a <a name="Index330"></a><a name="Index331"></a><b>void</b> return value, in which the method returns nothing but you still have the option to make it return something else. Constructors return nothing and you don&#146;t have an option (the <b>new</b> expression does return a reference to the newly-created object, but the constructor itself has no return value). If there were a return value, and if you could select your own, the compiler would somehow need to know what to do with that return value. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_657" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545276"></a><a name="_Toc24775601"></a><a name="Heading3424"></a>Method
+overloading<br></h2>
+<p><a name="Index332"></a><a name="Index333"></a>One of the important features in any programming language is the use of names. When you create an object, you give a name to a region of storage. A method is a name for an action. By using names to describe your system, you create a program that is easier for people to understand and change. It&#146;s a lot like writing prose&#151;the goal is to communicate with your readers. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_658" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You refer to all objects and methods by using names. Well-chosen names make it easier for you and others to understand your code. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_659" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A problem arises when mapping the concept of nuance in human language onto a programming language. Often, the same word expresses a number of different meanings&#151;it&#146;s <i>overloaded</i>. This is useful, especially when it comes to trivial differences. You say &#147;wash the shirt,&#148; &#147;wash the car,&#148; and &#147;wash the dog.&#148; It would be silly to be forced to say, &#147;shirtWash the shirt,&#148; &#147;carWash the car,&#148; and &#147;dogWash the dog&#148; just so the listener doesn&#146;t need to make any distinction about the action performed. Most human languages are redundant, so even if you miss a few words, you can still determine the meaning. We don&#146;t need unique identifiers&#151;we can deduce meaning from context. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_660" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Most programming languages (C in particular) require you to have a unique identifier for each function. So you could not have one function called <b>print(&#160;)</b> for printing integers and another called <b>print(&#160;)</b> for printing floats&#151;each function requires a unique name. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_661" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In Java (and C++), another factor forces the overloading of method names: the constructor. Because the constructor&#146;s name is predetermined by the name of the class, there can be only one constructor name. But what if you want to create an object in more than one way? For example, suppose you build a class that can initialize itself in a standard way or by reading information from a file. You need two constructors, one that takes no arguments (the <a name="Index334"></a><a name="Index335"></a><i>default</i> constructor,<sup><a name="fnB19" href="#fn19">[19]</a></sup> also called the <i>no-arg</i> constructor), and one that takes a <b>String</b> as an argument, which is the name of the file from which to initialize the object. Both are constructors, so they must have the same name&#151;the name of the class. Thus, <i>method overloading</i> is essential to allow the same method name to be used with different argument types. And although method overloading is a must for constructors, it&#146;s a general convenience and can be used with any method. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_662" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Here&#146;s an example that shows both overloaded constructors and overloaded ordinary methods:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:Overloading.java</font>
+<font color=#009900>// Demonstration of both constructor</font>
+<font color=#009900>// and ordinary method overloading.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>class</font> Tree {
+  <font color=#0000ff>int</font> height;
+  Tree() {
+    System.out.println(<font color=#004488>"Planting a seedling"</font>);
+    height = 0;
+  }
+  Tree(<font color=#0000ff>int</font> i) {
+    System.out.println(<font color=#004488>"Creating new Tree that is "</font>
+      + i + <font color=#004488>" feet tall"</font>);
+    height = i;
+  }
+  <font color=#0000ff>void</font> info() {
+    System.out.println(<font color=#004488>"Tree is "</font> + height + <font color=#004488>" feet tall"</font>);
+  }
+  <font color=#0000ff>void</font> info(String s) {
+    System.out.println(s + <font color=#004488>": Tree is "</font>
+      + height + <font color=#004488>" feet tall"</font>);
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Overloading {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 5; i++) {
+      Tree t = <font color=#0000ff>new</font> Tree(i);
+      t.info();
+      t.info(<font color=#004488>"overloaded method"</font>);
+    }
+    <font color=#009900>// Overloaded constructor:</font>
+    <font color=#0000ff>new</font> Tree();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Creating new Tree that is 0 feet tall"</font>,
+      <font color=#004488>"Tree is 0 feet tall"</font>,
+      <font color=#004488>"overloaded method: Tree is 0 feet tall"</font>,
+      <font color=#004488>"Creating new Tree that is 1 feet tall"</font>,
+      <font color=#004488>"Tree is 1 feet tall"</font>,
+      <font color=#004488>"overloaded method: Tree is 1 feet tall"</font>,
+      <font color=#004488>"Creating new Tree that is 2 feet tall"</font>,
+      <font color=#004488>"Tree is 2 feet tall"</font>,
+      <font color=#004488>"overloaded method: Tree is 2 feet tall"</font>,
+      <font color=#004488>"Creating new Tree that is 3 feet tall"</font>,
+      <font color=#004488>"Tree is 3 feet tall"</font>,
+      <font color=#004488>"overloaded method: Tree is 3 feet tall"</font>,
+      <font color=#004488>"Creating new Tree that is 4 feet tall"</font>,
+      <font color=#004488>"Tree is 4 feet tall"</font>,
+      <font color=#004488>"overloaded method: Tree is 4 feet tall"</font>,
+      <font color=#004488>"Planting a seedling"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>A <b>Tree</b> object can be created either as a seedling, with no argument, or as a plant grown in a nursery, with an existing height. To support this, there is a default constructor, and one that takes the existing height. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_663" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You might also want to call the <b>info(&#160;)</b> method in more than one way. For example, if you have an extra message you want printed, you can use <b>info(String)</b>, and <b>info(&#160;)</b> if you have nothing more to say. It would seem strange to give two separate names to what is obviously the same concept. Fortunately, method overloading allows you to use the same name for both. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_664" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545277"></a><a name="_Toc24775602"></a><a name="Heading3491"></a>Distinguishing
+overloaded methods<br></h3>
+<p><a name="Index338"></a><a name="Index339"></a>If the methods have the same name, how can Java know which method you mean? There&#146;s a simple rule: each overloaded method must take a unique list of argument types. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_665" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you think about this for a second, it makes sense. How else could a programmer tell the difference between two methods that have the same name, other than by the types of their arguments? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_666" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Even differences in the ordering of arguments are sufficient to distinguish two methods: (Although you don&#146;t normally want to take this approach, as it produces difficult-to-maintain code.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_667" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:OverloadingOrder.java</font>
+<font color=#009900>// Overloading based on the order of the arguments.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> OverloadingOrder {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> print(String s, <font color=#0000ff>int</font> i) {
+    System.out.println(<font color=#004488>"String: "</font> + s + <font color=#004488>", int: "</font> + i);
+  }
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> print(<font color=#0000ff>int</font> i, String s) {
+    System.out.println(<font color=#004488>"int: "</font> + i + <font color=#004488>", String: "</font> + s);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    print(<font color=#004488>"String first"</font>, 11);
+    print(99, <font color=#004488>"Int first"</font>);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"String: String first, int: 11"</font>,
+      <font color=#004488>"int: 99, String: Int first"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The two <b>print(&#160;)</b> methods have identical arguments, but the order is different, and that&#146;s what makes them distinct. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_668" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc312373866"></a><a name="_Toc375545278"></a><a name="_Toc24775603"></a><a name="Heading3518"></a>Overloading
+with primitives</h3>
+<p>A primitive can be automatically promoted from a smaller type to a larger one, and this can be slightly confusing in combination with overloading. The following example demonstrates what happens when a primitive is handed to an overloaded method:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:PrimitiveOverloading.java</font>
+<font color=#009900>// Promotion of primitives and overloading.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> PrimitiveOverloading {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>char</font> x) { System.out.println(<font color=#004488>"f1(char)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>byte</font> x) { System.out.println(<font color=#004488>"f1(byte)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>short</font> x) { System.out.println(<font color=#004488>"f1(short)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>int</font> x) { System.out.println(<font color=#004488>"f1(int)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>long</font> x) { System.out.println(<font color=#004488>"f1(long)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>float</font> x) { System.out.println(<font color=#004488>"f1(float)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>double</font> x) { System.out.println(<font color=#004488>"f1(double)"</font>); }
+
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>byte</font> x) { System.out.println(<font color=#004488>"f2(byte)"</font>); }
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>short</font> x) { System.out.println(<font color=#004488>"f2(short)"</font>); }
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>int</font> x) { System.out.println(<font color=#004488>"f2(int)"</font>); }
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>long</font> x) { System.out.println(<font color=#004488>"f2(long)"</font>); }
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>float</font> x) { System.out.println(<font color=#004488>"f2(float)"</font>); }
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>double</font> x) { System.out.println(<font color=#004488>"f2(double)"</font>); }
+
+  <font color=#0000ff>void</font> f3(<font color=#0000ff>short</font> x) { System.out.println(<font color=#004488>"f3(short)"</font>); }
+  <font color=#0000ff>void</font> f3(<font color=#0000ff>int</font> x) { System.out.println(<font color=#004488>"f3(int)"</font>); }
+  <font color=#0000ff>void</font> f3(<font color=#0000ff>long</font> x) { System.out.println(<font color=#004488>"f3(long)"</font>); }
+  <font color=#0000ff>void</font> f3(<font color=#0000ff>float</font> x) { System.out.println(<font color=#004488>"f3(float)"</font>); }
+  <font color=#0000ff>void</font> f3(<font color=#0000ff>double</font> x) { System.out.println(<font color=#004488>"f3(double)"</font>); }
+
+  <font color=#0000ff>void</font> f4(<font color=#0000ff>int</font> x) { System.out.println(<font color=#004488>"f4(int)"</font>); }
+  <font color=#0000ff>void</font> f4(<font color=#0000ff>long</font> x) { System.out.println(<font color=#004488>"f4(long)"</font>); }
+  <font color=#0000ff>void</font> f4(<font color=#0000ff>float</font> x) { System.out.println(<font color=#004488>"f4(float)"</font>); }
+  <font color=#0000ff>void</font> f4(<font color=#0000ff>double</font> x) { System.out.println(<font color=#004488>"f4(double)"</font>); }
+
+  <font color=#0000ff>void</font> f5(<font color=#0000ff>long</font> x) { System.out.println(<font color=#004488>"f5(long)"</font>); }
+  <font color=#0000ff>void</font> f5(<font color=#0000ff>float</font> x) { System.out.println(<font color=#004488>"f5(float)"</font>); }
+  <font color=#0000ff>void</font> f5(<font color=#0000ff>double</font> x) { System.out.println(<font color=#004488>"f5(double)"</font>); }
+
+  <font color=#0000ff>void</font> f6(<font color=#0000ff>float</font> x) { System.out.println(<font color=#004488>"f6(float)"</font>); }
+  <font color=#0000ff>void</font> f6(<font color=#0000ff>double</font> x) { System.out.println(<font color=#004488>"f6(double)"</font>); }
+
+  <font color=#0000ff>void</font> f7(<font color=#0000ff>double</font> x) { System.out.println(<font color=#004488>"f7(double)"</font>); }
+
+  <font color=#0000ff>void</font> testConstVal() {
+    System.out.println(<font color=#004488>"Testing with 5"</font>);
+    f1(5);f2(5);f3(5);f4(5);f5(5);f6(5);f7(5);
+  }
+  <font color=#0000ff>void</font> testChar() {
+    <font color=#0000ff>char</font> x = 'x';
+    System.out.println(<font color=#004488>"char argument:"</font>);
+    f1(x);f2(x);f3(x);f4(x);f5(x);f6(x);f7(x);
+  }
+  <font color=#0000ff>void</font> testByte() {
+    <font color=#0000ff>byte</font> x = 0;
+    System.out.println(<font color=#004488>"byte argument:"</font>);
+    f1(x);f2(x);f3(x);f4(x);f5(x);f6(x);f7(x);
+  }
+  <font color=#0000ff>void</font> testShort() {
+    <font color=#0000ff>short</font> x = 0;
+    System.out.println(<font color=#004488>"short argument:"</font>);
+    f1(x);f2(x);f3(x);f4(x);f5(x);f6(x);f7(x);
+  }
+  <font color=#0000ff>void</font> testInt() {
+    <font color=#0000ff>int</font> x = 0;
+    System.out.println(<font color=#004488>"int argument:"</font>);
+    f1(x);f2(x);f3(x);f4(x);f5(x);f6(x);f7(x);
+  }
+  <font color=#0000ff>void</font> testLong() {
+    <font color=#0000ff>long</font> x = 0;
+    System.out.println(<font color=#004488>"long argument:"</font>);
+    f1(x);f2(x);f3(x);f4(x);f5(x);f6(x);f7(x);
+  }
+  <font color=#0000ff>void</font> testFloat() {
+    <font color=#0000ff>float</font> x = 0;
+    System.out.println(<font color=#004488>"float argument:"</font>);
+    f1(x);f2(x);f3(x);f4(x);f5(x);f6(x);f7(x);
+  }
+  <font color=#0000ff>void</font> testDouble() {
+    <font color=#0000ff>double</font> x = 0;
+    System.out.println(<font color=#004488>"double argument:"</font>);
+    f1(x);f2(x);f3(x);f4(x);f5(x);f6(x);f7(x);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    PrimitiveOverloading p =
+      <font color=#0000ff>new</font> PrimitiveOverloading();
+    p.testConstVal();
+    p.testChar();
+    p.testByte();
+    p.testShort();
+    p.testInt();
+    p.testLong();
+    p.testFloat();
+    p.testDouble();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Testing with 5"</font>,
+      <font color=#004488>"f1(int)"</font>,
+      <font color=#004488>"f2(int)"</font>,
+      <font color=#004488>"f3(int)"</font>,
+      <font color=#004488>"f4(int)"</font>,
+      <font color=#004488>"f5(long)"</font>,
+      <font color=#004488>"f6(float)"</font>,
+      <font color=#004488>"f7(double)"</font>,
+      <font color=#004488>"char argument:"</font>,
+      <font color=#004488>"f1(char)"</font>,
+      <font color=#004488>"f2(int)"</font>,
+      <font color=#004488>"f3(int)"</font>,
+      <font color=#004488>"f4(int)"</font>,
+      <font color=#004488>"f5(long)"</font>,
+      <font color=#004488>"f6(float)"</font>,
+      <font color=#004488>"f7(double)"</font>,
+      <font color=#004488>"byte argument:"</font>,
+      <font color=#004488>"f1(byte)"</font>,
+      <font color=#004488>"f2(byte)"</font>,
+      <font color=#004488>"f3(short)"</font>,
+      <font color=#004488>"f4(int)"</font>,
+      <font color=#004488>"f5(long)"</font>,
+      <font color=#004488>"f6(float)"</font>,
+      <font color=#004488>"f7(double)"</font>,
+      <font color=#004488>"short argument:"</font>,
+      <font color=#004488>"f1(short)"</font>,
+      <font color=#004488>"f2(short)"</font>,
+      <font color=#004488>"f3(short)"</font>,
+      <font color=#004488>"f4(int)"</font>,
+      <font color=#004488>"f5(long)"</font>,
+      <font color=#004488>"f6(float)"</font>,
+      <font color=#004488>"f7(double)"</font>,
+      <font color=#004488>"int argument:"</font>,
+      <font color=#004488>"f1(int)"</font>,
+      <font color=#004488>"f2(int)"</font>,
+      <font color=#004488>"f3(int)"</font>,
+      <font color=#004488>"f4(int)"</font>,
+      <font color=#004488>"f5(long)"</font>,
+      <font color=#004488>"f6(float)"</font>,
+      <font color=#004488>"f7(double)"</font>,
+      <font color=#004488>"long argument:"</font>,
+      <font color=#004488>"f1(long)"</font>,
+      <font color=#004488>"f2(long)"</font>,
+      <font color=#004488>"f3(long)"</font>,
+      <font color=#004488>"f4(long)"</font>,
+      <font color=#004488>"f5(long)"</font>,
+      <font color=#004488>"f6(float)"</font>,
+      <font color=#004488>"f7(double)"</font>,
+      <font color=#004488>"float argument:"</font>,
+      <font color=#004488>"f1(float)"</font>,
+      <font color=#004488>"f2(float)"</font>,
+      <font color=#004488>"f3(float)"</font>,
+      <font color=#004488>"f4(float)"</font>,
+      <font color=#004488>"f5(float)"</font>,
+      <font color=#004488>"f6(float)"</font>,
+      <font color=#004488>"f7(double)"</font>,
+      <font color=#004488>"double argument:"</font>,
+      <font color=#004488>"f1(double)"</font>,
+      <font color=#004488>"f2(double)"</font>,
+      <font color=#004488>"f3(double)"</font>,
+      <font color=#004488>"f4(double)"</font>,
+      <font color=#004488>"f5(double)"</font>,
+      <font color=#004488>"f6(double)"</font>,
+      <font color=#004488>"f7(double)"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You&#146;ll see that the constant value 5 is treated as an <b>int</b>, so if an overloaded method is available that takes an <b>int</b>, it is used. In all other cases, if you have a data type that is smaller than the argument in the method, that data type is promoted. <b>char</b> produces a slightly different effect, since if it doesn&#146;t find an exact <b>char</b> match, it is promoted to <b>int</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_669" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>What happens if your argument is <i>bigger</i> than the argument expected by the overloaded method? A modification of the preceding program gives the answer:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:Demotion.java</font>
+<font color=#009900>// Demotion of primitives and overloading.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Demotion {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>char</font> x) { System.out.println(<font color=#004488>"f1(char)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>byte</font> x) { System.out.println(<font color=#004488>"f1(byte)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>short</font> x) { System.out.println(<font color=#004488>"f1(short)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>int</font> x) { System.out.println(<font color=#004488>"f1(int)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>long</font> x) { System.out.println(<font color=#004488>"f1(long)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>float</font> x) { System.out.println(<font color=#004488>"f1(float)"</font>); }
+  <font color=#0000ff>void</font> f1(<font color=#0000ff>double</font> x) { System.out.println(<font color=#004488>"f1(double)"</font>); }
+
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>char</font> x) { System.out.println(<font color=#004488>"f2(char)"</font>); }
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>byte</font> x) { System.out.println(<font color=#004488>"f2(byte)"</font>); }
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>short</font> x) { System.out.println(<font color=#004488>"f2(short)"</font>); }
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>int</font> x) { System.out.println(<font color=#004488>"f2(int)"</font>); }
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>long</font> x) { System.out.println(<font color=#004488>"f2(long)"</font>); }
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>float</font> x) { System.out.println(<font color=#004488>"f2(float)"</font>); }
+
+  <font color=#0000ff>void</font> f3(<font color=#0000ff>char</font> x) { System.out.println(<font color=#004488>"f3(char)"</font>); }
+  <font color=#0000ff>void</font> f3(<font color=#0000ff>byte</font> x) { System.out.println(<font color=#004488>"f3(byte)"</font>); }
+  <font color=#0000ff>void</font> f3(<font color=#0000ff>short</font> x) { System.out.println(<font color=#004488>"f3(short)"</font>); }
+  <font color=#0000ff>void</font> f3(<font color=#0000ff>int</font> x) { System.out.println(<font color=#004488>"f3(int)"</font>); }
+  <font color=#0000ff>void</font> f3(<font color=#0000ff>long</font> x) { System.out.println(<font color=#004488>"f3(long)"</font>); }
+
+  <font color=#0000ff>void</font> f4(<font color=#0000ff>char</font> x) { System.out.println(<font color=#004488>"f4(char)"</font>); }
+  <font color=#0000ff>void</font> f4(<font color=#0000ff>byte</font> x) { System.out.println(<font color=#004488>"f4(byte)"</font>); }
+  <font color=#0000ff>void</font> f4(<font color=#0000ff>short</font> x) { System.out.println(<font color=#004488>"f4(short)"</font>); }
+  <font color=#0000ff>void</font> f4(<font color=#0000ff>int</font> x) { System.out.println(<font color=#004488>"f4(int)"</font>); }
+
+  <font color=#0000ff>void</font> f5(<font color=#0000ff>char</font> x) { System.out.println(<font color=#004488>"f5(char)"</font>); }
+  <font color=#0000ff>void</font> f5(<font color=#0000ff>byte</font> x) { System.out.println(<font color=#004488>"f5(byte)"</font>); }
+  <font color=#0000ff>void</font> f5(<font color=#0000ff>short</font> x) { System.out.println(<font color=#004488>"f5(short)"</font>); }
+
+  <font color=#0000ff>void</font> f6(<font color=#0000ff>char</font> x) { System.out.println(<font color=#004488>"f6(char)"</font>); }
+  <font color=#0000ff>void</font> f6(<font color=#0000ff>byte</font> x) { System.out.println(<font color=#004488>"f6(byte)"</font>); }
+
+  <font color=#0000ff>void</font> f7(<font color=#0000ff>char</font> x) { System.out.println(<font color=#004488>"f7(char)"</font>); }
+
+  <font color=#0000ff>void</font> testDouble() {
+    <font color=#0000ff>double</font> x = 0;
+    System.out.println(<font color=#004488>"double argument:"</font>);
+    f1(x);f2((<font color=#0000ff>float</font>)x);f3((<font color=#0000ff>long</font>)x);f4((<font color=#0000ff>int</font>)x);
+    f5((<font color=#0000ff>short</font>)x);f6((<font color=#0000ff>byte</font>)x);f7((<font color=#0000ff>char</font>)x);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Demotion p = <font color=#0000ff>new</font> Demotion();
+    p.testDouble();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"double argument:"</font>,
+      <font color=#004488>"f1(double)"</font>,
+      <font color=#004488>"f2(float)"</font>,
+      <font color=#004488>"f3(long)"</font>,
+      <font color=#004488>"f4(int)"</font>,
+      <font color=#004488>"f5(short)"</font>,
+      <font color=#004488>"f6(byte)"</font>,
+      <font color=#004488>"f7(char)"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Here, the methods take narrower primitive values. If your argument is wider, then you must <a name="Index340"></a><i>cast</i> to the necessary type by placing the type name inside parentheses. If you don&#146;t do this, the compiler will issue an error message. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_670" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You should be aware that this is a <a name="Index341"></a><a name="Index342"></a><i>narrowing conversion,</i> which means you might lose information during the cast. This is why the compiler forces you to do it&#151;to flag the narrowing conversion. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_671" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775604"></a><a name="Heading3747"></a>Overloading on return
+values<br></h3>
+<p><a name="Index343"></a><a name="Index344"></a>It is common to wonder &#147;Why only class names and method argument lists? Why not distinguish between methods based on their return values?&#148; For example, these two methods, which have the same name and arguments, are easily distinguished from each other: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_672" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>void</font> f() {}
+<font color=#0000ff>int</font> f() {}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This works fine when the compiler can unequivocally determine the meaning from the context, as in <b>int x = f(&#160;)</b>. However, you can also call a method and ignore the return value. This is often referred to as <i>calling a method for its </i><a name="Index345"></a><i>side effect</i>, since you don&#146;t care about the return value, but instead want the other effects of the method call. So if you call the method this way: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_673" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>f();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>how can Java determine which <b>f(&#160;)</b> should be called? And how could someone reading the code see it? Because of this sort of problem, you cannot use return value types to distinguish overloaded methods. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_674" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545279"></a><a name="_Toc24775605"></a><a name="Heading3756"></a>Default
+constructors</h3>
+<p>As mentioned previously, a default constructor (a.k.a. a &#147;no-arg&#148; constructor) is one without arguments that is used to create a &#147;basic object.&#148; If you create a class that has no constructors, the compiler will automatically create a default constructor for you. For example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_675" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:DefaultConstructor.java</font>
+
+<font color=#0000ff>class</font> Bird {
+  <font color=#0000ff>int</font> i;
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> DefaultConstructor {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Bird nc = <font color=#0000ff>new</font> Bird(); <font color=#009900>// Default!</font>
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The line <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_676" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>new</font> Bird();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>creates a new object and calls the default constructor, even though one was not explicitly defined. Without it, we would have no method to call to build our object. However, if you define any constructors (with or without arguments), the compiler will <i>not</i> synthesize one for you: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_677" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> Hat {
+  Hat(<font color=#0000ff>int</font> i) {}
+  Hat(<font color=#0000ff>double</font> d) {}
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Now if you say: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_678" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>new</font> Hat();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>the compiler will complain that it cannot find a constructor that matches. It&#146;s as if when you don&#146;t put in any constructors, the compiler says &#147;You are bound to need <i>some</i> constructor, so let me make one for you.&#148; But if you write a constructor, the compiler says &#147;You&#146;ve written a constructor so you know what you&#146;re doing; if you didn&#146;t put in a default it&#146;s because you meant to leave it out.&#148; <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_679" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545280"></a><a name="_Toc24775606"></a><a name="Heading3783"></a>The
+<a name="Index348"></a><b>this </b>keyword</h3>
+<p>If you have two objects of the same type called <b>a</b> and <b>b</b>, you might wonder how it is that you can call a method <b>f(&#160;)</b> for both those objects: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_680" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> Banana { <font color=#0000ff>void</font> f(<font color=#0000ff>int</font> i) { <font color=#009900>/* ... */</font> } }
+Banana a = <font color=#0000ff>new</font> Banana(), b = <font color=#0000ff>new</font> Banana();
+a.f(1);
+b.f(2);</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>If there&#146;s only one method called <b>f(&#160;)</b>, how can that method know whether it&#146;s being called for the object <b>a</b> or <b>b</b>? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_681" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To allow you to write the code in a convenient object-oriented syntax in which you &#147;send a message to an object,&#148; the compiler does some undercover work for you. There&#146;s a secret first argument passed to the method <b>f(&#160;)</b>, and that argument is the reference to the object that&#146;s being manipulated. So the two method calls become something like: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_682" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>Banana.f(a,1);
+Banana.f(b,2);</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This is internal and you can&#146;t write these expressions and get the compiler to accept them, but it gives you an idea of what&#146;s happening. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_683" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Suppose you&#146;re inside a method and you&#146;d like to get the reference to the current object. Since that reference is passed <i>secretly</i> by the compiler, there&#146;s no identifier for it. However, for this purpose there&#146;s a keyword: <b>this</b>. The <b>this</b> keyword&#151;which can be used only inside a method&#151;produces the reference to the object the method has been called for. You can treat this reference just like any other object reference. Keep in mind that if you&#146;re calling a method of your class from within another method of your class, you don&#146;t need to use <b>this</b>. You simply call the method. The current <b>this</b> reference is automatically used for the other method. Thus you can say: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_684" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> Apricot {
+  <font color=#0000ff>void</font> pick() { <font color=#009900>/* ... */</font> }
+  <font color=#0000ff>void</font> pit() { pick(); <font color=#009900>/* ... */</font> }
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Inside <b>pit(&#160;)</b>, you <i>could</i> say <b>this.pick(&#160;)</b> but there&#146;s no need to.<sup><a name="fnB20" href="#fn20">[20]</a></sup> The compiler does it for you automatically. The <b>this</b> keyword is used only for those special cases in which you need to explicitly use the reference to the current object. For example, it&#146;s often used in <b>return</b> statements when you want to return the reference to the current object: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_685" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:Leaf.java</font>
+<font color=#009900>// Simple use of the "this" keyword.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Leaf {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>int</font> i = 0;
+  Leaf increment() {
+    i++;
+    <font color=#0000ff>return</font> <font color=#0000ff>this</font>;
+  }
+  <font color=#0000ff>void</font> print() {
+    System.out.println(<font color=#004488>"i = "</font> + i);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Leaf x = <font color=#0000ff>new</font> Leaf();
+    x.increment().increment().increment().print();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"i = 3"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Because <b>increment(&#160;)</b> returns the reference to the current object via the <b>this</b> keyword, multiple operations can easily be performed on the same object. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_686" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading3828"></a>Calling constructors from constructors<br></h4>
+<p><a name="Index349"></a>When you write several constructors for a class, there are times when you&#146;d like to call one constructor from another to avoid duplicating code. You can make such a call by by using the <b>this</b> keyword. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_687" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Normally, when you say <b>this</b>, it is in the sense of &#147;this object&#148; or &#147;the current object,&#148; and by itself it produces the reference to the current object. In a constructor, the <b>this</b> keyword takes on a different meaning when you give it an argument list. It makes an explicit call to the constructor that matches that argument list. Thus you have a straightforward way to call other constructors: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_688" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:Flower.java</font>
+<font color=#009900>// Calling constructors with "this."</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Flower {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>int</font> petalCount = 0;
+  String s = <font color=#0000ff>new</font> String(<font color=#004488>"null"</font>);
+  Flower(<font color=#0000ff>int</font> petals) {
+    petalCount = petals;
+    System.out.println(
+      <font color=#004488>"Constructor w</font><font color=#004488>/ int arg only, petalCount= "</font>
+      + petalCount);
+  }
+  Flower(String ss) {
+    System.out.println(
+      <font color=#004488>"Constructor w</font><font color=#004488>/ String arg only, s="</font> + ss);
+    s = ss;
+  }
+  Flower(String s, <font color=#0000ff>int</font> petals) {
+    <font color=#0000ff>this</font>(petals);
+<font color=#009900>//!    this(s); // Can't call two!</font>
+    <font color=#0000ff>this</font>.s = s; <font color=#009900>// Another use of "this"</font>
+    System.out.println(<font color=#004488>"String &amp; int args"</font>);
+  }
+  Flower() {
+    <font color=#0000ff>this</font>(<font color=#004488>"hi"</font>, 47);
+    System.out.println(<font color=#004488>"default constructor (no args)"</font>);
+  }
+  <font color=#0000ff>void</font> print() {
+<font color=#009900>//! this(11); // Not inside non-constructor!</font>
+    System.out.println(
+      <font color=#004488>"petalCount = "</font> + petalCount + <font color=#004488>" s = "</font>+ s);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Flower x = <font color=#0000ff>new</font> Flower();
+    x.print();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Constructor w</font><font color=#004488>/ int arg only, petalCount= 47"</font>,
+      <font color=#004488>"String &amp; int args"</font>,
+      <font color=#004488>"default constructor (no args)"</font>,
+      <font color=#004488>"petalCount = 47 s = hi"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The constructor <b>Flower(String s, int petals)</b> shows that, while you can call one constructor using <b>this</b>, you cannot call two. In addition, the constructor call must be the first thing you do, or you&#146;ll get a compiler error message. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_689" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This example also shows another way you&#146;ll see <b>this</b> used. Since the name of the argument <b>s </b>and the name of the member data <b>s</b> are the same, there&#146;s an ambiguity. You can resolve it using <b>this.s</b>, to say that you&#146;re referring to the member data. You&#146;ll often see this form used in Java code, and it&#146;s used in numerous places in this book. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_690" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In <b>print(&#160;)</b> you can see that the compiler won&#146;t let you call a constructor from inside any method other than a constructor. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_691" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading3880"></a>The meaning of <b>static</b><br></h4>
+<p><a name="Index350"></a>With the <b>this </b>keyword in mind, you can more fully understand what it means to make a <a name="Index351"></a><a name="Index352"></a>method <b>static</b>. It means that there is no <b>this</b> for that particular method. You cannot call non-<b>static</b> methods from inside <b>static</b> methods<sup><a name="fnB21" href="#fn21">[21]</a></sup> (although the reverse is possible), and you can call a <b>static</b> method for the class itself, without any object. In fact, that&#146;s primarily what a <b>static</b> method is for. It&#146;s as if you&#146;re creating the equivalent of a global function (from C). However, global functions are not permitted in Java, and putting the <b>static</b> method inside a class allows it access to other <b>static </b>methods and to <b>static</b> fields. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_692" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Some people argue that <b>static</b> methods are not object-oriented, since they do have the semantics of a global function; with a <b>static</b> method, you don&#146;t send a message to an object, since there&#146;s no <b>this</b>. This is probably a fair argument, and if you find yourself using a <i>lot</i> of static methods, you should probably rethink your strategy. However, <b>static</b>s are pragmatic, and there are times when you genuinely need them, so whether or not they are &#147;proper OOP&#148; should be left to the theoreticians. Indeed, even Smalltalk has the equivalent in its &#147;class methods.&#148;<a name="Index353"></a><i> </i><font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_693" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545281"></a><a name="_Toc24775607"></a><a name="Heading3884"></a>Cleanup:
+finalization and <br>garbage collection</h2>
+<p>Programmers know about the importance of initialization, but often forget the importance of cleanup. After all, who needs to clean up an <b>int</b>? But with libraries, simply &#147;letting go&#148; of an object once you&#146;re done with it is not always safe. Of course, Java has the garbage collector to reclaim the memory of objects that are no longer used. Now consider an unusual case: suppose your object allocates &#147;special&#148; memory without using <a name="Index354"></a><a name="Index355"></a><b>new</b>. The garbage collector only knows how to release memory allocated <i>with</i> <b>new</b>, so it won&#146;t know how to release the object&#146;s &#147;special&#148; memory. To handle this case, Java provides a method called <a name="Index356"></a><b>finalize(&#160;)</b> that you can define for your class. Here&#146;s how it&#146;s <i>supposed</i> to work. When the garbage collector is ready to release the storage used for your object, it will first call <b>finalize(&#160;)</b>, and only on the next garbage-collection pass will it reclaim the object&#146;s memory. So if you choose to use <b>finalize(&#160;)</b>, it gives you the ability to perform some important cleanup <i>at the time of garbage collection</i>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_694" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This is a potential programming pitfall because some programmers, especially C++ programmers, might initially mistake <b>finalize(&#160;)</b> for the <a name="Index357"></a><i>destructor</i> in C++, which is a function that is always called when an object is destroyed. But it is important to distinguish between C++ and Java here, because in C++, <i>objects always get destroyed</i> (in a bug-free program), whereas in Java, objects do not always get garbage collected. Or, put another way: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_695" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p class="makeapoint"><i>1. Your objects might not get garbage collected.</i><br></p>
+<p class="makeapoint"><i>2. Garbage collection is not destruction.</i><br></p>
+<p>If you remember this, you will stay out of trouble. What it means is that if there is some activity that must be performed before you no longer need an object, you must perform that activity yourself. Java has no destructor or similar concept, so you must create an ordinary method to perform this cleanup. For example, suppose that in the process of creating your object, it draws itself on the screen. If you don&#146;t explicitly erase its image from the screen, it might never get cleaned up. If you put some kind of erasing functionality inside <b>finalize(&#160;)</b>, then if an object is garbage collected and <b>finalize(&#160;)</b> is called (there&#146;s no guarantee this will happen), then the image will first be removed from the screen, but if it isn&#146;t, the image will remain. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_696" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You might find that the storage for an object never gets released because your program never nears the point of running out of storage. If your program completes and the garbage collector never gets around to releasing the storage for any of your objects, that storage will be returned to the operating system <i>en masse</i> as the program exits. This is a good thing, because garbage collection has some overhead, and if you never do, it you never incur that expense. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_697" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545282"></a><a name="_Toc24775608"></a><a name="Heading3891"></a>What
+is <b>finalize(&#160;)</b> for?</h3>
+<p>So, if you should not use <b>finalize(&#160;)</b> as a general-purpose cleanup method, what good is it? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_698" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A third point to remember is:<br></p>
+<p class="makeapoint"><i>3. Garbage collection is only about memory.</i><br></p>
+<p>That is, the sole reason for the existence of the garbage collector is to recover memory that your program is no longer using. So any activity that is associated with garbage collection, most notably your <b>finalize(&#160;)</b> method, must also be only about memory and its deallocation. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_699" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Does this mean that if your object contains other objects, <b>finalize(&#160;)</b> should explicitly release those objects? Well, no&#151;the garbage collector takes care of the release of all object memory regardless of how the object is created. It turns out that the need for <b>finalize(&#160;)</b> is limited to special cases in which your object can allocate some storage in some way other than creating an object. But, you might observe, everything in Java is an object, so how can this be? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_700" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>It would seem that <b>finalize(&#160;)</b> is in place because of the possibility that you&#146;ll do something C-like by allocating memory using a mechanism other than the normal one in Java. This can happen primarily through <i>native methods</i>, which are a way to call non-Java code from Java. (Native methods are covered in Appendix B in the electronic 2<sup>nd</sup> edition of this book, available on this book&#146;s CD ROM and at www.BruceEckel.com.) C and C++ are the only languages currently supported by native methods, but since they can call subprograms in other languages, you can effectively call anything. Inside the non-Java code, C&#146;s <b>malloc(&#160;)</b> family of functions might be called to allocate storage, and unless you call <b>free(&#160;)</b>, that storage will not be released, causing a memory leak. Of course, <b>free(&#160;)</b> is a C and C++ function, so you&#146;d need to call it in a native method inside your <b>finalize(&#160;)</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_701" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>After reading this, you probably get the idea that you won&#146;t use <b>finalize(&#160;)</b> much.<sup><a name="fnB22" href="#fn22">[22]</a></sup> You&#146;re correct; it is not the appropriate place for normal cleanup to occur. So where should normal cleanup be performed? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_702" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc312373857"></a><a name="_Toc375545283"></a><a name="_Toc24775609"></a><a name="Heading3900"></a>You
+must perform cleanup</h3>
+<p>To clean up an object, the user of that object must call a cleanup method at the point the cleanup is desired. This sounds pretty straightforward, but it collides a bit with the C++ concept of the destructor. In C++, all objects are destroyed. Or rather, all objects <a name="Index358"></a><a name="Index359"></a><i>should be</i> destroyed. If the C++ object is created as a local (i.e., on the stack&#151;not possible in Java), then the destruction happens at the closing curly brace of the scope in which the object was created. If the object was created using <b>new</b> (like in Java), the destructor is called when the programmer calls the C++ operator <b>delete</b> (which doesn&#146;t exist in Java). If the C++ programmer forgets to call <b>delete</b>, the destructor is never called, and you have a memory leak, plus the other parts of the object never get cleaned up. This kind of bug can be very difficult to track down, and is one of the compelling reasons to move from C++ to Java. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_703" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In contrast, Java doesn&#146;t allow you to create local objects&#151;you must always use <b>new</b>. But in Java, there&#146;s no &#147;delete&#148; to call to release the object, because the garbage collector releases the storage for you. So from a simplistic standpoint, you could say that because of garbage collection, Java has no destructor. You&#146;ll see as this book progresses, however, that the presence of a garbage collector does not remove the need for or utility of destructors. (And you should never call <a name="Index360"></a><a name="Index361"></a><b>finalize(&#160;)</b> directly, so that&#146;s not an appropriate avenue for a solution.) If you want some kind of cleanup performed other than storage release, you must <i>still</i> explicitly call an appropriate method in Java, which is the equivalent of a C++ destructor without the convenience. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_704" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Remember that neither garbage collection nor finalization is guaranteed. If the JVM isn&#146;t close to running out of memory, then it might not waste time recovering memory through garbage collection. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_714" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775610"></a><a name="Heading3904"></a>The termination
+condition<br></h3>
+<p><a name="Index362"></a><a name="Index363"></a>In general, you can&#146;t rely on <b>finalize(&#160;) </b>being called, and you must create separate &#147;cleanup&#148; methods and call them explicitly. So it appears that <b>finalize(&#160;)</b> is only useful for obscure memory cleanup that most programmers will never use. However, there is a very interesting use of <b>finalize(&#160;)</b> that does not rely on it being called every time. This is the verification of the <i>termination condition</i><sup><a name="fnB23" href="#fn23">[23]</a></sup> of an object. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_715" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>At the point that you&#146;re no longer interested in an object&#151;when it&#146;s ready to be cleaned up&#151;that object should be in a state whereby its memory can be safely released. For example, if the object represents an open file, that file should be closed by the programmer before the object is garbage collected. If any portions of the object are not properly cleaned up, then you have a bug in your program that could be very difficult to find. The value of <b>finalize(&#160;)</b> is that it can be used to eventually discover this condition, even if it isn&#146;t always called. If one of the finalizations happens to reveal the bug, then you discover the problem, which is all you really care about. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_716" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Here&#146;s a simple example of how you might use it:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:TerminationCondition.java</font>
+<font color=#009900>// Using finalize() to detect an object that</font>
+<font color=#009900>// hasn't been properly cleaned up.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Book {
+  <font color=#0000ff>boolean</font> checkedOut = <font color=#0000ff>false</font>;
+  Book(<font color=#0000ff>boolean</font> checkOut) {
+    checkedOut = checkOut;
+  }
+  <font color=#0000ff>void</font> checkIn() {
+    checkedOut = <font color=#0000ff>false</font>;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> finalize() {
+    <font color=#0000ff>if</font>(checkedOut)
+      System.out.println(<font color=#004488>"Error: checked out"</font>);
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> TerminationCondition {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Book novel = <font color=#0000ff>new</font> Book(<font color=#0000ff>true</font>);
+    <font color=#009900>// Proper cleanup:</font>
+    novel.checkIn();
+    <font color=#009900>// Drop the reference, forget to clean up:</font>
+    <font color=#0000ff>new</font> Book(<font color=#0000ff>true</font>);
+    <font color=#009900>// Force garbage collection &amp; finalization:</font>
+    System.gc();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Error: checked out"</font>}, Test.WAIT);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The termination condition is that all <b>Book</b> objects are supposed to be checked in before they are garbage collected, but in <b>main(&#160;)</b>, a programmer error doesn&#146;t check in one of the books. Without <b>finalize(&#160;)</b> to verify the termination condition, this could be a difficult bug to find. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_717" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Note that <b>System.gc(&#160;)</b> is used to force finalization (and you should do this during program development to speed debugging). But even if it isn&#146;t, it&#146;s highly probable that the errant <b>Book</b> will eventually be discovered through repeated executions of the program (assuming the program allocates enough storage to cause the garbage collector to execute). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_718" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775611"></a><a name="Heading3945"></a>How a garbage collector
+works<br></h3>
+<p><a name="Index364"></a>If you come from a programming language where allocating objects on the heap is expensive, you may naturally assume that Java&#146;s scheme of allocating everything (except primitives) on the heap is also expensive. However, it turns out that the garbage collector can have a significant impact on <i>increasing</i> the speed of object creation. This might sound a bit odd at first&#151;that storage release affects storage allocation&#151;but it&#146;s the way some JVMs work, and it means that allocating storage for heap objects in Java can be nearly as fast as creating storage on the stack in other languages. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_719" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>For example, you can think of the C++ heap as a yard where each object stakes out its own piece of turf. This real estate can become abandoned sometime later and must be reused. In some JVMs, the Java heap is quite different; it&#146;s more like a conveyor belt that moves forward every time you allocate a new object. This means that object storage allocation is remarkably rapid. The &#147;heap pointer&#148; is simply moved forward into virgin territory, so it&#146;s effectively the same as C++&#146;s stack allocation. (Of course, there&#146;s a little extra overhead for bookkeeping, but it&#146;s nothing like searching for storage.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_720" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Now you might observe that the heap isn&#146;t in fact a conveyor belt, and if you treat it that way, you&#146;ll eventually start paging memory a lot (which is a big performance hit) and later run out. The trick is that the garbage collector steps in, and while it collects the garbage it compacts all the objects in the heap so that you&#146;ve effectively moved the &#147;heap pointer&#148; closer to the beginning of the conveyor belt and farther away from a page fault. The garbage collector rearranges things and makes it possible for the high-speed, infinite-free-heap model to be used while allocating storage. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_721" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To understand how this works, you need to get a little better idea of the way different garbage collector (GC) schemes work. A simple but slow garbage collection technique is is called <a name="Index365"></a><i>reference counting</i>. This means that each object contains a reference counter, and every time a reference is attached to an object, the reference count is increased. Every time a reference goes out of scope or is set to <b>null</b>, the reference count is decreased. Thus, managing reference counts is a small but constant overhead that happens throughout the lifetime of your program. The garbage collector moves through the entire list of objects, and when it finds one with a reference count of zero it releases that storage. The one drawback is that if objects circularly refer to each other they can have nonzero reference counts while still being garbage. Locating such self-referential groups requires significant extra work for the garbage collector. Reference counting is commonly used to explain one kind of garbage collection, but it doesn&#146;t seem to be used in any JVM implementations. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_722" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In faster schemes, garbage collection is not based on reference counting. Instead, it is based on the idea that any nondead object must ultimately be traceable back to a reference that lives either on the stack or in static storage. The chain might go through several layers of objects. Thus, if you start in the stack and the static storage area and walk through all the references, you&#146;ll find all the live objects. For each reference that you find, you must trace into the object that it points to and then follow all the references in <i>that</i> object, tracing into the objects they point to, etc., until you&#146;ve moved through the entire web that originated with the reference on the stack or in static storage. Each object that you move through must still be alive. Note that there is no problem with detached self-referential groups&#151;these are simply not found, and are therefore automatically garbage. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_723" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In the approach described here, the JVM uses an <i>adaptive </i>garbage-collection scheme, and what it does with the live objects that it locates depends on the variant currently being used. One of these variants is <i>stop-and-copy</i>. This means that&#151;for reasons that will become apparent&#151;the program is first stopped (this is not a background collection scheme). Then, each live object that is found is copied from one heap to another, leaving behind all the garbage. In addition, as the objects are copied into the new heap, they are packed end-to-end, thus compacting the new heap (and allowing new storage to simply be reeled off the end as previously described). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_724" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Of course, when an object is moved from one place to another, all references that point at (i.e., that <i>reference</i>) the object must be changed. The reference that goes from the heap or the static storage area to the object can be changed right away, but there can be other references pointing to this object that will be encountered later during the &#147;walk.&#148; These are fixed up as they are found (you could imagine a table that maps old addresses to new ones). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_725" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There are two issues that make these so-called &#147;copy collectors&#148; inefficient. The first is the idea that you have two heaps and you slosh all the memory back and forth between these two separate heaps, maintaining twice as much memory as you actually need. Some JVMs deal with this by allocating the heap in chunks as needed and simply copying from one chunk to another. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_726" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The second issue is the copying. Once your program becomes stable, it might be generating little or no garbage. Despite that, a copy collector will still copy all the memory from one place to another, which is wasteful. To prevent this, some JVMs detect that no new garbage is being generated and switch to a different scheme (this is the &#147;adaptive&#148; part). This other scheme is called <i>mark-and-sweep</i>, and it&#146;s what earlier versions of Sun&#146;s JVM used all the time. For general use, mark-and-sweep is fairly slow, but when you know you&#146;re generating little or no garbage, it&#146;s fast. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_727" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Mark-and-sweep follows the same logic of starting from the stack and static storage and tracing through all the references to find live objects. However, each time it finds a live object, that object is marked by setting a flag in it, but the object isn&#146;t collected yet. Only when the marking process is finished does the sweep occur. During the sweep, the dead objects are released. However, no copying happens, so if the collector chooses to compact a fragmented heap, it does so by shuffling objects around. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_728" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The &#147;stop-and-copy&#148; refers to the idea that this type of garbage collection is <i>not</i> done in the background; instead, the program is stopped while the garbage collection occurs. In the Sun literature you&#146;ll find many references to garbage collection as a low-priority background process, but it turns out that the garbage collection was not implemented that way, at least in earlier versions of the Sun JVM. Instead, the Sun garbage collector ran when memory got low. In addition, mark-and-sweep requires that the program be stopped. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_729" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As previously mentioned, in the JVM described here memory is allocated in big blocks. If you allocate a large object, it gets its own block. Strict stop-and-copy requires copying every live object from the source heap to a new heap before you could free the old one, which translates to lots of memory. With blocks, the garbage collection can typically copy objects to dead blocks as it collects. Each block has a <i>generation count</i> to keep track of whether it&#146;s alive. In the normal case, only the blocks created since the last garbage collection are compacted; all other blocks get their generation count bumped if they have been referenced from somewhere. This handles the normal case of lots of short-lived temporary objects. Periodically, a full sweep is made&#151;large objects are still not copied (they just get their generation count bumped), and blocks containing small objects are copied and compacted. The JVM monitors the efficiency of garbage collection and if it becomes a waste of time because all objects are long-lived, then it switches to mark-and-sweep. Similarly, the JVM keeps track of how successful mark-and-sweep is, and if the heap starts to become fragmented, it switches back to stop-and-copy. This is where the &#147;adaptive&#148; part comes in, so you end up with a mouthful: &#147;Adaptive generational stop-and-copy mark-and-sweep.&#148; <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_730" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There are a number of additional speedups possible in a JVM. An especially important one involves the operation of the loader and what is called a <i>just-in-time</i> (JIT) compiler. A JIT compiler partially or fully converts a program into native machine code so that it doesn&#146;t need to be interpreted by the JVM and thus runs much faster. When a class must be loaded (typically, the first time you want to create an object of that class), the <a name="Index366"></a><b>.class</b> file is located, and the byte codes for that class are brought into memory. At this point, one approach is to simply JIT compile all the code, but this has two drawbacks: it takes a little more time, which, compounded throughout the life of the program, can add up; and it increases the size of the executable (byte codes are significantly more compact than expanded JIT code), and this might cause paging, which definitely slows down a program. An alternative approach is <i>lazy evaluation,</i> which means that the code is not JIT compiled until necessary. Thus, code that never gets executed might never be JIT compiled. The Java HotSpot technologies in recent JDKs take a similar approach by increasingly optimizing a piece of code each time it is executed, so the more the code is executed, the faster it gets. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_731" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545284"></a><a name="_Toc24775612"></a><a name="Heading3959"></a>Member
+initialization</h2>
+<p>Java goes out of its way to guarantee that variables are properly initialized before they are used. In the case of variables that are defined locally to a method, this guarantee comes in the form of a compile-time error. So if you say: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_732" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>  <font color=#0000ff>void</font> f() {
+    <font color=#0000ff>int</font> i;
+    i++; <font color=#009900>// Error -- i not initialized</font>
+  }</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>you&#146;ll get an error message that says that <b>i</b> might not have been initialized. Of course, the compiler could have given <b>i</b> a default value, but it&#146;s more likely that this is a programmer error and a default value would have covered that up. Forcing the programmer to provide an initialization value is more likely to catch a bug. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_733" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index367"></a><a name="Index368"></a><a name="Index369"></a>If a primitive is a field in a class, however, things are a bit different. Since any method can initialize or use that data, it might not be practical to force the user to initialize it to its appropriate value before the data is used. However, it&#146;s unsafe to leave it with a garbage value, so each primitive field of a class is guaranteed to get an initial value. Those values can be seen here: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_734" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:InitialValues.java</font>
+<font color=#009900>// Shows default initial values.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> InitialValues {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>boolean</font> t;
+  <font color=#0000ff>char</font> c;
+  <font color=#0000ff>byte</font> b;
+  <font color=#0000ff>short</font> s;
+  <font color=#0000ff>int</font> i;
+  <font color=#0000ff>long</font> l;
+  <font color=#0000ff>float</font> f;
+  <font color=#0000ff>double</font> d;
+  <font color=#0000ff>void</font> print(String s) { System.out.println(s); }
+  <font color=#0000ff>void</font> printInitialValues() {
+    print(<font color=#004488>"Data type      Initial value"</font>);
+    print(<font color=#004488>"boolean        "</font> + t);
+    print(<font color=#004488>"char           ["</font> + c + <font color=#004488>"]"</font>);
+    print(<font color=#004488>"byte           "</font> + b);
+    print(<font color=#004488>"short          "</font> + s);
+    print(<font color=#004488>"int            "</font> + i);
+    print(<font color=#004488>"long           "</font> + l);
+    print(<font color=#004488>"float          "</font> + f);
+    print(<font color=#004488>"double         "</font> + d);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    InitialValues iv = <font color=#0000ff>new</font> InitialValues();
+    iv.printInitialValues();
+    <font color=#009900>/* You could also say:
+    new InitialValues().printInitialValues();
+    */</font>
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Data type      Initial value"</font>,
+      <font color=#004488>"boolean        false"</font>,
+      <font color=#004488>"char           ["</font> + (<font color=#0000ff>char</font>)0 + <font color=#004488>"]"</font>,
+      <font color=#004488>"byte           0"</font>,
+      <font color=#004488>"short          0"</font>,
+      <font color=#004488>"int            0"</font>,
+      <font color=#004488>"long           0"</font>,
+      <font color=#004488>"float          0.0"</font>,
+      <font color=#004488>"double         0.0"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that even though the values are not specified, they automatically get initialized (The <b>char</b> value is a zero, which prints as a space). So at least there&#146;s no threat of working with uninitialized variables. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_735" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You&#146;ll see later that when you define an object reference inside a class without initializing it to a new object, that reference is given a special value of <b>null</b> (which is a Java keyword). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_736" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545285"></a><a name="_Toc24775613"></a><a name="Heading4016"></a>Specifying
+initialization</h3>
+<p>What happens if you want to give a variable an initial value? One direct way to do this is simply to assign the value at the point you define the variable in the class. (Notice you cannot do this in C++, although C++ novices always try.) Here the field definitions in class <b>InitialValues</b> are changed to provide initial values: <br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> InitialValues {
+  <font color=#0000ff>boolean</font> b = <font color=#0000ff>true</font>;
+  <font color=#0000ff>char</font> c = 'x';
+  <font color=#0000ff>byte</font> B = 47;
+  <font color=#0000ff>short</font> s = 0xff;
+  <font color=#0000ff>int</font> i = 999;
+  <font color=#0000ff>long</font> l = 1;
+  <font color=#0000ff>float</font> f = 3.14f;
+  <font color=#0000ff>double</font> d = 3.14159;
+  <font color=#009900>//. . .</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can also initialize nonprimitive objects in this same way. If <b>Depth</b> is a class, you can create a variable and initialize it like so: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_738" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> Measurement {
+  Depth d = <font color=#0000ff>new</font> Depth();
+  <font color=#009900>// . . .</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>If you haven&#146;t given <b>d</b> an initial value and you try to use it anyway, you&#146;ll get a run-time error called an <i>exception</i> (covered in Chapter 9). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_739" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can even call a method to provide an initialization value:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> CInit {
+  <font color=#0000ff>int</font> i = f();
+  <font color=#009900>//...</font>
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This method can have arguments, of course, but those arguments cannot be other class members that haven&#146;t been initialized yet. Thus, you can do this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_740" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> CInit {
+  <font color=#0000ff>int</font> i = f();
+  <font color=#0000ff>int</font> j = g(i);
+  <font color=#009900>//...</font>
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>But you cannot do this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_741" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> CInit {
+  <font color=#0000ff>int</font> j = g(i);
+  <font color=#0000ff>int</font> i = f();
+  <font color=#009900>//...</font>
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This is one place in which the compiler, appropriately, <i>does</i> complain about forward referencing, since this has to do with the order of initialization and not the way the program is compiled. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_742" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index375"></a><a name="Index376"></a>This approach to initialization is simple and straightforward. It has the limitation that <i>every</i> object of type <b>InitialValues</b> will get these same initialization values. Sometimes this is exactly what you need, but at other times you need more flexibility. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_743" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545286"></a><a name="_Toc24775614"></a><a name="Heading4057"></a>Constructor
+initialization</h3>
+<p>The constructor can be used to perform initialization, and this gives you greater flexibility in your programming because you can call methods and perform actions at run time to determine the initial values. There&#146;s one thing to keep in mind, however: You aren&#146;t precluding the automatic initialization, which happens before the constructor is entered. So, for example, if you say:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> Counter {
+  <font color=#0000ff>int</font> i;
+  Counter() { i = 7; }
+  <font color=#009900>// . . .</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>then <b>i </b>will first be initialized to 0, then to 7. This is true with all the primitive types and with object references, including those that are given explicit initialization at the point of definition. For this reason, the compiler doesn&#146;t try to force you to initialize elements in the constructor at any particular place, or before they are used&#151;initialization is already guaranteed.<sup><a name="fnB24" href="#fn24">[24]</a></sup> <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_744" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading4066"></a>Order of initialization<br></h4>
+<p><a name="Index377"></a><a name="Index378"></a><a name="Index379"></a>Within a class, the order of initialization is determined by the order that the variables are defined within the class. The variable definitions may be scattered throughout and in between method definitions, but the variables are initialized before any methods can be called&#151;even the constructor. For example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_745" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:OrderOfInitialization.java</font>
+<font color=#009900>// Demonstrates initialization order.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#009900>// When the constructor is called to create a</font>
+<font color=#009900>// Tag object, you'll see a message:</font>
+<font color=#0000ff>class</font> Tag {
+  Tag(<font color=#0000ff>int</font> marker) {
+    System.out.println(<font color=#004488>"Tag("</font> + marker + <font color=#004488>")"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Card {
+  Tag t1 = <font color=#0000ff>new</font> Tag(1); <font color=#009900>// Before constructor</font>
+  Card() {
+    <font color=#009900>// Indicate we're in the constructor:</font>
+    System.out.println(<font color=#004488>"Card()"</font>);
+    t3 = <font color=#0000ff>new</font> Tag(33); <font color=#009900>// Reinitialize t3</font>
+  }
+  Tag t2 = <font color=#0000ff>new</font> Tag(2); <font color=#009900>// After constructor</font>
+  <font color=#0000ff>void</font> f() {
+    System.out.println(<font color=#004488>"f()"</font>);
+  }
+  Tag t3 = <font color=#0000ff>new</font> Tag(3); <font color=#009900>// At end</font>
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> OrderOfInitialization {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Card t = <font color=#0000ff>new</font> Card();
+    t.f(); <font color=#009900>// Shows that construction is done</font>
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Tag(1)"</font>,
+      <font color=#004488>"Tag(2)"</font>,
+      <font color=#004488>"Tag(3)"</font>,
+      <font color=#004488>"Card()"</font>,
+      <font color=#004488>"Tag(33)"</font>,
+      <font color=#004488>"f()"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In <b>Card</b>, the definitions of the <b>Tag</b> objects are intentionally scattered about to prove that they&#146;ll all get initialized before the constructor is entered or anything else can happen. In addition, <b>t3</b> is reinitialized inside the constructor. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_746" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>From the output, you can see that, the <b>t3</b> reference gets initialized twice: once before and once during the constructor call. (The first object is dropped, so it can be garbage collected later.) This might not seem efficient at first, but it guarantees proper initialization&#151;what would happen if an overloaded constructor were defined that did <i>not</i> initialize <b>t3</b> and there wasn&#146;t a &#147;default&#148; initialization for <b>t3</b> in its definition? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_747" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading4112"></a>Static data initialization</h4>
+<p>When the data is <a name="Index380"></a><a name="Index381"></a><b>static</b>, the same thing happens; if it&#146;s a primitive and you don&#146;t initialize it, it gets the standard primitive initial values. If it&#146;s a reference to an object, it&#146;s <b>null</b> unless you create a new object and attach your reference to it. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_748" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you want to place initialization at the point of definition, it looks the same as for non-<b>static</b>s. There&#146;s only a single piece of storage for a <b>static</b>, regardless of how many objects are created. But the question arises of when the <b>static</b> storage gets initialized. An example makes this question clear: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_749" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:StaticInitialization.java</font>
+<font color=#009900>// Specifying initial values in a class definition.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Bowl {
+  Bowl(<font color=#0000ff>int</font> marker) {
+    System.out.println(<font color=#004488>"Bowl("</font> + marker + <font color=#004488>")"</font>);
+  }
+  <font color=#0000ff>void</font> f(<font color=#0000ff>int</font> marker) {
+    System.out.println(<font color=#004488>"f("</font> + marker + <font color=#004488>")"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Table {
+  <font color=#0000ff>static</font> Bowl b1 = <font color=#0000ff>new</font> Bowl(1);
+  Table() {
+    System.out.println(<font color=#004488>"Table()"</font>);
+    b2.f(1);
+  }
+  <font color=#0000ff>void</font> f2(<font color=#0000ff>int</font> marker) {
+    System.out.println(<font color=#004488>"f2("</font> + marker + <font color=#004488>")"</font>);
+  }
+  <font color=#0000ff>static</font> Bowl b2 = <font color=#0000ff>new</font> Bowl(2);
+}
+
+<font color=#0000ff>class</font> Cupboard {
+  Bowl b3 = <font color=#0000ff>new</font> Bowl(3);
+  <font color=#0000ff>static</font> Bowl b4 = <font color=#0000ff>new</font> Bowl(4);
+  Cupboard() {
+    System.out.println(<font color=#004488>"Cupboard()"</font>);
+    b4.f(2);
+  }
+  <font color=#0000ff>void</font> f3(<font color=#0000ff>int</font> marker) {
+    System.out.println(<font color=#004488>"f3("</font> + marker + <font color=#004488>")"</font>);
+  }
+  <font color=#0000ff>static</font> Bowl b5 = <font color=#0000ff>new</font> Bowl(5);
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> StaticInitialization {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    System.out.println(<font color=#004488>"Creating new Cupboard() in main"</font>);
+    <font color=#0000ff>new</font> Cupboard();
+    System.out.println(<font color=#004488>"Creating new Cupboard() in main"</font>);
+    <font color=#0000ff>new</font> Cupboard();
+    t2.f2(1);
+    t3.f3(1);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Bowl(1)"</font>,
+      <font color=#004488>"Bowl(2)"</font>,
+      <font color=#004488>"Table()"</font>,
+      <font color=#004488>"f(1)"</font>,
+      <font color=#004488>"Bowl(4)"</font>,
+      <font color=#004488>"Bowl(5)"</font>,
+      <font color=#004488>"Bowl(3)"</font>,
+      <font color=#004488>"Cupboard()"</font>,
+      <font color=#004488>"f(2)"</font>,
+      <font color=#004488>"Creating new Cupboard() in main"</font>,
+      <font color=#004488>"Bowl(3)"</font>,
+      <font color=#004488>"Cupboard()"</font>,
+      <font color=#004488>"f(2)"</font>,
+      <font color=#004488>"Creating new Cupboard() in main"</font>,
+      <font color=#004488>"Bowl(3)"</font>,
+      <font color=#004488>"Cupboard()"</font>,
+      <font color=#004488>"f(2)"</font>,
+      <font color=#004488>"f2(1)"</font>,
+      <font color=#004488>"f3(1)"</font>
+    });
+  }
+  <font color=#0000ff>static</font> Table t2 = <font color=#0000ff>new</font> Table();
+  <font color=#0000ff>static</font> Cupboard t3 = <font color=#0000ff>new</font> Cupboard();
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><b>Bowl</b> allows you to view the creation of a class, and <b>Table</b> and <b>Cupboard</b> create <b>static</b> members of <b>Bowl</b> scattered through their class definitions. Note that <b>Cupboard</b> creates a non-<b>static</b> <b>Bowl b3</b> prior to the <b>static</b> definitions. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_750" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>From the output, you can see that the <b>static</b> initialization occurs only if it&#146;s necessary. If you don&#146;t create a <b>Table </b>object and you never refer to <b>Table.b1 </b>or <b>Table.b2</b>, the <b>static Bowl b1 </b>and <b>b2 </b>will never be created. They are initialized only when the <i>first </i><b>Table </b>object is created (or the first <b>static</b> access occurs). After that, the <b>static</b> objects are not reinitialized. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_751" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The order of initialization is <b>static</b>s first, if they haven&#146;t already been initialized by a previous object creation, and then the non-<b>static</b> objects. You can see the evidence of this in the output. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_752" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>It&#146;s helpful to summarize the process of creating an object. Consider a class called <a name="Index382"></a><a name="Index383"></a><b>Dog</b>: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_753" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li>The first time an object of type <b>Dog</b> is created (the constructor is
+actually a <b>static</b> method), <i>or</i> the first time a <b>static</b>
+method or <b>static </b>field of class <b>Dog</b> is accessed, the Java
+interpreter must locate <b>Dog.class</b>, which it does by searching through the
+classpath. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_754" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>As <b>Dog.class</b> is loaded (creating a <b>Class</b> object, which
+you&#146;ll learn about later), all of its <b>static</b> initializers are run.
+Thus, <b>static </b>initialization takes place only once, as the <b>Class</b>
+object is loaded for the first time. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_755" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>When you create a <b>new Dog(&#160;)</b>, the construction process for a
+<b>Dog</b> object first allocates enough storage for a <b>Dog</b> object on the
+heap. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_756" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>This storage is wiped to zero, automatically setting all the primitives in
+that <b>Dog</b> object to their default values (zero for numbers and the
+equivalent for <b>boolean</b> and <b>char</b>) and the references to
+<b>null</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_757" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>Any initializations that occur at the point of field definition are
+executed. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_758" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>Constructors are executed. As you shall see in Chapter 6, this might
+actually involve a fair amount of activity, especially when inheritance is
+involved. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_759" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><h4>
+<a name="Heading4198"></a>Explicit static initialization</h4>
+<p>Java allows you to group other <b>static</b> initializations inside a special &#147;<a name="Index384"></a><a name="Index385"></a><b>static</b> clause&#148; (sometimes called a <a name="Index386"></a><i>static block</i>)<i> </i>in a class. It looks like this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_760" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> Spoon {
+  <font color=#0000ff>static</font> <font color=#0000ff>int</font> i;
+  <font color=#0000ff>static</font> {
+    i = 47;
+  }
+  <font color=#009900>// . . .</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>It appears to be a method, but it&#146;s just the <b>static</b> keyword followed by a block of code. This code, like other <b>static</b> initializations, is executed only once: the first time you make an object of that class <i>or</i> the first time you access a <b>static</b> member of that class (even if you never make an object of that class). For example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_761" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:ExplicitStatic.java</font>
+<font color=#009900>// Explicit static initialization with the "static" clause.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Cup {
+  Cup(<font color=#0000ff>int</font> marker) {
+    System.out.println(<font color=#004488>"Cup("</font> + marker + <font color=#004488>")"</font>);
+  }
+  <font color=#0000ff>void</font> f(<font color=#0000ff>int</font> marker) {
+    System.out.println(<font color=#004488>"f("</font> + marker + <font color=#004488>")"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Cups {
+  <font color=#0000ff>static</font> Cup c1;
+  <font color=#0000ff>static</font> Cup c2;
+  <font color=#0000ff>static</font> {
+    c1 = <font color=#0000ff>new</font> Cup(1);
+    c2 = <font color=#0000ff>new</font> Cup(2);
+  }
+  Cups() {
+    System.out.println(<font color=#004488>"Cups()"</font>);
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ExplicitStatic {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    System.out.println(<font color=#004488>"Inside main()"</font>);
+    Cups.c1.f(99);  <font color=#009900>// (1)</font>
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Inside main()"</font>,
+      <font color=#004488>"Cup(1)"</font>,
+      <font color=#004488>"Cup(2)"</font>,
+      <font color=#004488>"f(99)"</font>
+    });
+  }
+  <font color=#009900>// static Cups x = new Cups();  // (2)</font>
+  <font color=#009900>// static Cups y = new Cups();  // (2)</font>
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>static</b> initializers for <b>Cups</b> run when either the access of the <b>static</b> object <b>c1</b> occurs on the line marked (1), or if line (1) is commented out and the lines marked (2) are uncommented. If both (1) and (2) are commented out, the <b>static</b> initialization for <b>Cups</b> never occurs. Also, it doesn&#146;t matter if one or both of the lines marked (2) are uncommented; the static initialization only occurs once. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_762" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading4250"></a>Non-static instance initialization<br></h4>
+<p><a name="Index387"></a><a name="Index388"></a><a name="Index389"></a>Java provides a similar syntax for initializing non-<b>static</b> variables for each object. Here&#146;s an example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:Mugs.java</font>
+<font color=#009900>// Java "Instance Initialization."</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Mug {
+  Mug(<font color=#0000ff>int</font> marker) {
+    System.out.println(<font color=#004488>"Mug("</font> + marker + <font color=#004488>")"</font>);
+  }
+  <font color=#0000ff>void</font> f(<font color=#0000ff>int</font> marker) {
+    System.out.println(<font color=#004488>"f("</font> + marker + <font color=#004488>")"</font>);
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Mugs {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  Mug c1;
+  Mug c2;
+  {
+    c1 = <font color=#0000ff>new</font> Mug(1);
+    c2 = <font color=#0000ff>new</font> Mug(2);
+    System.out.println(<font color=#004488>"c1 &amp; c2 initialized"</font>);
+  }
+  Mugs() {
+    System.out.println(<font color=#004488>"Mugs()"</font>);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    System.out.println(<font color=#004488>"Inside main()"</font>);
+    Mugs x = <font color=#0000ff>new</font> Mugs();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Inside main()"</font>,
+      <font color=#004488>"Mug(1)"</font>,
+      <font color=#004488>"Mug(2)"</font>,
+      <font color=#004488>"c1 &amp; c2 initialized"</font>,
+      <font color=#004488>"Mugs()"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that the instance initialization clause: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_763" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>  {
+    c1 = <font color=#0000ff>new</font> Mug(1);
+    c2 = <font color=#0000ff>new</font> Mug(2);
+    System.out.println(<font color=#004488>"c1 &amp; c2 initialized"</font>);
+  }</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>looks exactly like the static initialization clause except for the missing <b>static</b> keyword. This syntax is necessary to support the initialization of <i>anonymous inner classes</i> (see Chapter 8). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_764" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc312373861"></a><a name="_Toc375545287"></a><a name="_Toc24775615"></a><a name="Heading4298"></a>Array
+initialization</h2>
+<p>Initializing arrays in C is error-prone and tedious. C++ uses <i>aggregate initialization</i> to make it much safer.<sup><a name="fnB25" href="#fn25">[25]</a></sup> Java has no &#147;aggregates&#148; like C++ does, since everything is an object in Java. It does have arrays, and these are supported with array initialization. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_765" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index390"></a><a name="Index391"></a><a name="Index392"></a>An array is simply a sequence of either objects or primitives that are all the same type and packaged together under one identifier name. Arrays are defined and used with the square-brackets <a name="Index393"></a><a name="Index394"></a><a name="Index395"></a><i>indexing operator</i> <b>[&#160;]</b>. To define an array, you simply follow your type name with empty square brackets: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_766" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>int</font>[] a1;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can also put the square brackets after the identifier to produce exactly the same meaning: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_767" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>int</font> a1[];</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This conforms to expectations from C and C++ programmers. The former style, however, is probably a more sensible syntax, since it says that the type is &#147;an <b>int</b> array.&#148; That style will be used in this book. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_768" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The compiler doesn&#146;t allow you to tell it how big the array is. This brings us back to that issue of &#147;references.&#148; All that you have at this point is a reference to an array, and there&#146;s been no space allocated for the array. To create storage for the array, you must write an initialization expression. For arrays, initialization can appear anywhere in your code, but you can also use a special kind of initialization expression that must occur at the point where the array is created. This special initialization is a set of values surrounded by curly braces. The storage allocation (the equivalent of using <b>new</b>) is taken care of by the compiler in this case. For example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_769" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>int</font>[] a1 = { 1, 2, 3, 4, 5 };</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>So why would you ever define an array reference without an array? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_770" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>int</font>[] a2;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Well, it&#146;s possible to assign one array to another in Java, so you can say: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_771" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>a2 = a1;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>What you&#146;re really doing is copying a reference, as demonstrated here: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_772" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:Arrays.java</font>
+<font color=#009900>// Arrays of primitives.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Arrays {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>int</font>[] a1 = { 1, 2, 3, 4, 5 };
+    <font color=#0000ff>int</font>[] a2;
+    a2 = a1;
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a2.length; i++)
+      a2[i]++;
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a1.length; i++)
+      System.out.println(
+        <font color=#004488>"a1["</font> + i + <font color=#004488>"] = "</font> + a1[i]);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"a1[0] = 2"</font>,
+      <font color=#004488>"a1[1] = 3"</font>,
+      <font color=#004488>"a1[2] = 4"</font>,
+      <font color=#004488>"a1[3] = 5"</font>,
+      <font color=#004488>"a1[4] = 6"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that <b>a1</b> is given an initialization value but <b>a2</b> is not; <b>a2</b> is assigned later&#151;in this case, to another array. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_773" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There&#146;s something new here: All arrays have an intrinsic member (whether they&#146;re arrays of objects or arrays of primitives) that you can query&#151;but not change&#151;to tell you how many elements there are in the array. This member is <b>length</b>. Since arrays in Java, like C and C++, start counting from element zero, the largest element you can index is <a name="Index396"></a><a name="Index397"></a><b>length - 1</b>. If you go out of bounds, C and C++ quietly accept this and allow you to stomp all over your memory, which is the source of many infamous bugs. However, Java protects you against such problems by causing a run-time error (an <a name="Index398"></a><a name="Index399"></a><i>exception</i>, the subject of Chapter 9) if you step out of bounds. Of course, checking every array access costs time and code and there&#146;s no way to turn it off, which means that array accesses might be a source of inefficiency in your program if they occur at a critical juncture. For Internet security and programmer productivity, the Java designers thought that this was a worthwhile trade-off. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_774" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>What if you don&#146;t know how many elements you&#146;re going to need in your array while you&#146;re writing the program? You simply use <b>new</b> to create the elements in the array. Here, <a name="Index400"></a><b>new</b> works even though it&#146;s creating an array of primitives (<b>new</b> won&#146;t create a nonarray primitive): <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_775" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:ArrayNew.java</font>
+<font color=#009900>// Creating arrays with new.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ArrayNew {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>static</font> Random rand = <font color=#0000ff>new</font> Random();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>int</font>[] a;
+    a = <font color=#0000ff>new</font> <font color=#0000ff>int</font>[rand.nextInt(20)];
+    System.out.println(<font color=#004488>"length of a = "</font> + a.length);
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a.length; i++)
+      System.out.println(<font color=#004488>"a["</font> + i + <font color=#004488>"] = "</font> + a[i]);
+    monitor.expect(<font color=#0000ff>new</font> Object[] {
+      <font color=#004488>"%% length of a = \\d+"</font>,
+      <font color=#0000ff>new</font> TestExpression(<font color=#004488>"%% a\\[\\d+\\] = 0"</font>, a.length)
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>expect(&#160;)</b> statement contains something new in this example: the <b>TestExpression</b> class. A <b>TestExpression</b> object takes an expression, either an ordinary string<b> </b>or a regular expression as shown here, and a second integer argument that indicates that the preceding expression will be repeated that many times. <b>TestExpression</b> not only prevents needless duplication in the code, but in this case, it allows the number of repetitions to be determined at run time. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0460" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The size of the array is chosen at random by using the <b>Random.nextInt(&#160;)</b> method, which produces a value from zero to that of its argument. Because of the randomness, it&#146;s clear that array creation is actually happening at run time. In addition, the output of this program shows that array elements of primitive types are automatically initialized to &#147;empty&#148; values. (For numerics and <b>char</b>, this is zero, and for <b>boolean</b>, it&#146;s <b>false</b>.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_776" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Of course, the array could also have been defined and initialized in the same statement:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>int</font>[] a = <font color=#0000ff>new</font> <font color=#0000ff>int</font>[rand.nextInt(20)];</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This is the preferred way to do it, if you can. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0461" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you&#146;re dealing with an array of nonprimitive objects, you must always use <b>new</b>. Here, the reference issue comes up again, because what you create is an array of references. Consider the wrapper type <b>Integer</b><a name="Index401"></a><b>,</b> which is a class and not a primitive: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_777" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:ArrayClassObj.java</font>
+<font color=#009900>// Creating an array of nonprimitive objects.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ArrayClassObj {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>static</font> Random rand = <font color=#0000ff>new</font> Random();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Integer[] a = <font color=#0000ff>new</font> Integer[rand.nextInt(20)];
+    System.out.println(<font color=#004488>"length of a = "</font> + a.length);
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a.length; i++) {
+      a[i] = <font color=#0000ff>new</font> Integer(rand.nextInt(500));
+      System.out.println(<font color=#004488>"a["</font> + i + <font color=#004488>"] = "</font> + a[i]);
+    }
+    monitor.expect(<font color=#0000ff>new</font> Object[] {
+      <font color=#004488>"%% length of a = \\d+"</font>,
+      <font color=#0000ff>new</font> TestExpression(<font color=#004488>"%% a\\[\\d+\\] = \\d+"</font>, a.length)
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Here, even after <b>new</b> is called to create the array: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_778" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>Integer[] a = <font color=#0000ff>new</font> Integer[rand.nextInt(20)];</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>it&#146;s only an array of references, and not until the reference itself is initialized by creating a new <b>Integer</b> object is the initialization complete: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_779" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>a[i] = <font color=#0000ff>new</font> Integer(rand.nextInt(500));</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>If you forget to create the object, however, you&#146;ll get an exception at run time when you try to use the empty array location. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_780" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Take a look at the formation of the <b>String </b>object inside the print statements. You can see that the reference to the <b>Integer</b> object is automatically converted to produce a <b>String </b>representing the value inside the object. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_781" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>It&#146;s also possible to initialize arrays of objects by using the curly-brace-enclosed list. There are two forms:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:ArrayInit.java</font>
+<font color=#009900>// Array initialization.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ArrayInit {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Integer[] a = {
+      <font color=#0000ff>new</font> Integer(1),
+      <font color=#0000ff>new</font> Integer(2),
+      <font color=#0000ff>new</font> Integer(3),
+    };
+    Integer[] b = <font color=#0000ff>new</font> Integer[] {
+      <font color=#0000ff>new</font> Integer(1),
+      <font color=#0000ff>new</font> Integer(2),
+      <font color=#0000ff>new</font> Integer(3),
+    };
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The first form is useful at times, but it&#146;s more limited since the size of the array is determined at compile time. The final comma in the list of initializers is optional. (This feature makes for easier maintenance of long lists.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_782" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The second form provides a convenient syntax to create and call methods that can produce the same effect as C&#146;s <a name="Index402"></a><a name="Index403"></a><i>variable argument lists</i> (known as &#147;varargs&#148; in C). These can include unknown quantities of arguments as well as unknown types. Since all classes are ultimately inherited from the common root class <b>Object</b> (a subject you will learn more about as this book progresses), you can create a method that takes an array of <b>Object</b> and call it like this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_783" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:VarArgs.java</font>
+<font color=#009900>// Using array syntax to create variable argument lists.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> A { <font color=#0000ff>int</font> i; }
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> VarArgs {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> print(Object[] x) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; x.length; i++)
+      System.out.println(x[i]);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    print(<font color=#0000ff>new</font> Object[] {
+      <font color=#0000ff>new</font> Integer(47), <font color=#0000ff>new</font> VarArgs(),
+      <font color=#0000ff>new</font> Float(3.14), <font color=#0000ff>new</font> Double(11.11)
+    });
+    print(<font color=#0000ff>new</font> Object[] {<font color=#004488>"one"</font>, <font color=#004488>"two"</font>, <font color=#004488>"three"</font> });
+    print(<font color=#0000ff>new</font> Object[] {<font color=#0000ff>new</font> A(), <font color=#0000ff>new</font> A(), <font color=#0000ff>new</font> A()});
+    monitor.expect(<font color=#0000ff>new</font> Object[] {
+      <font color=#004488>"47"</font>,
+      <font color=#004488>"%% VarArgs@\\p{XDigit}+"</font>,
+      <font color=#004488>"3.14"</font>,
+      <font color=#004488>"11.11"</font>,
+      <font color=#004488>"one"</font>,
+      <font color=#004488>"two"</font>,
+      <font color=#004488>"three"</font>,
+      <font color=#0000ff>new</font> TestExpression(<font color=#004488>"%% A@\\p{XDigit}+"</font>, 3)
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that <b>print(&#160;)</b> takes an array of <b>Object</b>, then steps through the array and prints each one. The standard Java library classes produce sensible output, but the objects of the classes created here&#151;<b>A</b> and <b>VarArgs</b>&#151;print the class name, followed by an &#145;@&#146; sign, and yet another regular expression construct, <b>\p{XDigit}</b>, which indicates a hexadecimal digit. The trailing &#145;<b>+</b>&#146; means there will be one or more hexadecimal digits. Thus, the default behavior (if you don&#146;t define a <b>toString(&#160;)</b> method for your class, which will be described later in the book) is to print the class name and the address of the object. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_784" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775616"></a><a name="Heading4458"></a>Multidimensional
+arrays</h3>
+<p>Java allows you to easily create multidimensional arrays:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c04:MultiDimArray.java</font>
+<font color=#009900>// Creating multidimensional arrays.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> MultiDimArray {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>static</font> Random rand = <font color=#0000ff>new</font> Random();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>int</font>[][] a1 = {
+      { 1, 2, 3, },
+      { 4, 5, 6, },
+    };
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a1.length; i++)
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 0; j &lt; a1[i].length; j++)
+        System.out.println(
+          <font color=#004488>"a1["</font> + i + <font color=#004488>"]["</font> + j + <font color=#004488>"] = "</font> + a1[i][j]);
+    <font color=#009900>// 3-D array with fixed length:</font>
+    <font color=#0000ff>int</font>[][][] a2 = <font color=#0000ff>new</font> <font color=#0000ff>int</font>[2][2][4];
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a2.length; i++)
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 0; j &lt; a2[i].length; j++)
+        <font color=#0000ff>for</font>(<font color=#0000ff>int</font> k = 0; k &lt; a2[i][j].length; k++)
+          System.out.println(<font color=#004488>"a2["</font> + i + <font color=#004488>"]["</font> + j + <font color=#004488>"]["</font> +
+            k + <font color=#004488>"] = "</font> + a2[i][j][k]);
+    <font color=#009900>// 3-D array with varied-length vectors:</font>
+    <font color=#0000ff>int</font>[][][] a3 = <font color=#0000ff>new</font> <font color=#0000ff>int</font>[rand.nextInt(7)][][];
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a3.length; i++) {
+      a3[i] = <font color=#0000ff>new</font> <font color=#0000ff>int</font>[rand.nextInt(5)][];
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 0; j &lt; a3[i].length; j++)
+        a3[i][j] = <font color=#0000ff>new</font> <font color=#0000ff>int</font>[rand.nextInt(5)];
+    }
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a3.length; i++)
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 0; j &lt; a3[i].length; j++)
+        <font color=#0000ff>for</font>(<font color=#0000ff>int</font> k = 0; k &lt; a3[i][j].length; k++)
+          System.out.println(<font color=#004488>"a3["</font> + i + <font color=#004488>"]["</font> + j + <font color=#004488>"]["</font> +
+            k + <font color=#004488>"] = "</font> + a3[i][j][k]);
+    <font color=#009900>// Array of nonprimitive objects:</font>
+    Integer[][] a4 = {
+      { <font color=#0000ff>new</font> Integer(1), <font color=#0000ff>new</font> Integer(2)},
+      { <font color=#0000ff>new</font> Integer(3), <font color=#0000ff>new</font> Integer(4)},
+      { <font color=#0000ff>new</font> Integer(5), <font color=#0000ff>new</font> Integer(6)},
+    };
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a4.length; i++)
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 0; j &lt; a4[i].length; j++)
+        System.out.println(<font color=#004488>"a4["</font> + i + <font color=#004488>"]["</font> + j +
+            <font color=#004488>"] = "</font> + a4[i][j]);
+    Integer[][] a5;
+    a5 = <font color=#0000ff>new</font> Integer[3][];
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a5.length; i++) {
+      a5[i] = <font color=#0000ff>new</font> Integer[3];
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 0; j &lt; a5[i].length; j++)
+        a5[i][j] = <font color=#0000ff>new</font> Integer(i * j);
+    }
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a5.length; i++)
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 0; j &lt; a5[i].length; j++)
+        System.out.println(<font color=#004488>"a5["</font> + i + <font color=#004488>"]["</font> + j +
+            <font color=#004488>"] = "</font> + a5[i][j]);
+    <font color=#009900>// Output test</font>
+    <font color=#0000ff>int</font> ln = 0;
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a3.length; i++)
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 0; j &lt; a3[i].length; j++)
+        <font color=#0000ff>for</font>(<font color=#0000ff>int</font> k = 0; k &lt; a3[i][j].length; k++)
+          ln++;
+    monitor.expect(<font color=#0000ff>new</font> Object[] {
+      <font color=#004488>"a1[0][0] = 1"</font>,
+      <font color=#004488>"a1[0][1] = 2"</font>,
+      <font color=#004488>"a1[0][2] = 3"</font>,
+      <font color=#004488>"a1[1][0] = 4"</font>,
+      <font color=#004488>"a1[1][1] = 5"</font>,
+      <font color=#004488>"a1[1][2] = 6"</font>,
+      <font color=#0000ff>new</font> TestExpression(
+        <font color=#004488>"%% a2\\[\\d\\]\\[\\d\\]\\[\\d\\] = 0"</font>, 16),
+      <font color=#0000ff>new</font> TestExpression(
+        <font color=#004488>"%% a3\\[\\d\\]\\[\\d\\]\\[\\d\\] = 0"</font>, ln),
+      <font color=#004488>"a4[0][0] = 1"</font>,
+      <font color=#004488>"a4[0][1] = 2"</font>,
+      <font color=#004488>"a4[1][0] = 3"</font>,
+      <font color=#004488>"a4[1][1] = 4"</font>,
+      <font color=#004488>"a4[2][0] = 5"</font>,
+      <font color=#004488>"a4[2][1] = 6"</font>,
+      <font color=#004488>"a5[0][0] = 0"</font>,
+      <font color=#004488>"a5[0][1] = 0"</font>,
+      <font color=#004488>"a5[0][2] = 0"</font>,
+      <font color=#004488>"a5[1][0] = 0"</font>,
+      <font color=#004488>"a5[1][1] = 1"</font>,
+      <font color=#004488>"a5[1][2] = 2"</font>,
+      <font color=#004488>"a5[2][0] = 0"</font>,
+      <font color=#004488>"a5[2][1] = 2"</font>,
+      <font color=#004488>"a5[2][2] = 4"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The code used for printing uses <b>length</b> so that it doesn&#146;t depend on fixed array sizes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_785" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The first example shows a multidimensional array of primitives. You delimit each vector in the array by using curly braces:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>    <font color=#0000ff>int</font>[][] a1 = {
+      { 1, 2, 3, },
+      { 4, 5, 6, },
+    };</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Each set of square brackets moves you into the next level of the array. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_786" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The second example shows a three-dimensional array allocated with <b>new</b>. Here, the whole array is allocated at once:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>int</font>[][][] a2 = <font color=#0000ff>new</font> <font color=#0000ff>int</font>[2][2][4];</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>But the third example shows that each vector in the arrays that make up the matrix can be of any length:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>    <font color=#0000ff>int</font>[][][] a3 = <font color=#0000ff>new</font> <font color=#0000ff>int</font>[rand.nextInt(7)][][];
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a3.length; i++) {
+      a3[i] = <font color=#0000ff>new</font> <font color=#0000ff>int</font>[rand.nextInt(5)][];
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 0; j &lt; a3[i].length; j++)
+        a3[i][j] = <font color=#0000ff>new</font> <font color=#0000ff>int</font>[rand.nextInt(5)];
+    }</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The first <b>new</b> creates an array with a random-length first element and the rest undetermined. The second <b>new</b> inside the <b>for</b> loop fills out the elements but leaves the third index undetermined until you hit the third <b>new</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_787" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You will see from the output that array values are automatically initialized to zero if you don&#146;t give them an explicit initialization value.<br></p>
+<p>You can deal with arrays of nonprimitive objects in a similar fashion, which is shown in the fourth example, demonstrating the ability to collect many <b>new</b> expressions with curly braces:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>    Integer[][] a4 = {
+      { <font color=#0000ff>new</font> Integer(1), <font color=#0000ff>new</font> Integer(2)},
+      { <font color=#0000ff>new</font> Integer(3), <font color=#0000ff>new</font> Integer(4)},
+      { <font color=#0000ff>new</font> Integer(5), <font color=#0000ff>new</font> Integer(6)},
+    };</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The fifth example shows how an array of nonprimitive objects can be built up piece by piece:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>    Integer[][] a5;
+    a5 = <font color=#0000ff>new</font> Integer[3][];
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; a5.length; i++) {
+      a5[i] = <font color=#0000ff>new</font> Integer[3];
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 0; j &lt; a5[i].length; j++)
+        a5[i][j] = <font color=#0000ff>new</font> Integer(i*j);
+    }</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>i*j</b> is just to put an interesting value into the <b>Integer</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_788" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545288"></a><a name="_Toc24775617"></a><a name="Heading4591"></a>Summary</h2>
+<p>This seemingly elaborate mechanism for initialization, the constructor, should give you a strong hint about the critical importance placed on initialization in the language. As Bjarne Stroustrup, the inventor of C++, was designing that language, one of the first observations he made about productivity in C was that improper initialization of variables causes a significant portion of programming problems. These kinds of bugs are hard to find, and similar issues apply to improper cleanup. Because constructors allow you to <i>guarantee</i> proper initialization and cleanup (the compiler will not allow an object to be created without the proper constructor calls), you get complete control and safety. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_789" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In C++, destruction is quite important because objects created with <b>new</b> must be explicitly destroyed. In Java, the garbage collector automatically releases the memory for all objects, so the equivalent cleanup method in Java isn&#146;t necessary much of the time (but when it is, as observed in this chapter, you must do it yourself). In cases where you don&#146;t need destructor-like behavior, Java&#146;s garbage collector greatly simplifies programming and adds much-needed safety in managing memory. Some garbage collectors can even clean up other resources like graphics and file handles. However, the garbage collector does add a run-time cost, the expense of which is difficult to put into perspective because of the historical slowness of Java interpreters. Although Java has had significant performance increases over time, the speed problem has taken its toll on the adoption of the language for certain types of programming problems. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_790" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Because of the guarantee that all objects will be constructed, there&#146;s actually more to the constructor than what is shown here. In particular, when you create new classes using either <i>composition</i> or <i>inheritance,</i> the guarantee of construction also holds, and some additional syntax is necessary to support this. You&#146;ll learn about composition, inheritance, and how they affect constructors in future chapters. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_791" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545289"></a><a name="_Toc24775618"></a><a name="Heading4595"></a>Exercises</h2>
+<p>Solutions to selected exercises can be found in the electronic document <i>The Thinking in Java Annotated Solution Guide</i>, available for a small fee from <i>www.BruceEckel.com</i>.<br></p>
+<ol>
+<li>	Create a class with a default constructor (one that takes no arguments)
+that prints a message. Create an object of this class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_792" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Add an overloaded constructor to Exercise 1 that takes a <b>String</b>
+argument and prints it along with your message. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_793" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create an array of object references of the class you created in Exercise
+2, but don&#146;t actually create objects to assign into the array. When you
+run the program, notice whether the initialization messages from the constructor
+calls are printed. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_794" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Complete Exercise 3 by creating objects to attach to the array of
+references. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_795" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create an array of <b>String</b> objects and assign a string to each
+element. Print the array by using a <b>for</b> loop. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_796" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class called <b>Dog</b> with an overloaded <b>bark(&#160;)</b>
+method. This method should be overloaded based on various primitive data types,
+and print different types of barking, howling, etc., depending on which
+overloaded version is called. Write a <b>main(&#160;)</b> that calls all the
+different versions. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_797" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify Exercise 6 so that two of the overloaded methods have two arguments
+(of two different types), but in reversed order relative to each other. Verify
+that this works. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_798" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class without a constructor, and then create an object of that
+class in <b>main(&#160;)</b> to verify that the default constructor is
+automatically synthesized. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_799" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class with two methods. Within the first method, call the second
+method twice: the first time without using <b>this</b>, and the second time
+using <b>this</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_800" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class with two (overloaded) constructors. Using <b>this</b>, call
+the second constructor inside the first one. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_801" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class with a <b>finalize(&#160;)</b> method that prints a message.
+In <b>main(&#160;)</b>, create an object of your class. Explain the behavior of
+your program. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_802" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify Exercise 11 so that your <b>finalize(&#160;)</b> will always be
+called. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_803" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class called <b>Tank</b> that can be filled and emptied, and has a
+<i>termination condition</i> that it must be empty when the object is cleaned
+up. Write a <b>finalize(&#160;)</b> that verifies this termination condition. In
+<b>main(&#160;)</b>, test the possible scenarios that can occur when your
+<b>Tank</b> is used. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_804" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class containing an <b>int</b> and a <b>char</b> that are not
+initialized, and print their values to verify that Java performs default
+initialization. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_805" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class containing an uninitialized <b>String</b> reference.
+Demonstrate that this reference is initialized by Java to <b>null</b>. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_806"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Create a class with a <b>String </b>field that is initialized at the point
+of definition, and another one that is initialized by the constructor. What is
+the difference between the two approaches? <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_807" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class with a <b>static String </b>field that is initialized at the
+point of definition, and another one that is initialized by the <b>static
+</b>block. Add a <b>static</b> method that prints both fields and demonstrates
+that they are both initialized before they are used. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_808" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class with a <b>String</b> that is initialized using
+&#147;instance initialization.&#148; Describe a use for this feature (other
+than the one specified in this book). <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_809" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Write a method that creates and initializes a two-dimensional array of
+<b>double</b>. The size of the array is determined by the arguments of the
+method, and the initialization values are a range determined by beginning and
+ending values that are also arguments of the method. Create a second method that
+will print the array generated by the first method. In <b>main(&#160;)</b> test
+the methods by creating and printing several different sizes of arrays. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_810"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Repeat Exercise 19 for a three-dimensional array. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_811" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Comment the line marked (1) in <b>ExplicitStatic.java</b> and verify that
+the static initialization clause is not called. Now uncomment one of the lines
+marked (2) and verify that the static initialization clause <i>is</i> called.
+Now uncomment the other line marked (2) and verify that static initialization
+only occurs once. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap04_812" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><hr><p class="footnote text"><sup><a name="fn19" href="#fnB19">[19]</a></sup> In some of the Java literature from Sun, they instead refer to these with the awkward but descriptive name &#147;<a name="Index336"></a><a name="Index337"></a>no-arg constructors.&#148; The term &#147;default constructor&#148; has been in use for many years, so I will use that.<br></p>
+<p class="footnote text"><sup><a name="fn20" href="#fnB20">[20]</a></sup> Some people will obsessively put <b>this</b> in front of every method call and field reference, arguing that it makes it &#147;clearer and more explicit.&#148; Don&#146;t do it. There&#146;s a reason that we use high-level languages: they do things for us. If you put <b>this</b> in when it&#146;s not necessary, you will confuse and annoy everyone who reads your code, since all the rest of the code they&#146;ve read <i>won&#146;t</i> use <b>this</b> everywhere. Following a consistent and straightforward coding style saves time and money.<br></p>
+<p class="footnote text"><sup><a name="fn21" href="#fnB21">[21]</a></sup> The one case in which this is possible occurs if you pass a reference to an object into the <b>static</b> method. Then, via the reference (which is now effectively <b>this</b>), you can call non-<b>static</b> methods and access non-<b>static</b> fields. But typically, if you want to do something like this, you&#146;ll just make an ordinary, non-<b>static</b> method.<br></p>
+<p class="footnote text"><sup><a name="fn22" href="#fnB22">[22]</a></sup> Joshua Bloch goes further in his section titled &#147;avoid finalizers&#148;: &#147;Finalizers are unpredictable, often dangerous, and generally unnecessary.&#148; <i>Effective Java,</i> page 20 (Addison-Wesley 2001).<br></p>
+<p class="footnote text"><sup><a name="fn23" href="#fnB23">[23]</a></sup> A term coined by Bill Venners (www.artima.com) during a seminar that he and I were giving together.<br></p>
+<p class="footnote text"><sup><a name="fn24" href="#fnB24">[24]</a></sup> In contrast, C++ has the <i>constructor initializer list</i> that causes initialization to occur before entering the constructor body, and is enforced for objects. See <i>Thinking in C++, 2<sup>nd</sup> edition</i> (available on this book&#146;s CD ROM and at <i>www.BruceEckel.com</i>).<br></p>
+<p class="footnote text"><sup><a name="fn25" href="#fnB25">[25]</a></sup> See <i>Thinking in C++, 2<sup>nd</sup> edition</i> for a complete description of C++ aggregate initialization.<br></p>
+
+<!-- <hr><b>Placeholder</b> -->
+
+<hr>
+
+<div align="CENTER"><a href="TIJ305.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ307.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+
+</font></body>
+
+</html>

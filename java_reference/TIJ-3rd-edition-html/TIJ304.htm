@@ -1,0 +1,854 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<!--
+This document was converted from RTF source: 
+By r2net 5.8 r2netcmd Windows 
+See http://www.logictran.com
+-->
+<head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Thinking in Java, 3rd ed. Revision 4.0: 2: Everything is an Object</title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css"></head>
+
+<body >
+   <CENTER>     <a href="http://www.MindView.net">     <img src="mindview.gif" alt="MindView Inc." BORDER = "0"></a>     <Font FACE="Verdana, Tahoma, Arial, Helvetica, Sans">     <h2>Thinking in Java, 3<sup>rd</sup> ed. Revision 4.0</h2>     <FONT size = "-1"><br>     [ <a href="README.txt">Viewing Hints</a> ]     [ <a href="http://www.mindview.net/Books/TIJ/">Book Home Page</a> ]     [ <a href="http://www.mindview.net/Etc/MailingList.html">Free Newsletter</a> ] <br>     [ <a href="http://www.mindview.net/Seminars">Seminars</a> ]     [ <a href="http://www.mindview.net/CDs">Seminars on CD ROM</a> ]     [ <a href="http://www.mindview.net/Services">Consulting</a> ] <br><br>     </FONT></FONT>   </CENTER> 
+<font face="Georgia"><div align="CENTER"><a href="TIJ303.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ305.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+<hr>
+
+<h1>
+<a name="_Toc375545216"></a><a name="_Toc15535411"></a><a name="_Toc24272641"></a><a name="_Toc24775542"></a><a name="Heading1242"></a>2:
+Everything<br>is an Object</h1>
+<p class="Intro">Although it is based on C++, Java is more of a &#147;pure&#148; object-oriented language.<br></p>
+<p>Both C++ and Java are hybrid languages, but in Java the designers felt that the hybridization was not as important as it was in C++. A hybrid language allows multiple programming styles; the reason C++ is hybrid is to support backward compatibility with the C language. Because C++ is a superset of the C language, it includes many of that language&#146;s undesirable features, which can make some aspects of C++ overly complicated. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_357" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The Java language assumes that you want to do only object-oriented programming. This means that before you can begin you must shift your mindset into an object-oriented world (unless it&#146;s already there)<i>.</i> The benefit of this initial effort is the ability to program in a language that is simpler to learn and to use than many other OOP languages. In this chapter we&#146;ll see the basic components of a Java program and we&#146;ll learn that everything in Java is an object, even a Java program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_358" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545217"></a><a name="_Toc24775543"></a><a name="Heading1246"></a>You
+manipulate objects <br>with references </h2>
+<p>Each programming language has its own means of manipulating data. Sometimes the programmer must be constantly aware of what type of manipulation is going on. Are you manipulating the object directly, or are you dealing with some kind of indirect representation (a pointer in C or C++) that must be treated with a special syntax? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_359" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>All this is simplified in Java. You treat everything as an object, using a single consistent syntax. Although you <i>treat </i>everything as an object, the identifier you manipulate is actually a &#147;reference&#148; to an object.<sup><a name="fnB10" href="#fn10">[10]</a></sup> You might imagine this scene as a television (the object) with your remote control (the reference). As long as you&#146;re holding this reference, you have a connection to the television, but when someone says &#147;change the channel&#148; or &#147;lower the volume,&#148; what you&#146;re manipulating is the reference, which in turn modifies the object. If you want to move around the room and still control the television, you take the remote/reference with you, not the television. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_360" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Also, the remote control can stand on its own, with no television. That is, just because you have a reference doesn&#146;t mean there&#146;s necessarily an object connected to it. So if you want to hold a word or sentence, you create a <b>String</b> reference: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_361" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>String s;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>But here you&#146;ve created <i>only</i> the reference, not an object. If you decided to send a message to <b>s</b> at this point, you&#146;ll get an error (at run time) because <b>s</b> isn&#146;t actually attached to anything (there&#146;s no television). A safer practice, then, is always to initialize a reference when you create it: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_362" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>String s = <font color=#004488>"asdf"</font>;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>However, this uses a special Java feature: strings can be initialized with quoted text. Normally, you must use a more general type of initialization for objects. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_363" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545218"></a><a name="_Toc24775544"></a><a name="Heading1257"></a>You
+must create <br>all the objects</h2>
+<p>When you create a reference, you want to connect it with a new object. You do so, in general, with the <b>new</b> keyword. The keyword <b>new</b> says, &#147;Make me a new one of these objects.&#148; So in the preceding example, you can say: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_364" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>String s = <font color=#0000ff>new</font> String(<font color=#004488>"asdf"</font>);</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Not only does this mean &#147;Make me a new <b>String</b>,&#148; but it also gives information about <i>how</i> to make the <b>String</b> by supplying an initial character string. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_365" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Of course, <b>String</b> is not the only type that exists. Java comes with a plethora of ready-made types. What&#146;s more important is that you can create your own types. In fact, that&#146;s the fundamental activity in Java programming, and it&#146;s what you&#146;ll be learning about in the rest of this book. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_366" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545219"></a><a name="_Toc24775545"></a><a name="Heading1263"></a>Where
+storage lives</h3>
+<p>It&#146;s useful to visualize some aspects of how things are laid out while the program is running&#151;in particular how memory is arranged. There are six different places to store data: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_367" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li><b>Registers</b>. This is the fastest storage because it exists in a place
+different from that of other storage: inside the processor. However, the number
+of registers is severely limited, so registers are allocated by the compiler
+according to its needs. You don&#146;t have direct control, nor do you see any
+evidence in your programs that registers even exist. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_368" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li><b>The stack</b>. This lives in the general random-access memory (RAM) area,
+but has direct support from the processor via its <i>stack pointer</i>. The
+stack pointer is moved down to create new memory and moved up to release that
+memory. This is an extremely fast and efficient way to allocate storage, second
+only to registers. The Java compiler must know, while it is creating the
+program, the exact size and lifetime of all the data that is stored on the
+stack, because it must generate the code to move the stack pointer up and down.
+This constraint places limits on the flexibility of your programs, so while some
+Java storage exists on the stack&#151;in particular, object
+references&#151;Java objects themselves are not placed on the stack. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_369"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li><b>The heap</b>. This is a general-purpose pool of memory (also in the RAM
+area) where all Java objects live. The nice thing about the heap is that, unlike
+the stack, the compiler doesn&#146;t need to know how much storage it needs to
+allocate from the heap or how long that storage must stay on the heap. Thus,
+there&#146;s a great deal of flexibility in using storage on the heap. Whenever
+you need to create an object, you simply write the code to create it by using
+<b>new</b>,<b> </b>and the storage is allocated on the heap when that code is
+executed. Of course there&#146;s a price you pay for this flexibility. It takes
+more time to allocate heap storage than it does to allocate stack storage (if
+you even <i>could</i> create objects on the stack in Java, as you can in C++).
+<font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_370"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li><b>Static storage</b>. &#147;Static&#148; is used here in the sense of
+&#147;in a fixed location&#148; (although it&#146;s also in RAM). Static
+storage contains data that is available for the entire time a program is
+running. You can use the <b>static</b> keyword to specify that a particular
+element of an object is static, but Java objects themselves are never placed in
+static storage. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_371" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li><b>Constant storage</b>. Constant values are often placed directly in the
+program code, which is safe since they can never change. Sometimes constants are
+cordoned off by themselves so that they can be optionally placed in read-only
+memory (ROM), in embedded systems. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_372" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li><b>Non-RAM storage</b>. If data lives completely outside a program, it can
+exist while the program is not running, outside the control of the program. The
+two primary examples of this are <i>streamed objects,</i> in which objects are
+turned into streams of bytes, generally to be sent to another machine, and
+<i>persistent objects, </i>in which the objects are placed on disk so they will
+hold their state even when the program is terminated. The trick with these types
+of storage is turning the objects into something that can exist on the other
+medium, and yet can be resurrected into a regular RAM-based object when
+necessary. Java provides support for <i>lightweight persistence</i>, and future
+versions of Java might provide more complete solutions for persistence. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_373"
+title="Send BackTalk Comment">Feedback</a></font></li></ol><h3>
+<a name="_Toc375545220"></a><a name="_Toc24775546"></a><a name="Heading1271"></a>Special
+case: primitive types<br></h3>
+<p><a name="Index117"></a><a name="Index118"></a>One group of types, which you&#146;ll use quite often in your programming, gets special treatment. You can think of these as &#147;primitive&#148; types. The reason for the special treatment is that to create an object with <b>new</b>&#151;especially a small, simple variable&#151;isn&#146;t very efficient, because <b>new</b> places objects on the heap. For these types Java falls back on the approach taken by C and C++. That is, instead of creating the variable by using <b>new</b>, an &#147;automatic&#148; variable is created that is<i> not a reference</i>. The variable holds the value, and it&#146;s placed on the stack, so it&#146;s much more efficient. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_374" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Java determines the size of each primitive type. These sizes don&#146;t change from one machine architecture to another as they do in most languages. This size invariance is one reason Java programs are portable. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_375" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<div align="center" style="position:relative; left: 0"><table border="1">
+<tr valign="top">
+<th width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Primitive type</b><br></p>
+</th>
+<th width="59.999985" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Size</b><br></p>
+</th>
+<th width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Minimum</b><br></p>
+</th>
+<th width="113.333305" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Maximum</b><br></p>
+</th>
+<th width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Wrapper type</b><br></p>
+</th>
+</tr>
+<tr valign="top">
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>boolean</b><br></p>
+</td>
+<td width="59.999985" colspan="1" rowspan="1" valign="top">
+<p class="Table">&#151;<br></p>
+</td>
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table">&#151;<br></p>
+</td>
+<td width="113.333305" colspan="1" rowspan="1" valign="top">
+<p class="Table">&#151;<br></p>
+</td>
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Boolean</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>char</b><br></p>
+</td>
+<td width="59.999985" colspan="1" rowspan="1" valign="top">
+<p class="Table">16-bit<br></p>
+</td>
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table">Unicode 0<br></p>
+</td>
+<td width="113.333305" colspan="1" rowspan="1" valign="top">
+<p class="Table">Unicode 2<sup>16</sup>- 1<br></p>
+</td>
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Character</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>byte </b><br></p>
+</td>
+<td width="59.999985" colspan="1" rowspan="1" valign="top">
+<p class="Table">8-bit<br></p>
+</td>
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table">-128<br></p>
+</td>
+<td width="113.333305" colspan="1" rowspan="1" valign="top">
+<p class="Table">+127<br></p>
+</td>
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Byte</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>short</b><br></p>
+</td>
+<td width="59.999985" colspan="1" rowspan="1" valign="top">
+<p class="Table">16-bit<br></p>
+</td>
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table">-2<sup>15</sup><br></p>
+</td>
+<td width="113.333305" colspan="1" rowspan="1" valign="top">
+<p class="Table">+2<sup>15</sup>&#151;1<br></p>
+</td>
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Short</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>int</b><br></p>
+</td>
+<td width="59.999985" colspan="1" rowspan="1" valign="top">
+<p class="Table">32-bit<br></p>
+</td>
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table">-2<sup>31</sup><br></p>
+</td>
+<td width="113.333305" colspan="1" rowspan="1" valign="top">
+<p class="Table">+2<sup>31</sup>&#151;1<br></p>
+</td>
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Integer</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>long</b><br></p>
+</td>
+<td width="59.999985" colspan="1" rowspan="1" valign="top">
+<p class="Table">64-bit<br></p>
+</td>
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table">-2<sup>63</sup><br></p>
+</td>
+<td width="113.333305" colspan="1" rowspan="1" valign="top">
+<p class="Table">+2<sup>63</sup>&#151;1<br></p>
+</td>
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Long</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>float</b><br></p>
+</td>
+<td width="59.999985" colspan="1" rowspan="1" valign="top">
+<p class="Table">32-bit<br></p>
+</td>
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table">IEEE754<br></p>
+</td>
+<td width="113.333305" colspan="1" rowspan="1" valign="top">
+<p class="Table">IEEE754<br></p>
+</td>
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Float</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>double</b><br></p>
+</td>
+<td width="59.999985" colspan="1" rowspan="1" valign="top">
+<p class="Table">64-bit <br></p>
+</td>
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table">IEEE754<br></p>
+</td>
+<td width="113.333305" colspan="1" rowspan="1" valign="top">
+<p class="Table">IEEE754<br></p>
+</td>
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Double</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>void</b><br></p>
+</td>
+<td width="59.999985" colspan="1" rowspan="1" valign="top">
+<p class="Table">&#151;<br></p>
+</td>
+<td width="95.999976" colspan="1" rowspan="1" valign="top">
+<p class="Table">&#151;<br></p>
+</td>
+<td width="113.333305" colspan="1" rowspan="1" valign="top">
+<p class="Table">&#151;<br></p>
+</td>
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Void</b><br></p>
+</td>
+</tr>
+</table></div>
+<p class="TableFollower">All numeric types are signed, so don&#146;t look for unsigned types. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_376" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The size of the <b>boolean</b> type is not explicitly specified; it is only defined to be able to take the literal values <b>true</b> or <b>false</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0107" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The &#147;wrapper&#148;<i> </i>classes for the primitive data types allow you to make a nonprimitive object on the heap to represent that primitive type. For example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_377" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>char</font> c = 'x';
+Character C = <font color=#0000ff>new</font> Character(c);</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Or you could also use:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>Character C = <font color=#0000ff>new</font> Character('x');</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The reasons for doing this will be shown in a later chapter. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_378" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1334"></a>High-precision numbers</h4>
+<p>Java includes two classes for performing high-precision arithmetic: <b>BigInteger</b> and <b>BigDecimal</b>. Although these approximately fit into the same category as the &#147;wrapper&#148; classes, neither one has a primitive analogue. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_379" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Both classes have methods that provide analogues for the operations that you perform on primitive types. That is, you can do anything with a <b>BigInteger</b> or <b>BigDecimal </b>that you can with an <b>int</b> or <b>float</b>, it&#146;s just that you must use method calls instead of operators. Also, since there&#146;s more involved, the operations will be slower. You&#146;re exchanging speed for accuracy. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_380" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><b>BigInteger</b> supports arbitrary-precision integers. This means that you can accurately represent integral values of any size without losing any information during operations. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_381" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><b>BigDecimal</b> is for arbitrary-precision fixed-point numbers; you can use these for accurate monetary calculations, for example. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_382" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Consult the JDK documentation for details about the constructors and methods you can call for these two classes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_383" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545221"></a><a name="_Toc24775547"></a><a name="Heading1340"></a>Arrays
+in Java</h3>
+<p>Virtually all programming languages support arrays. Using arrays in C and C++ is perilous because those arrays are only blocks of memory. If a program accesses the array outside of its memory block or uses the memory before initialization (common programming errors), there will be unpredictable results. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_384" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>One of the primary goals of Java is safety, so many of the problems that plague programmers in C and C++ are not repeated in Java. A Java array is guaranteed to be initialized and cannot be accessed outside of its range. The range checking comes at the price of having a small amount of memory overhead on each array as well as verifying the index at run time, but the assumption is that the safety and increased productivity is worth the expense. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_385" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When you create an array of objects, you are really creating an array of references, and each of those references is automatically initialized to a special value with its own keyword: <a name="Index119"></a><a name="Index120"></a><b>null</b>. When Java sees <b>null</b>, it recognizes that the reference in question isn&#146;t pointing to an object.<b> </b>You must assign an object to each reference before you use it, and if you try to use a reference that&#146;s still <b>null,</b> the problem will be reported at run time. Thus, typical array errors are prevented in Java. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_386" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can also create an array of primitives. Again, the compiler guarantees initialization because it zeroes the memory for that array. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_387" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Arrays will be covered in detail in later chapters. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_388" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545222"></a><a name="_Toc24775548"></a><a name="Heading1346"></a>You
+never need to <br>destroy an object</h2>
+<p>In most programming languages, the concept of the lifetime of a variable occupies a significant portion of the programming effort. How long does the variable last? If you are supposed to destroy it, when should you? Confusion over variable lifetimes can lead to a lot of bugs, and this section shows how Java greatly simplifies the issue by doing all the cleanup work for you. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_389" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545223"></a><a name="_Toc24775549"></a><a name="Heading1348"></a>Scoping</h3>
+<p>Most procedural languages have the concept of <i>scope</i>. This determines both the visibility and lifetime of the names defined within that scope. In C, C++, and Java, scope is determined by the placement of curly braces <b>{}</b>. So for example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_390" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>{
+  <font color=#0000ff>int</font> x = 12;
+  <font color=#009900>// Only x available</font>
+  {
+    <font color=#0000ff>int</font> q = 96;
+    <font color=#009900>// Both x &amp; q available</font>
+  }
+  <font color=#009900>// Only x available</font>
+  <font color=#009900>// q &#147;out of scope&#148;</font>
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>A variable defined within a scope is available only to the end of that scope. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_391" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Any text after a &#145;//&#146; to the end of a line is a comment. <br></p>
+<p>Indentation makes Java code easier to read. Since Java is a free-form language, the extra spaces, tabs, and carriage returns do not affect the resulting program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_392" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Note that you <i>cannot</i> do the following, even though it is legal in C and C++:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>{
+  <font color=#0000ff>int</font> x = 12;
+  {
+    <font color=#0000ff>int</font> x = 96; <font color=#009900>// Illegal</font>
+  }
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The compiler will announce that the variable <b>x </b>has already been defined. Thus the C and C++ ability to &#147;hide&#148; a variable in a larger scope is not allowed, because the Java designers thought that it led to confusing programs. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_393" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545224"></a><a name="_Toc24775550"></a><a name="Heading1373"></a>Scope
+of objects</h3>
+<p>Java objects do not have the same lifetimes as primitives. When you create a Java object using <b>new</b>, it hangs around past the end of the scope. Thus if you use:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>{
+  String s = <font color=#0000ff>new</font> String(<font color=#004488>"a string"</font>);
+} <font color=#009900>// End of scope</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>the reference <b>s</b> vanishes at the end of the scope. However, the <b>String</b> object that <b>s</b> was pointing to is still occupying memory. In this bit of code, there is no way to access the object, because the only reference to it is out of scope. In later chapters you&#146;ll see how the reference to the object can be passed around and duplicated during the course of a program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_394" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>It turns out that because objects created with <b>new</b> stay around for as long as you want them, a whole slew of C++ programming problems simply vanish in Java. The hardest problems seem to occur in C++ because you don&#146;t get any help from the language in making sure that the objects are available when they&#146;re needed. And more important, in C++ you must make sure that you destroy the objects when you&#146;re done with them. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_395" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>That brings up an interesting question. If Java leaves the objects lying around, what keeps them from filling up memory and halting your program? This is exactly the kind of problem that would occur in C++. This is where a bit of magic happens. Java has a <i>garbage collector</i>, which looks at all the objects that were created with <b>new</b> and figures out which ones are not being referenced anymore. Then it releases the memory for those objects, so the memory can be used for new objects. This means that you never need to worry about reclaiming memory yourself. You simply create objects, and when you no longer need them, they will go away by themselves. This eliminates a certain class of programming problem: the so-called &#147;memory leak,&#148; in which a programmer forgets to release memory. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_396" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545225"></a><a name="_Toc24775551"></a><a name="Heading1382"></a>Creating
+new <br>data types: class</h2>
+<p>If everything is an object, what determines how a particular class of object looks and behaves? Put another way, what establishes the <i>type</i> of an object? You might expect there to be a keyword called &#147;type,&#148; and that certainly would have made sense. Historically, however, most object-oriented languages have used the keyword <b>class</b> to mean &#147;I&#146;m about to tell you what a new type of object looks like.&#148; The <b>class</b> keyword (which is so common that it will not be bold-faced throughout this book) is followed by the name of the new type. For example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_397" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> ATypeName { <font color=#009900>/* Class body goes here */</font> }</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This introduces a new type, although the class body consists only of a comment (the stars and slashes and what is inside, which will be discussed later in this chapter), so there is not too much that you can do with it. However, you can create an object of this type using <b>new</b>:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>ATypeName a = <font color=#0000ff>new</font> ATypeName();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>But you cannot tell it to do much of anything (that is, you cannot send it any interesting messages) until you define some methods for it. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_398" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545226"></a><a name="_Toc24775552"></a><a name="Heading1390"></a>Fields
+and methods</h3>
+<p>When you define a class (and all you do in Java is define classes, make objects of those classes, and send messages to those objects), you can put two types of elements in your class: <i>fields</i> (sometimes called data members), and <i>methods</i> (sometimes called <i>member functions</i>). A field is an object of any type that you can communicate with via its reference. It can also be one of the primitive types (which isn&#146;t a reference). If it is a reference to an object, you must initialize that reference to connect it to an actual object (using <b>new</b>, as seen earlier) in a special method called a <i>constructor</i> (described fully in Chapter 4). If it is a primitive type, you can initialize it directly at the point of definition in the class. (As you&#146;ll see later, references can also be initialized at the point of definition.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_399" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Each object keeps its own storage for its fields; the fields are not shared among objects. Here is an example of a class with some fields: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_400" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> DataOnly {
+  <font color=#0000ff>int</font> i;
+  <font color=#0000ff>float</font> f;
+  <font color=#0000ff>boolean</font> b;
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This class doesn&#146;t <i>do</i> anything, but you can create an object: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_401" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>DataOnly d = <font color=#0000ff>new</font> DataOnly();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can assign values to the fields, but you must first know how to refer to a member of an object. This is accomplished by stating the name of the object reference, followed by a period (dot), followed by the name of the member inside the object: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_402" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>objectReference.member</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>For example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_403" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>d.i = 47;
+d.f = 1.1f; <font color=#009900>// &#145;f&#146; after number indicates float constant</font>
+d.b = <font color=#0000ff>false</font>;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>It is also possible that your object might contain other objects that contain data you&#146;d like to modify. For this, you just keep &#147;connecting the dots.&#148; For example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_404" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>myPlane.leftTank.capacity = 100;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>DataOnly </b>class cannot do much of anything except hold data, because it has no methods. To understand how those work, you must first understand <i>arguments</i> and <i>return values</i>, which will be described shortly. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_405" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1414"></a>Default values for primitive members</h4>
+<p>When a primitive data type is a member of a class, it is guaranteed to get a default value if you do not initialize it:<br></p>
+<div align="center" style="position:relative; left: 0"><table border="1">
+<tr valign="top">
+<th width="133.333300" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Primitive type</b><br></p>
+</th>
+<th width="141.333298" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Default</b><br></p>
+</th>
+</tr>
+<tr valign="top">
+<td width="133.333300" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>boolean</b><br></p>
+</td>
+<td width="141.333298" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>false</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="133.333300" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>char</b><br></p>
+</td>
+<td width="141.333298" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>&#145;\u0000&#146; (null)</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="133.333300" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>byte</b><br></p>
+</td>
+<td width="141.333298" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>(byte)0</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="133.333300" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>short</b><br></p>
+</td>
+<td width="141.333298" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>(short)0</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="133.333300" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>int</b><br></p>
+</td>
+<td width="141.333298" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>0</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="133.333300" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>long</b><br></p>
+</td>
+<td width="141.333298" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>0L</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="133.333300" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>float</b><br></p>
+</td>
+<td width="141.333298" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>0.0f</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="133.333300" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>double</b><br></p>
+</td>
+<td width="141.333298" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>0.0d</b><br></p>
+</td>
+</tr>
+</table></div>
+<p class="TableFollower">Note carefully that the default values are what Java guarantees when the variable is used <i>as a member of a class</i>. This ensures that member variables of primitive types will always be initialized (something C++ doesn&#146;t do), reducing a source of bugs. However, this initial value may not be correct or even legal for the program you are writing. It&#146;s best to always explicitly initialize your variables. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_406" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This guarantee doesn&#146;t apply to &#147;local&#148; variables&#151;those that are not fields of a class. Thus, if within a method definition you have:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>int</font> x;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Then <b>x</b> will get some arbitrary value (as in C and C++); it will not automatically be initialized to zero. You are responsible for assigning an appropriate value before you use <b>x</b>. If you forget, Java definitely improves on C++: you get a compile-time error telling you the variable might not have been initialized. (Many C++ compilers will warn you about uninitialized variables, but in Java these are errors.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_407" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545227"></a><a name="_Toc24775553"></a><a name="Heading1439"></a>Methods,
+arguments, <br>and return values</h2>
+<p>In many languages (like C and C++), the term <i>function</i> is used to describe a named subroutine. The term that is more commonly used in Java is <i>method,</i> as in &#147;a way to do something.&#148; If you want, you can continue thinking in terms of functions. It&#146;s really only a syntactic difference, but this book follows the common Java usage of the term &#147;method.&#148; <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_408" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Methods in Java determine the messages an object can receive. In this section you will learn how simple it is to define a method. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_409" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The fundamental parts of a method are the name, the arguments, the return type, and the body. Here is the basic form:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>returnType methodName( <font color=#009900>/* Argument list */</font> ) {
+  <font color=#009900>/* Method body */</font>
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The return type is the type of the value that pops out of the method after you call it. The argument list gives the types and names for the information you want to pass into the method. The method name and argument list together uniquely identify the method. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_410" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Methods in Java can be created only as part of a class. A method can be called only for an object,<sup><a name="fnB11" href="#fn11">[11]</a></sup> and that object must be able to perform that method call. If you try to call the wrong method for an object, you&#146;ll get an error message at compile time. You call a method for an object by naming the object followed by a period (dot), followed by the name of the method and its argument list, like this: <br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>objectName.methodName(arg1, arg2, arg3);</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>For example, suppose you have a method <b>f(&#160;)</b> that takes no arguments and returns a value of type <b>int</b>. Then, if you have an object called <b>a</b> for which <b>f(&#160;)</b> can be called, you can say this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>int</font> x = a.f();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The type of the return value must be compatible with the type of <b>x</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_411" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This act of calling a method is commonly referred to as <i>sending a message to an object</i>. In the preceding example, the message is <b>f(&#160;)</b> and the object is <b>a</b>. Object-oriented programming is often summarized as simply &#147;sending messages to objects.&#148; <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_412" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545228"></a><a name="_Toc24775554"></a><a name="Heading1457"></a>The
+argument list</h3>
+<p>The method argument list specifies what information you pass into the method. As you might guess, this information&#151;like everything else in Java&#151;takes the form of objects. So, what you must specify in the argument list are the types of the objects to pass in and the name to use for each one. As in any situation in Java where you seem to be handing objects around, you are actually passing references.<sup><a name="fnB12" href="#fn12">[12]</a></sup> The type of the reference must be correct, however. If the argument is supposed to be a <b>String</b>, you must pass in a <b>String</b> or the compiler will give an error. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_413" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Consider a method that takes a <b>String</b> as its argument. Here is the definition, which must be placed within a class definition for it to be compiled:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>int</font> storage(String s) {
+  <font color=#0000ff>return</font> s.length() * 2;
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This method tells you how many bytes are required to hold the information in a particular <b>String. </b>(Each <b>char </b>in a <b>String </b>is 16 bits, or two bytes, long, to support Unicode characters.) The argument is of type <b>String</b> and is called <b>s</b>. Once <b>s</b> is passed into the method, you can treat it just like any other object. (You can send messages to it.) Here, the <b>length(&#160;)</b> method is called, which is one of the methods for <b>String</b>s; it returns the number of characters in a string. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_414" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can also see the use of the <b>return</b> keyword, which does two things. First, it means &#147;leave the method, I&#146;m done.&#148; Second, if the method produces a value, that value is placed right after the <b>return</b> statement. In this case, the return value is produced by evaluating the expression <b>s.length(&#160;) * 2</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_415" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can return any type you want, but if you don&#146;t want to return anything at all, you do so by indicating that the method returns <b>void</b>. Here are some examples:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>boolean</font> flag() { <font color=#0000ff>return</font> <font color=#0000ff>true</font>; }
+<font color=#0000ff>float</font> naturalLogBase() { <font color=#0000ff>return</font> 2.718f; }
+<font color=#0000ff>void</font> nothing() { <font color=#0000ff>return</font>; }
+<font color=#0000ff>void</font> nothing2() {}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>When the return type is <b>void</b>, then the <b>return</b> keyword is used only to exit the method, and is therefore unnecessary when you reach the end of the method. You can return from a method at any point, but if you&#146;ve given a non-<b>void </b>return type, then the compiler will force you (with error messages) to return the appropriate type of value regardless of where you return. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_416" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>At this point, it can look like a program is just a bunch of objects with methods that take other objects as arguments and send messages to those other objects. That is indeed much of what goes on, but in the following chapter you&#146;ll learn how to do the detailed low-level work by making decisions within a method. For this chapter, sending messages will suffice. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_417" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545229"></a><a name="_Toc24775555"></a><a name="Heading1475"></a>Building
+a Java program</h2>
+<p>There are several other issues you must understand before seeing your first Java program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_418" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545230"></a><a name="_Toc24775556"></a><a name="Heading1477"></a>Name
+visibility</h3>
+<p>A problem in any programming language is the control of names. If you use a name in one module of the program, and another programmer uses the same name in another module, how do you distinguish one name from another and prevent the two names from &#147;clashing?&#148; In C this is a particular problem because a program is often an unmanageable sea of names. C++ classes (on which Java classes are based) nest functions within classes so they cannot clash with function names nested within other classes. However, C++ still allows global data and global functions, so clashing is still possible. To solve this problem, C++ introduced <i>namespaces</i> using additional keywords. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_419" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Java was able to avoid all of this by taking a fresh approach. To produce an unambiguous name for a library, the specifier used is not unlike an Internet domain name. In fact, the Java creators want you to use your Internet domain name in reverse since those are guaranteed to be unique. Since my domain name is <b>BruceEckel.com</b>, my utility library of foibles would be named <b>com.bruceeckel.utility.foibles</b>. After your reversed domain name, the dots are intended to represent subdirectories. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_420" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In Java 1.0 and Java 1.1 the domain extensions <b>com</b>, <b>edu</b>, <b>org</b>, <b>net</b>, etc., were capitalized by convention, so the library would appear: <a name="Index121"></a><a name="Index122"></a><b>COM.bruceeckel.utility.foibles</b>. Partway through the development of Java 2, however, it was discovered that this caused problems, so now the entire package name is lowercase. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_421" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This mechanism means that all of your files automatically live in their own namespaces, and each class within a file must have a unique identifier. So you do not need to learn special language features to solve this problem&#151;the language takes care of it for you. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_422" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545231"></a><a name="_Toc24775557"></a><a name="Heading1482"></a>Using
+other components</h3>
+<p>Whenever you want to use a predefined class in your program, the compiler must know how to locate it. Of course, the class might already exist in the same source code file that it&#146;s being called from. In that case, you simply use the class&#151;even if the class doesn&#146;t get defined until later in the file (Java eliminates the &#147;forward referencing&#148; problem, so you don&#146;t need to think about it). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_423" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>What about a class that exists in some other file? You might think that the compiler should be smart enough to simply go and find it, but there is a problem. Imagine that you want to use a class with a particular name, but more than one definition for that class exists (presumably these are different definitions). Or worse, imagine that you&#146;re writing a program, and as you&#146;re building it you add a new class to your library that conflicts with the name of an existing class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_424" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To solve this problem, you must eliminate all potential ambiguities. This is accomplished by telling the Java compiler exactly what classes you want by using the <b>import</b> keyword. <b>import </b>tells the compiler to bring in a package, which is a library of classes. (In other languages, a library could consist of functions and data as well as classes, but remember that all code in Java must be written inside a class.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_425" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Most of the time you&#146;ll be using components from the standard Java libraries that come with your compiler. With these, you don&#146;t need to worry about long, reversed domain names; you just say, for example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>import</font> java.util.ArrayList;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>to tell the compiler that you want to use Java&#146;s <b>ArrayList</b> class. However, <b>util</b> contains a number of classes and you might want to use several of them without declaring them all explicitly. This is easily accomplished by using &#145;<b>*</b>&#146; to indicate a wild card:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>import</font> java.util.*;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>It is more common to import a collection of classes in this manner than to import classes individually. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_426" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545232"></a><a name="_Toc24775558"></a><a name="Heading1493"></a>The
+<b>static</b> keyword</h3>
+<p>Ordinarily, when you create a class you are describing how objects of that class look and how they will behave. You don&#146;t actually get anything until you create an object of that class with <b>new</b>, and at that point data storage is created and methods become available. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_427" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>But there are two situations in which this approach is not sufficient. One is if you want to have only one piece of storage for a particular piece of data, regardless of how many objects are created, or even if no objects are created. The other is if you need a method that isn&#146;t associated with any particular object of this class. That is, you need a method that you can call even if no objects are created. You can achieve both of these effects with the <b>static</b> keyword. When you say something is <b>static</b>, it means that data or method is not tied to any particular object instance of that class. So even if you&#146;ve never created an object of that class you can call a <b>static</b> method or access a piece of <b>static</b> data. With ordinary, non-<b>static</b> data and methods, you must create an object and use that object to access the data or method, since non-<b>static</b> data and methods must know the particular object they are working with. Of course, since <b>static</b> methods don&#146;t need any objects to be created before they are used, they cannot <i>directly </i>access non-<b>static</b> members or methods by simply calling those other members without referring to a named object (since non-<b>static</b> members and methods must be tied to a particular object). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_428" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Some object-oriented languages use the terms <i>class data</i> and <i>class methods</i>, meaning that the data and methods exist only for the class as a whole, and not for any particular objects of the class. Sometimes the Java literature uses these terms too. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_429" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To make a field or method <b>static</b>, you simply place the keyword before the definition. For example, the following produces a <b>static</b> field and initializes it: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_430" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> StaticTest {
+  <font color=#0000ff>static</font> <font color=#0000ff>int</font> i = 47;
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Now even if you make two <b>StaticTest</b> objects, there will still be only one piece of storage for <b>StaticTest.i.</b> Both objects will share the same <b>i</b>.<b> </b>Consider: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_431" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>StaticTest st1 = <font color=#0000ff>new</font> StaticTest();
+StaticTest st2 = <font color=#0000ff>new</font> StaticTest();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>At this point, both <b>st1.i</b> and <b>st2.i</b> have the same value of 47 since they refer to the same piece of memory. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_432" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There are two ways to refer to a <b>static</b> variable. As the preceeding example indicates, you can name it via an object, by saying, for example, <b>st2.i</b>. You can also refer to it directly through its class name, something you cannot do with a non-static member. (This is the preferred way to refer to a <b>static</b> variable since it emphasizes that variable&#146;s <b>static</b> nature.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_433" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>StaticTest.i++;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>++</b> operator increments the variable. At this point, both <b>st1.i</b> and <b>st2.i</b> will have the value 48. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_434" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Similar logic applies to static methods. You can refer to a static method either through an object as you can with any method, or with the special additional syntax <b>ClassName.method(&#160;)</b>. You define a static method in a similar way: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_435" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> StaticFun {
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> incr() { StaticTest.i++; }
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that the <b>StaticFun</b> method <b>incr(&#160;)</b> increments the <b>static</b> data <b>i</b> using the <b>++ </b>operator. You can call <b>incr(&#160;)</b> in the typical way, through an object: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_436" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>StaticFun sf = <font color=#0000ff>new</font> StaticFun();
+sf.incr();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Or, because <b>incr(&#160;) </b>is a static method, you can call it directly through its class: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_437" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>StaticFun.incr();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Although <b>static</b>, when applied to a field, definitely changes the way the data is created (one for each class versus the non-<b>static </b>one for each object), when applied to a method it&#146;s not so dramatic. An important use of <b>static</b> for methods is to allow you to call that method without creating an object. This is essential, as we will see, in defining the <b>main(&#160;)</b> method that is the entry point for running an application. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_438" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Like any method, a <b>static</b> method can create or use named objects of its type, so a <b>static</b> method is often used as a &#147;shepherd&#148; for a flock of instances of its own type. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_439" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545233"></a><a name="_Toc24775559"></a><a name="Heading1525"></a>Your
+first Java program</h2>
+<p>Finally, here&#146;s the first complete program. It starts by printing a string, and then the date, using the <b>Date </b>class from the Java standard library. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_440" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>// HelloDate.java</font>
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> HelloDate {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    System.out.println(<font color=#004488>"Hello, it's: "</font>);
+    System.out.println(<font color=#0000ff>new</font> Date());
+  }
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>At the beginning of each program file, you must place the <b>import</b> statement to bring in any extra classes you&#146;ll need for the code in that file. Note that I say &#147;extra.&#148; That&#146;s because there&#146;s a certain library of classes that are automatically brought into every Java file: <b>java.lang</b>. Start up your Web browser and look at the documentation from Sun. (If you haven&#146;t downloaded the JDK documentation from <i>java.sun.com</i>, do so now<sup><a name="fnB13" href="#fn13">[13]</a></sup>). If you look at the list of the packages, you&#146;ll see all the different class libraries that come with Java. Select <b>java.lang</b>. This will bring up a list of all the classes that are part of that library. Since <b>java.lang</b> is implicitly included in every Java code file, these classes are automatically available. There&#146;s no <b>Date</b> class listed in <b>java.lang</b>, which means you must import another library to use that. If you don&#146;t know the library where a particular class is, or if you want to see all of the classes, you can select &#147;Tree&#148; in the Java documentation. Now you can find every single class that comes with Java. Then you can use the browser&#146;s &#147;find&#148; function to find <b>Date</b>.<b> </b>When you do you&#146;ll see it listed as <b>java.util.Date</b>, which lets you know that it&#146;s in the <b>util</b> library and that you must <b>import java.util.*</b> in order to use <b>Date</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_441" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you go back to the beginning, select <b>java.lang</b> and then <b>System</b>, you&#146;ll see that the <b>System</b> class has several fields, and if you select <b>out</b>, you&#146;ll discover that it&#146;s a <b>static</b> <b>PrintStream </b>object. Since it&#146;s <b>static</b>, you don&#146;t need to create anything. The <b>out</b> object is always there, and you can just use it. What you can do with this <b>out</b> object is determined by the type it is: a <b>PrintStream</b>. Conveniently, <b>PrintStream </b>is shown in the description as a hyperlink, so if you click on that, you&#146;ll see a list of all the methods you can call for <b>PrintStream</b>. There are quite a few, and these will be covered later in this book. For now all we&#146;re interested in is <b>println(&#160;)</b>, which in effect means &#147;print what I&#146;m giving you out to the console and end with a newline.&#148; Thus, in any Java program you write you can say <b>System.out.println("things");</b> whenever you want to print something to the console. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_442" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The name of the class is the same as the name of the file. When you&#146;re creating a standalone program such as this one, one of the classes in the file must have the same name as the file. (The compiler complains if you don&#146;t do this.) That class must contain a method called <b>main(&#160;)</b> with this signature: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_443" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>public</b> keyword means that the method is available to the outside world (described in detail in Chapter 5). The argument to <b>main(&#160;)</b> is an array of <b>String</b> objects. The <b>args</b> won&#146;t be used in this program, but the Java compiler insists that they be there because they hold the arguments from the command line. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_444" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The line that prints the date is quite interesting: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_445" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>System.out.println(<font color=#0000ff>new</font> Date());</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The argument is a <b>Date</b> object that is being created just to send its value (which is automatically converted to a <b>String)</b> to <b>println(&#160;)</b>. As soon as this statement is finished, that <b>Date</b> is unnecessary, and the garbage collector can come along and get it anytime. We don&#146;t need to worry about cleaning it up. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_446" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545234"></a><a name="_Toc24775560"></a><a name="Heading1548"></a>Compiling
+and running</h3>
+<p>To compile and run this program, and all the other programs in this book, you must first have a Java programming environment. There are a number of third-party development environments, but in this book we will assume that you are using the Java Developer&#146;s Kit (JDK) from Sun, which is free. If you are using another development system,<a name="Index123"></a><a name="Index124"></a><a name="Index125"></a><a name="Index126"></a><sup><a name="fnB14" href="#fn14">[14]</a></sup> you will need to look in the documentation for that system to determine how to compile and run programs. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_447" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Get on the Internet and go to <i>java.sun.com</i>. There you will find information and links that will lead you through the process of downloading and installing the JDK for your particular platform. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_448" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Once the JDK is installed, and you&#146;ve set up your computer&#146;s path information so that it will find <b>javac</b> and <a name="Index127"></a><b>java</b>, download and unpack the source code for this book (you can find it at <i>www.BruceEckel.com</i>). This will create a subdirectory for each chapter in this book. Move to subdirectory <b>c02</b> and type: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_449" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>javac HelloDate.java</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This command should produce no response. If you get any kind of an error message, it means you haven&#146;t installed the JDK properly and you need to investigate those problems. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_450" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>On the other hand, if you just get your command prompt back, you can type:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>java HelloDate</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>and you&#146;ll get the message and the date as output. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_451" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This is the process you can use to compile and run each of the programs in this book. However, you will see that the source code for this book also has a file called <b>build.xml</b> in each chapter, and this contains &#147;ant&#148; commands for automatically building the files for that chapter. Buildfiles and Ant (including where to download it) are described more fully in Chapter 15, but once you have Ant installed (from <i>http://jakarta.apache.org/ant</i>) you can just type &#145;<b>ant</b>&#146; at the command prompt to compile and run the programs in each chapter. If you haven&#146;t installed Ant yet, you can just type the <b>javac</b> and <b>java</b> commands by hand. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_452" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775561"></a><a name="Heading1561"></a>Comments and embedded
+documentation<br></h2>
+<p><a name="Index128"></a><a name="Index129"></a>There are two types of comments in Java. The first is the traditional C-style comment that was inherited by C++. These comments begin with a <b>/*</b> and continue, possibly across many lines, until a <b>*/</b>. Note that many programmers will begin each line of a continued comment with a <b>*</b>, so you&#146;ll often see:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>/* This is a comment
+ * that continues
+ * across lines
+ */</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Remember, however, that everything inside the <b>/*</b> and <b>*/</b> is ignored, so there&#146;s no difference in saying: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_453" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>/* This is a comment that
+continues across lines */</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The second form of comment comes from C++. It is the single-line comment, which starts at a <b>//</b> and continues until the end of the line. This type of comment is convenient and commonly used because it&#146;s easy. You don&#146;t need to hunt on the keyboard to find <b>/</b> and then <b>*</b> (instead, you just press the same key twice), and you don&#146;t need to close the comment. So you will often see: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_454" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>// This is a one-line comment</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<h3>
+<a name="_Toc375545235"></a><a name="_Toc24775562"></a><a name="Heading1575"></a>Comment
+documentation</h3>
+<p>One of the better ideas in Java is that writing code isn&#146;t the only important activity&#151;documenting it is at least as important. Possibly the biggest problem with documenting code has been maintaining that documentation. If the documentation and the code are separate, it becomes a hassle to change the documentation every time you change the code. The solution seems simple: link the code to the documentation. The easiest way to do this is to put everything in the same file. To complete the picture, however, you need a special comment syntax to mark the documentation and a tool to extract those comments and put them in a useful form. This is what Java has done. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_455" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The tool to extract the comments is called <a name="Index130"></a><i>javadoc</i>, and it is part of the JDK installation<i>.</i> It uses some of the technology from the Java compiler to look for special comment tags that you put in your programs. It not only extracts the information marked by these tags, but it also pulls out the class name or method name that adjoins the comment. This way you can get away with the minimal amount of work to generate decent program documentation. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_456" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The output of javadoc is an HTML file that you can view with your Web browser. Thus, javadoc allows you to create and maintain a single source file and automatically generate useful documentation. Because of javadoc we have a standard for creating documentation, and it&#146;s easy enough that we can expect or even demand documentation with all Java libraries. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_457" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In addition, you can write your own javadoc handlers, called <i>doclets</i>, if you want to perform special operations on the information processed by javadoc (output in a different format, for example). Doclets are introduced in Chapter 15. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0446" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>What follows is only an introduction and overview of the basics of javadoc. A thorough description can be found in the JDK documentation downloadable from <i>java.sun.com</i> (note that this documentation doesn&#146;t come packed with the JDK; you have to do a separate download to get it). When you unpack the documentation, look in the &#147;tooldocs&#148; subdirectory (or follow the &#147;tooldocs&#148; link). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0447" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Ref348399283"></a><a name="_Toc375545236"></a><a name="_Toc24775563"></a><a name="Heading1581"></a>Syntax</h3>
+<p>All of the javadoc commands occur only within <b>/**</b> comments. The comments end with <b>*/ </b>as usual. There are two primary ways to use javadoc: embed HTML or use &#147;doc tags.&#148; <i>Standalone doc tags</i> are commands that start with a &#145;<b>@</b>&#146; and are placed at the beginning of a comment line. (A leading &#145;<b>*</b>&#146;, however, is ignored.) <i>Inline doc tags </i>can appear anywhere within a javadoc comment and also start with a &#145;<b>@</b>&#146; but are surrounded by curly braces. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_458" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There are three &#147;types&#148; of comment documentation, which correspond to the element the comment precedes: class, variable, or method. That is, a class comment appears right before the definition of a class; a variable comment appears right in front of the definition of a variable, and a method comment appears right in front of the definition of a method. As a simple example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_459" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>/** A class comment */</font>
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> DocTest {
+  <font color=#009900>/** A variable comment */</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>int</font> i;
+  <font color=#009900>/** A method comment */</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Note that javadoc will process comment documentation for only <b>public </b>and <b>protected </b>members. Comments for <b>private </b>and package-access members (see Chapter 5) are ignored, and you&#146;ll see no output. (However, you can use the <b>-private </b>flag to include <b>private</b> members as well.) This makes sense, since only <b>public</b> and <b>protected</b> members are available outside the file, which is the client programmer&#146;s perspective. However, all <b>class</b> comments are included in the output. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_460" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The output for the preceding code is an HTML file that has the same standard format as all the rest of the Java documentation, so users will be comfortable with the format and can easily navigate your classes. It&#146;s worth entering the preceding code, sending it through javadoc, and viewing the resulting HTML file to see the results. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_461" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545237"></a><a name="_Toc24775564"></a><a name="Heading1594"></a>Embedded
+HTML</h3>
+<p>Javadoc passes HTML commands through to the generated HTML document. This allows you full use of HTML; however, the primary motive is to let you format code, such as: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_462" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>/**
+* &lt;pre&gt;
+* System.out.println(new Date());
+* &lt;/pre&gt;
+*/</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can also use HTML just as you would in any other Web document to format the regular text in your descriptions: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_463" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>/**
+* You can &lt;em&gt;even&lt;/em&gt; insert a list:
+* &lt;ol&gt;
+* &lt;li&gt; Item one
+* &lt;li&gt; Item two
+* &lt;li&gt; Item three
+* &lt;/ol&gt;
+*/</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Note that within the documentation comment, asterisks at the beginning of a line are thrown away by javadoc, along with leading spaces. Javadoc reformats everything so that it conforms to the standard documentation appearance. Don&#146;t use headings such as <b>&lt;h1&gt;</b> or <b>&lt;hr&gt;</b> as embedded HTML, because javadoc inserts its own headings and yours will interfere with them. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_464" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>All types of comment documentation&#151;class, variable, and method&#151;can support embedded HTML. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_465" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545238"></a><a name="_Toc24775565"></a><a name="Heading1614"></a>Some
+example tags</h3>
+<p>Here are some of the javadoc tags available for code documentation. Before trying to do anything serious using javadoc, you should consult the javadoc reference in the downloadable JDK documentation to get full coverage of the way to use javadoc. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0448" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1616"></a><b>@see</b>: referring to other classes</h4>
+<p>The <a name="Index131"></a><b>@see</b> tag allows you to refer to the documentation in other classes. Javadoc will generate HTML with the <b>@see</b> tags hyperlinked to the other documentation. The forms are: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_466" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>@see classname
+@see fully-qualified-classname
+@see fully-qualified-classname#method-name</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Each one adds a hyperlinked &#147;See Also&#148; entry to the generated documentation. Javadoc will not check the hyperlinks you give it to make sure they are valid. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_467" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1623"></a>{@link <i>package.class#member label</i>}<br></h4>
+<p><a name="Index132"></a>Very similar to <b>@see</b>, except that it can be used inline and uses the <i>label</i> as the hyperlink text rather than &#147;See Also.&#148;<br></p>
+<h4>
+<a name="Heading1625"></a>{@docRoot}<br></h4>
+<p><a name="Index133"></a>Produces the relative path to the documentation root directory. Useful for explicit hyperlinking to pages in the documentation tree.<br></p>
+<h4>
+<a name="Heading1627"></a>{@inheritDoc}&#160;<br></h4>
+<p><a name="Index134"></a>Inherits the documentation from the nearest base class of this class into the current doc comment.<br></p>
+<h4>
+<a name="Heading1629"></a>@version<br></h4>
+<p><a name="Index135"></a>This is of the form:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>@version version-information</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>in which <b>version-information</b> is any significant information you see fit to include. When the <b>-version</b> flag is placed on the javadoc command line, the version information will be called out specially in the generated HTML documentation. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_469" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1634"></a>@author<br></h4>
+<p><a name="Index136"></a>This is of the form:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>@author author-information</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>in which <b>author-information</b> is, presumably, your name, but it could also include your email address or any other appropriate information. When the <b>-author </b>flag is placed on the javadoc command line, the author information will be called out specially in the generated HTML documentation. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_470" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can have multiple author tags for a list of authors, but they must be placed consecutively. All the author information will be lumped together into a single paragraph in the generated HTML. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_471" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1640"></a>@since<br></h4>
+<p><a name="Index137"></a>This tag allows you to indicate the version of this code that began using a particular feature. You&#146;ll see it appearing in the HTML Java documentation to indicate what version of the JDK is used. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_472" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1642"></a>@param<br></h4>
+<p><a name="Index138"></a>This is used for method documentation, and is of the form:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>@param parameter-name description</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>in which <b>parameter-name </b>is the identifier in the method parameter list, and <b>description </b>is text that can continue on subsequent lines. The description is considered finished when a new documentation tag is encountered. You can have any number of these, presumably one for each parameter. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_475" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1647"></a>@return<br></h4>
+<p><a name="Index139"></a>This is used for method documentation, and looks like this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>@<font color=#0000ff>return</font> description</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>in which <b>description</b> gives you the meaning of the return value. It can continue on subsequent lines. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_476" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1652"></a>@throws<br></h4>
+<p><a name="Index140"></a>Exceptions will be demonstrated in Chapter 9. Briefly, they are objects that can be &#147;thrown&#148; out of a method if that method fails. Although only one exception object can emerge when you call a method, a particular method might produce any number of different types of exceptions, all of which need descriptions. So the form for the exception tag is:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>@<font color=#0000ff>throws</font> fully-qualified-<font color=#0000ff>class</font>-name description</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>in which <b>fully-qualified-class-name</b> gives an unambiguous name of an exception class that&#146;s defined somewhere, and <b>description</b> (which can continue on subsequent lines) tells you why this particular type of exception can emerge from the method call. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_477" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1657"></a>@deprecated<br></h4>
+<p><a name="Index141"></a>This is used to indicate features that were superseded by an improved feature. The deprecated tag is a suggestion that you no longer use this particular feature, since sometime in the future it is likely to be removed. A method that is marked <b>@deprecated</b> causes the compiler to issue a warning if it is used. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_478" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545242"></a><a name="_Toc24775566"></a><a name="Heading1659"></a>Documentation
+example</h3>
+<p> Here is the first Java program again, this time with documentation comments added:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c02:HelloDate.java</font>
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#009900>/** The first Thinking in Java example program.
+ * Displays a string and today's date.
+ * @author Bruce Eckel
+ * @author www.BruceEckel.com
+ * @version 2.0
+*/</font>
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> HelloDate {
+  <font color=#009900>/** Sole entry point to class &amp; application
+   * @param args array of string arguments
+   * @return No return value
+   * @exception exceptions No exceptions thrown
+  */</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    System.out.println(<font color=#004488>"Hello, it's: "</font>);
+    System.out.println(<font color=#0000ff>new</font> Date());
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The first line of the file uses my own technique of putting a &#145;<b>//:</b>&#146; as a special marker for the comment line containing the source file name. That line contains the path information to the file (in this case, <b>c02 </b>indicates Chapter 2) followed by the file name.<sup><a name="fnB15" href="#fn15">[15]</a></sup> The last line also finishes with a comment, and this one (&#145;<b>///:~</b>&#146;) indicates the end of the source code listing, which allows it to be automatically updated into the text of this book after being checked with a compiler and executed. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_479" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc312373851"></a><a name="_Toc375545243"></a><a name="_Toc24775567"></a><a name="Heading1684"></a>Coding
+style<br></h2>
+<p><a name="Index142"></a><a name="Index143"></a>The style described in the <i>Code Conventions for the Java Programming Language<sup><a name="fnB16" href="#fn16">[16]</a></sup></i> is to capitalize the first letter of a class name. If the class name consists of several words, they are run together (that is, you don&#146;t use underscores to separate the names), and the first letter of each embedded word is capitalized, such as: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_480" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> AllTheColorsOfTheRainbow { <font color=#009900>// ...</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This is sometimes called &#147;camel-casing.&#148; For almost everything else: methods, fields (member variables), and object reference names, the accepted style is just as it is for classes <i>except</i> that the first letter of the identifier is lowercase. For example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_481" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> AllTheColorsOfTheRainbow {
+  <font color=#0000ff>int</font> anIntegerRepresentingColors;
+  <font color=#0000ff>void</font> changeTheHueOfTheColor(<font color=#0000ff>int</font> newHue) {
+    <font color=#009900>// ...</font>
+  }
+  <font color=#009900>// ...</font>
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The user must also type all these long names, so be merciful. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_482" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The Java code you will see in the Sun libraries also follows the placement of open-and-close curly braces that you see used in this book. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_483" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545244"></a><a name="_Toc24775568"></a><a name="Heading1700"></a>Summary</h2>
+<p>The goal of this chapter is just enough Java to understand how to write a simple program. You&#146;ve also gotten an overview of the language and some of its basic ideas. However, the examples so far have all been of the form &#147;do this, then do that, then do something else.&#148; What if you want the program to make choices, such as &#147;if the result of doing this is red, do that; if not, then do something else&#148;? The support in Java for this fundamental programming activity will be covered in the next chapter. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_484" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545245"></a><a name="_Toc24775569"></a><a name="Heading1702"></a>Exercises</h2>
+<p>Solutions to selected exercises can be found in the electronic document <i>The Thinking in Java Annotated Solution Guide</i>, available for a small fee from <i>www.BruceEckel.com</i>.<br></p>
+<ol>
+<li>	Following the <b>HelloDate.java</b> example in this chapter, create a
+&#147;hello, world&#148; program that simply prints out that statement. You
+need only a single method in your class (the &#147;main&#148; one that gets
+executed when the program starts). Remember to make it <b>static</b> and to
+include the argument list, even though you don&#146;t use the argument list.
+Compile the program with <b>javac</b> and run it using <b>java</b>. If you are
+using a different development environment than the JDK, learn how to compile and
+run programs in that environment. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_485" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Find the code fragments involving <b>ATypeName</b> and turn them into a
+program that compiles and runs. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_486" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Turn the <b>DataOnly</b> code fragments into a program that compiles and
+runs. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_487" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify Exercise 3 so that the values of the data in <b>DataOnly</b> are
+assigned to and printed in <b>main(&#160;)</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_488" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Write a program that includes and calls the <b>storage(&#160;)</b> method
+defined as a code fragment in this chapter. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_489" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Turn the <b>StaticFun</b> code fragments into a working program. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_490"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Write a program that prints three arguments taken from the command line. To
+do this, you&#146;ll need to index into the command-line array of
+<b>String</b>s. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_491" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Turn the <b>AllTheColorsOfTheRainbow</b> example into a program that
+compiles and runs. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_492" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Find the code for the second version of <b>HelloDate.java</b>, which is the
+simple comment documentation example. Execute <b>javadoc</b> on the file and
+view the results with your Web browser. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_493" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Turn <b>docTest</b> into a file that compiles, then run it through
+<b>javadoc</b>. Verify the resulting documentation with your Web browser. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_494"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Add an HTML list of items to the documentation in Exercise 10. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_495"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Take the program in Exercise 1 and add comment documentation to it. Extract
+this comment documentation into an HTML file using <b>javadoc</b> and view it
+with your Web browser. <a name="_Toc375545246"></a><font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap02_496" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	In Chapter 4, locate the <b>Overloading.java</b> example and add javadoc
+documentation. Extract this comment documentation into an HTML file using
+<b>javadoc</b> and view it with your Web browser. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0449" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><hr><p class="footnote text"><sup><a name="fn10" href="#fnB10">[10]</a></sup> This can be a flashpoint. There are those who say &#147;clearly, it&#146;s a pointer,&#148; but this presumes an underlying implementation. Also, Java references are much more akin to C++ references than pointers in their syntax. In the first edition of this book, I chose to invent a new term, &#147;handle,&#148; because C++ references and Java references have some important differences. I was coming out of C++ and did not want to confuse the C++ programmers whom I assumed would be the largest audience for Java. In the 2<sup>nd</sup> edition, I decided that &#147;reference&#148; was the more commonly used term, and that anyone changing from C++ would have a lot more to cope with than the terminology of references, so they might as well jump in with both feet. However, there are people who disagree even with the term &#147;reference.&#148; I read in one book where it was &#147;completely wrong to say that Java supports pass by reference,&#148; because Java object identifiers (according to that author) are <i>actually</i> &#147;object references.&#148; And (he goes on) everything is <i>actually</i> pass by value. So you&#146;re not passing by reference, you&#146;re &#147;passing an object reference by value.&#148; One could argue for the precision of such convoluted explanations, but I think my approach simplifies the understanding of the concept without hurting anything (well, the language lawyers may claim that I&#146;m lying to you, but I&#146;ll say that I&#146;m providing an appropriate abstraction.)<br></p>
+<p class="footnote text"><sup><a name="fn11" href="#fnB11">[11]</a></sup> <b>static</b> methods, which you&#146;ll learn about soon, can be called <i>for the class</i>, without an object.<br></p>
+<p class="footnote text"><sup><a name="fn12" href="#fnB12">[12]</a></sup> With the usual exception of the aforementioned &#147;special&#148; data types <b>boolean, char</b>, <b>byte</b>, <b>short</b>, <b>int</b>, <b>long</b>,<b> float,</b> and <b>double</b>. In general, though, you pass objects, which really means you pass references to objects.<br></p>
+<p class="footnote text"><sup><a name="fn13" href="#fnB13">[13]</a></sup> The Java compiler and documentation from Sun was not included on this book&#146;s CD because it tends to change regularly. By downloading it yourself, you will get the most recent version.<br></p>
+<p class="footnote text"><sup><a name="fn14" href="#fnB14">[14]</a></sup> IBM&#146;s &#147;jikes&#148; compiler is a common alternative, as it is significantly faster than Sun&#146;s javac.<br></p>
+<p class="footnote text"><sup><a name="fn15" href="#fnB15">[15]</a></sup> Originally, I created a tool using Python (see www.Python.org), which uses this information to extract the code files, put them in appropriate subdirectories, and create makefiles. In this edition, all the files are stored in Concurrent Versions System (CVS) and automatically incorporated into this book using a Visual BASIC for Applications (VBA) macro. This new approach seems to work much better in terms of code maintenance, mostly because of CVS.<br></p>
+<p class="footnote text"><sup><a name="fn16" href="#fnB16">[16]</a></sup> http://java.sun.com/docs/codeconv/index.html. To preserve space in this book and seminar presentations, not all of these guidelines could be followed.<br></p>
+
+<!-- <hr><b>Placeholder</b> -->
+
+<hr>
+
+<div align="CENTER"><a href="TIJ303.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ305.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+
+</font></body>
+
+</html>

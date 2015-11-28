@@ -1,0 +1,565 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<!--
+This document was converted from RTF source: 
+By r2net 5.8 r2netcmd Windows 
+See http://www.logictran.com
+-->
+<head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Thinking in Java, 3rd ed. Revision 4.0: 5: Hiding the Implementation</title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css"></head>
+
+<body >
+   <CENTER>     <a href="http://www.MindView.net">     <img src="mindview.gif" alt="MindView Inc." BORDER = "0"></a>     <Font FACE="Verdana, Tahoma, Arial, Helvetica, Sans">     <h2>Thinking in Java, 3<sup>rd</sup> ed. Revision 4.0</h2>     <FONT size = "-1"><br>     [ <a href="README.txt">Viewing Hints</a> ]     [ <a href="http://www.mindview.net/Books/TIJ/">Book Home Page</a> ]     [ <a href="http://www.mindview.net/Etc/MailingList.html">Free Newsletter</a> ] <br>     [ <a href="http://www.mindview.net/Seminars">Seminars</a> ]     [ <a href="http://www.mindview.net/CDs">Seminars on CD ROM</a> ]     [ <a href="http://www.mindview.net/Services">Consulting</a> ] <br><br>     </FONT></FONT>   </CENTER> 
+<font face="Georgia"><div align="CENTER"><a href="TIJ306.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ308.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+<hr>
+
+<h1>
+<a name="_Toc375545290"></a><a name="_Toc24272644"></a><a name="_Toc24775619"></a><a name="Heading4619"></a>5:
+Hiding the Implementation</h1>
+<p class="Intro">A primary consideration in object-oriented design is &#147;separating the things that change from the things that stay the same.&#148;<br></p>
+<p>This is particularly important for libraries. Users (<i>client programmers</i>) of that library must be able to rely on the part they use, and know that they won&#146;t need to rewrite code if a new version of the library comes out. On the flip side, the library creator must have the freedom to make modifications and improvements with the certainty that the client code won&#146;t be affected by those changes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_814" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index406"></a><a name="Index407"></a>This can be achieved through convention. For example, the library programmer must agree to not remove existing methods when modifying a class in the library, since that would break the client programmer&#146;s code. The reverse situation is thornier, however. In the case of a field, how can the library creator know which fields have been accessed by client programmers? This is also true with methods that are only part of the implementation of a class, and not meant to be used directly by the client programmer. But what if the library creator wants to rip out an old implementation and put in a new one? Changing any of those members might break a client programmer&#146;s code. Thus the library creator is in a strait jacket and can&#146;t change anything. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_815" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To solve this problem, Java provides <a name="Index408"></a><a name="Index409"></a><i>access specifiers</i> to allow the library creator to say what is available to the client programmer and what is not. The levels of access control from &#147;most access&#148; to &#147;least access&#148; are <a name="Index410"></a><a name="Index411"></a><b>public</b>, <b>protected</b>, package access (which has no keyword), and<a name="Index412"></a><b> private</b><a name="Index413"></a>. From the previous paragraph you might think that, as a library designer, you&#146;ll want to keep everything as &#147;private&#148; as possible, and expose only the methods that you want the client programmer to use. This is exactly right, even though it&#146;s often counterintuitive for people who program in other languages (especially C) and are used to accessing everything without restriction. By the end of this chapter you should be convinced of the value of access control in Java. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_816" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index414"></a><a name="Index415"></a>The concept of a library of components and the control over who can access the components of that library is not complete, however. There&#146;s still the question of how the components are bundled together into a cohesive library unit. This is controlled with the <b>package</b> keyword in Java, and the access specifiers are affected by whether a class is in the same package or in a separate package. So to begin this chapter, you&#146;ll learn how library components are placed into packages. Then you&#146;ll be able to understand the complete meaning of the access specifiers. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_817" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545291"></a><a name="_Toc24775620"></a><a name="Heading4625"></a>package:
+the library unit</h2>
+<p>A package is what becomes available when you use the <a name="Index416"></a><a name="Index417"></a><b>import</b> keyword to bring in an entire library, such as<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>import</font> java.util.*;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This brings in the entire utility library that&#146;s part of the standard Java distribution. For instance, there&#146;s a class called <a name="Index418"></a><b>ArrayList</b> in <b>java.util</b>, so you can now either specify the full name <b>java.util.ArrayList</b> (which you can do without the <b>import</b> statement), or you can simply say <b>ArrayList</b> (because of the <b>import</b>). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_818" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you want to bring in a single class, you can name that class in the <b>import</b> statement<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>import</font> java.util.ArrayList;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Now you can use <b>ArrayList</b> with no qualification. However, none of the other classes in <b>java.util</b> are available. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_819" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The reason for all this importing is to provide a mechanism to manage <a name="Index419"></a><a name="Index420"></a><i>name spaces</i>. The names of all your class members are insulated from each other. A method <b>f(&#160;)</b> inside a class <b>A</b> will not clash with an <a name="Index421"></a><b>f(&#160;)</b> that has the same signature (argument list) in class <b>B</b>. But what about the class names? Suppose you create a <b>Stack</b> class that is installed on a machine that already has a <b>Stack</b> class that&#146;s written by someone else? This potential clashing of names is why it&#146;s important to have complete control over the name spaces in Java, and to be able to create a completely unique name regardless of the constraints of the Internet. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_820" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Most of the examples thus far in this book have existed in a single file and have been designed for local use, so they haven&#146;t bothered with package names. (In this case the class name is placed in the &#147;default package.&#148;) This is certainly an option, and for simplicity&#146;s sake this approach will be used whenever possible throughout the rest of this book. However, if you&#146;re planning to create libraries or programs that are friendly to other Java programs on the same machine, you must think about preventing class name clashes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_822" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When you create a source-code file for Java, it&#146;s commonly called a <a name="Index422"></a><i>compilation unit</i> (sometimes a <a name="Index423"></a><i>translation unit</i>). Each compilation unit must have a name ending in <b>.java</b>, and inside the compilation unit there can be a <b>public</b> class that must have the same name as the file (including capitalization, but excluding the <b>.java</b> filename extension). There can be only<i> one</i> <a name="Index424"></a><a name="Index425"></a><b>public</b> class in each compilation unit, otherwise the compiler will complain. If there are additional classes in that compilation unit, they are hidden from the world outside that package because they&#146;re <i>not</i> <b>public</b>, and they comprise &#147;support&#148; classes for the main <b>public</b> class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_823" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When you compile a <b>.java</b> file, you get an output file <i>for each class in the </i><b>.java</b> file. Each output file has the name of a class in the <b>.java </b>file, but with an extension of <b>.class</b>. Thus you can end up with quite a few <b>.class</b> files from a small number of <b>.java</b> files. If you&#146;ve programmed with a compiled language, you might be used to the compiler spitting out an intermediate form (usually an &#147;obj&#148; file) that is then packaged together with others of its kind using a linker (to create an executable file) or a librarian (to create a library). That&#146;s not how Java works. A working program is a bunch of <b>.class</b> files, which can be packaged and compressed into a Java ARchive (JAR) file (using Java&#146;s <a name="Index426"></a><a name="Index427"></a><b>jar </b>archiver). The Java interpreter is responsible for finding, loading, and interpreting<sup><a name="fnB26" href="#fn26">[26]</a></sup> these files. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_824" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A library is a group of these class files. Each file has one class that is <b>public</b> (you&#146;re not forced to have a <b>public</b> class, but it&#146;s typical), so there&#146;s one component for each file. If you want to say that all these components (each in their own separate <b>.java </b>and <b>.class </b>files) belong together, that&#146;s where the <b>package</b> keyword comes in. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_825" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When you say:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>package</font> mypackage;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>at the beginning of a file (if you use a <b>package </b>statement, it <i>must </i>appear as the first noncomment in the file), you&#146;re stating that this compilation unit is part of a library named <b>mypackage</b>. Or, put another way, you&#146;re saying that the <b>public</b> class name within this compilation unit is under the umbrella of the name <b>mypackage</b>, and anyone who wants to use the name must either fully specify the name or use the <b>import</b> keyword in combination with <b>mypackage</b> (using the choices given previously). Note that the convention for Java package names is to use all lowercase letters, even for intermediate words. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_826" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>For example, suppose the name of the file is <b>MyClass.java</b>. This means there can be one and only one <b>public</b> class in that file, and the name of that class must be <b>MyClass</b> (including the capitalization):<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>package</font> mypackage;
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> MyClass {
+  <font color=#009900>// . . .</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Now, if someone wants to use <b>MyClass</b> or, for that matter, any of the other <b>public</b> classes in <b>mypackage</b>, they must use the <b>import</b> keyword to make the name or names in <b>mypackage</b> available. The alternative is to give the fully qualified name:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>mypackage.MyClass m = <font color=#0000ff>new</font> mypackage.MyClass();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>import</b> keyword can make this much cleaner:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>import</font> mypackage.*;
+<font color=#009900>// . . . </font>
+MyClass m = <font color=#0000ff>new</font> MyClass();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>It&#146;s worth keeping in mind that what the <b>package</b> and <b>import</b> keywords allow you to do, as a library designer, is to divide up the single global name space so you won&#146;t have clashing names, no matter how many people get on the Internet and start writing classes in Java. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_827" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545292"></a><a name="_Toc24775621"></a><a name="Heading4658"></a>Creating
+unique package names</h3>
+<p>You might observe that, since a package never really gets &#147;packaged&#148; into a single file, a package could be made up of many <b>.class</b> files, and things could get a bit cluttered. To prevent this, a logical thing to do is to place all the <b>.class</b> files for a particular package into a single directory; that is, use the hierarchical file structure of the operating system to your advantage. This is one way that Java references the problem of clutter; you&#146;ll see the other way later when the <b>jar</b> utility is introduced.  <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_828" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index428"></a><a name="Index429"></a>Collecting the package files into a single subdirectory solves two other problems: creating unique package names, and finding those classes that might be buried in a directory structure someplace. This is accomplished, as was introduced in Chapter 2, by encoding the path of the location of the <b>.class</b> file into the name of the <b>package</b>. By convention, the first part of the <b>package</b> name is the reversed Internet domain name of the creator of the class. Since Internet domain names are guaranteed to be unique, <i>if</i> you follow this convention, your <b>package</b> name will be unique and you&#146;ll never have a name clash. (That is, until you lose the domain name to someone else who starts writing Java code with the same path names as you did.) Of course, if you don&#146;t have your own domain name, then you must fabricate an unlikely combination (such as your first and last name) to create unique package names. If you&#146;ve decided to start publishing Java code, it&#146;s worth the relatively small effort to get a domain name. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_829" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The second part of this trick is resolving the <b>package</b> name into a directory on your machine, so when the Java program runs and it needs to load the <a name="Index430"></a><a name="Index431"></a><b>.class </b>file (which it does dynamically, at the point in the program where it needs to create an object of that particular class, or the first time you access a <b>static </b>member of the class), it can locate the directory where the <b>.class </b>file resides. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_830" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The Java interpreter proceeds as follows. First, it finds the environment variable CLASSPATH<a name="Index432"></a><sup><a name="fnB27" href="#fn27">[27]</a></sup> (set via the operating system, and sometimes by the installation program that installs Java or a Java-based tool on your machine). CLASSPATH contains one or more directories that are used as roots in a search for <b>.class</b> files. Starting at that root, the interpreter will take the package name and replace each dot with a slash to generate a path name from the CLASSPATH root (so <b>package foo.bar.baz</b> becomes <b>foo\bar\baz </b>or <b>foo/bar/baz </b>or possibly something else, depending on your operating system). This is then concatenated to the various entries in the CLASSPATH. That&#146;s where it looks for the <b>.class</b> file with the name corresponding to the class you&#146;re trying to create. (It also searches some standard directories relative to where the Java interpreter resides). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_831" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To understand this, consider my domain name, which is <b>bruceeckel.com</b>. By reversing this, <b>com.bruceeckel</b> establishes my unique global name for my classes. (The com, edu, org, etc., extensions were formerly capitalized in Java packages, but this was changed in Java 2 so the entire package name is lowercase.) I can further subdivide this by deciding that I want to create a library named <b>simple</b>, so I&#146;ll end up with a package name:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>package</font> com.bruceeckel.simple;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Now this package name can be used as an umbrella name space for the following two files: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_832" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: com:bruceeckel:simple:Vector.java</font>
+<font color=#009900>// Creating a package.</font>
+<font color=#0000ff>package</font> com.bruceeckel.simple;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Vector {
+  <font color=#0000ff>public</font> Vector() {
+    System.out.println(<font color=#004488>"com.bruceeckel.simple.Vector"</font>);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>When you create your own packages, you&#146;ll discover that the <b>package</b> statement must be the first noncomment code in the file. The second file looks much the same: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_833" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: com:bruceeckel:simple:List.java</font>
+<font color=#009900>// Creating a package.</font>
+<font color=#0000ff>package</font> com.bruceeckel.simple;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> List {
+  <font color=#0000ff>public</font> List() {
+    System.out.println(<font color=#004488>"com.bruceeckel.simple.List"</font>);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Both of these files are placed in the subdirectory on my system: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_834" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>C:\DOC\JavaT\com\bruceeckel\simple</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>If you walk back through this, you can see the package name <b>com.bruceeckel.simple</b>, but what about the first portion of the path? That&#146;s taken care of in the CLASSPATH environment variable, which is, on my machine: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_835" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>CLASSPATH=.;D:\JAVA\LIB;C:\DOC\JavaT</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that the CLASSPATH can contain a number of alternative search paths. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_836" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There&#146;s a variation when using JAR files, however. You must put the name of the JAR file in the classpath, not just the path where it&#146;s located. So for a JAR named <a name="Index433"></a><b>grape.jar</b> your classpath would include:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>CLASSPATH=.;D:\JAVA\LIB;C:\flavors\grape.jar</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Once the classpath is set up properly, the following file can be placed in any directory:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c05:LibTest.java</font>
+<font color=#009900>// Uses the library.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> com.bruceeckel.simple.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> LibTest {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Vector v = <font color=#0000ff>new</font> Vector();
+    List l = <font color=#0000ff>new</font> List();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"com.bruceeckel.simple.Vector"</font>,
+      <font color=#004488>"com.bruceeckel.simple.List"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>When the compiler encounters the <b>import</b> statement for the <b>simple</b> library, it begins searching at the directories specified by CLASSPATH, looking for subdirectory com\bruceeckel\simple, then seeking the compiled files of the appropriate names (<b>Vector.class</b> for <b>Vector</b>, and <b>List.class</b> for <b>List</b>). Note that both the classes and the desired methods in <b>Vector</b> and <b>List</b> must be <b>public</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_837" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Setting the CLASSPATH has been such a trial for beginning Java users (it was for me, when I started) that Sun made the JDK in Java 2 a bit smarter. You&#146;ll find that when you install it, even if you don&#146;t set the CLASSPATH, you&#146;ll be able to compile and run basic Java programs. To compile and run the source-code package for this book (available at <i>www.BruceEckel.com</i>), however, you will need to add the base directory of the book&#146;s code tree to your CLASSPATH. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_838" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading4719"></a>Collisions</h4>
+<p>What happens if two libraries are imported via &#145;<b>*</b>&#146; and they include the same names? For example, suppose a program does this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>import</font> com.bruceeckel.simple.*;
+<font color=#0000ff>import</font> java.util.*;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Since <b>java.util.*</b> also contains a <b>Vector</b> class, this causes a potential collision. However, as long as you don&#146;t write the code that actually causes the collision, everything is OK&#151;this is good, because otherwise you might end up doing a lot of typing to prevent collisions that would never happen. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_839" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The collision <i>does</i> occur if you now try to make a <b>Vector</b>:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>Vector v = <font color=#0000ff>new</font> Vector();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Which <b>Vector</b> class does this refer to? The compiler can&#146;t know, and the reader can&#146;t know either. So the compiler complains and forces you to be explicit. If I want the standard Java <b>Vector</b>, for example, I must say:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>java.util.Vector v = <font color=#0000ff>new</font> java.util.Vector();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Since this (along with the CLASSPATH) completely specifies the location of that <b>Vector</b>, there&#146;s no need for the <b>import java.util.*</b> statement unless I&#146;m using something else from <b>java.util</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_840" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545293"></a><a name="_Toc24775622"></a><a name="Heading4732"></a>A
+custom tool library</h3>
+<p>With this knowledge, you can now create your own libraries of tools to reduce or eliminate duplicate code. Consider, for example, creating an alias for <b>System.out.println(&#160;)</b> to reduce typing. This can be part of a package called <b>tools</b>:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: com:bruceeckel:tools:P.java</font>
+<font color=#009900>// The P.rint &amp; P.rintln shorthand.</font>
+<font color=#0000ff>package</font> com.bruceeckel.tools;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> P {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> rint(String s) {
+    System.out.print(s);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> rintln(String s) {
+    System.out.println(s);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can use this shorthand to print a <b>String</b> either with a newline (<b>P.rintln(&#160;)</b>) or without a newline (<b>P.rint(&#160;)</b>). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_841" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can guess that the location of this file must be in a directory that starts at one of the CLASSPATH locations, then continues <b>com/bruceeckel/tools</b>. After compiling, the <b>P.class</b> file can be used anywhere on your system with an <b>import</b> statement:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c05:ToolTest.java</font>
+<font color=#009900>// Uses the tools library.</font>
+<font color=#0000ff>import</font> com.bruceeckel.tools.*;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ToolTest {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    P.rintln(<font color=#004488>"Available from now on!"</font>);
+    P.rintln(<font color=#004488>""</font> + 100); <font color=#009900>// Force it to be a String</font>
+    P.rintln(<font color=#004488>""</font> + 100L);
+    P.rintln(<font color=#004488>""</font> + 3.14159);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Available from now on!"</font>,
+      <font color=#004488>"100"</font>,
+      <font color=#004488>"100"</font>,
+      <font color=#004488>"3.14159"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Notice that all objects can easily be forced into <b>String</b> representations by putting them in a <b>String </b>expression; in the preceding example, starting the expression with an empty <b>String </b>does the trick. But this brings up an interesting observation. If you call <b>System.out.println(100)</b>, it works without casting it to a <b>String</b>. With some extra overloading, you can get the <b>P</b> class to do this as well (this is an exercise at the end of this chapter). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_842" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>So from now on, whenever you come up with a useful new utility, you can add it to your own <b>tools</b> or <b>util </b>directory. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_843" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545294"></a><a name="_Toc24775623"></a><a name="Heading4772"></a>Using
+imports to change behavior</h3>
+<p>A feature that is missing from Java is C&#146;s <i>conditional compilation</i>, which allows you to change a switch and get different behavior without changing any other code. The reason such a feature was left out of Java is probably because it is most often used in C to solve cross-platform issues: Different portions of the code are compiled depending on the platform that the code is being compiled for. Since Java is intended to be automatically cross-platform, such a feature should not be necessary. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_844" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>However, there are other valuable uses for conditional compilation. A very common use is for debugging code. The debugging features are enabled during development and disabled in the shipping product. You can accomplish this by changing the <b>package</b> that&#146;s imported to change the code used in your program from the debug version to the production version. This technique can be used for any kind of conditional code. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_850" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775624"></a><a name="Heading4775"></a>Package caveat</h3>
+<p>It&#146;s worth remembering that anytime you create a package, you implicitly specify a directory structure when you give the package a name. The package <a name="Index436"></a><a name="Index437"></a><i>must</i> live in the directory indicated by its name, which must be a directory that is searchable starting from the CLASSPATH. Experimenting with the <b>package</b> keyword can be a bit frustrating at first, because unless you adhere to the package-name to directory-path rule, you&#146;ll get a lot of mysterious run-time messages about not being able to find a particular class, even if that class is sitting there in the same directory. If you get a message like this, try commenting out the <b>package</b> statement, and if it runs, you&#146;ll know where the problem lies. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_851" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545295"></a><a name="_Toc24775625"></a><a name="Heading4777"></a>Java
+access specifiers</h2>
+<p>When used, the Java access specifiers <a name="Index438"></a><a name="Index439"></a><a name="Index440"></a><b>public</b>, <a name="Index441"></a><b>protected,</b> and <a name="Index442"></a><b>private</b> are placed in front of each definition for each member in your class, whether it&#146;s a field or a method. Each access specifier controls the access for only that particular definition. This is a distinct contrast to C++, in which the access specifier controls all the definitions following it until another access specifier comes along. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_852" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>One way or another, everything has some kind of access specified for it. In the following sections, you&#146;ll learn all about the various types of access, starting with the default access. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_853" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775626"></a><a name="Heading4780"></a>Package access</h3>
+<p>What if you give no access specifier at all, as in all the examples before this chapter? The default access has no keyword, but it is commonly referred to as <i>package access </i>(and sometimes &#147;friendly&#148;). It means that all the other classes in the current package have access to that member, but to all the classes outside of this package, the member appears to be <b>private</b>. Since a compilation unit&#151;a file&#151;can belong only to a single package, all the classes within a single compilation unit are automatically available each other via package access. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_854" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index443"></a><a name="Index444"></a>Package access allows you to group related classes together in a package so that they can easily interact with each other. When you put classes together in a package, thus granting mutual access to their package-access members, you &#147;own&#148; the code in that package. It makes sense that only code you own should have package access to other code you own. You could say that package access gives a meaning or a reason for grouping classes together in a package. In many languages the way you organize your definitions in files can be arbitrary, but in Java you&#146;re compelled to organize them in a sensible fashion. In addition, you&#146;ll probably want to exclude classes that shouldn&#146;t have access to the classes being defined in the current package. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_855" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index445"></a><a name="Index446"></a>The class controls which code has access to its members. There&#146;s no magic way to &#147;break in.&#148; Code from another package can&#146;t show up and say, &#147;Hi, I&#146;m a friend of <b>Bob</b>&#146;s!&#148; and expect to see the <b>protected</b>, package-access, and <b>private</b> members of <b>Bob</b>. The only way to grant access to a member is to: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_856" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li>Make the member <b>public</b>. Then everybody, everywhere, can access it.
+<font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_857"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>Give the member package access by leaving off any access specifier, and put
+the other classes in the same package. Then the other classes in that package
+can access the member. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_858" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>As you&#146;ll see in Chapter 6, when inheritance is introduced, an
+inherited class can access a <b>protected</b> member as well as a <b>public</b>
+member (but not <b>private</b> members). It can access package-access members
+only if the two classes are in the same package. But don&#146;t worry about
+that now. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_859" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>Provide &#147;accessor/mutator&#148; methods (also known as
+&#147;get/set&#148; methods) that read and change the value. This is the most
+civilized approach in terms of OOP, and it is fundamental to JavaBeans, as
+you&#146;ll see in Chapter 14. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_860" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><h3>
+<a name="_Ref351419800"></a><a name="_Toc375545297"></a><a name="_Toc24775627"></a><a name="Heading4788"></a><b>public</b>:
+interface access</h3>
+<p>When you use the <b>public</b> keyword, it means that the member declaration that immediately follows <a name="Index447"></a><b>public</b> is available to everyone, in particular to the client programmer who uses the library. Suppose you define a package <b>dessert</b> containing the following compilation unit: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_861" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c05:dessert:Cookie.java</font>
+<font color=#009900>// Creates a library.</font>
+<font color=#0000ff>package</font> c05.dessert;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Cookie {
+  <font color=#0000ff>public</font> Cookie() {
+   System.out.println(<font color=#004488>"Cookie constructor"</font>);
+  }
+  <font color=#0000ff>void</font> bite() { System.out.println(<font color=#004488>"bite"</font>); }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Remember, the class file produced by <b>Cookie.java</b> must reside in a subdirectory called <b>dessert</b>, in a directory under <b>c05 </b>(indicating Chapter 5 of this book) that must be under one of the CLASSPATH directories. Don&#146;t make the mistake of thinking that Java will always look at the current directory as one of the starting points for searching. If you don&#146;t have a &#145;<b>.</b>&#146; as one of the paths in your CLASSPATH, Java won&#146;t look there. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_862" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Now if you create a program that uses <b>Cookie</b>:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c05:Dinner.java</font>
+<font color=#009900>// Uses the library.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> c05.dessert.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Dinner {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> Dinner() {
+   System.out.println(<font color=#004488>"Dinner constructor"</font>);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Cookie x = <font color=#0000ff>new</font> Cookie();
+    <font color=#009900>//! x.bite(); // Can't access</font>
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Cookie constructor"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>you can create a <b>Cookie</b> object, since its constructor is <b>public</b> and the class is <b>public</b>. (We&#146;ll look more at the concept of a <b>public</b> class later.) However, the <b>bite(&#160;)</b> member is inaccessible inside <b>Dinner.java</b> since <b>bite(&#160;)</b> provides access only within package <b>dessert</b>, so the compiler prevents you from using it. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_863" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading4823"></a>The default package<br></h4>
+<p><a name="Index448"></a><a name="Index449"></a><a name="Index450"></a>You might be surprised to discover that the following code compiles, even though it would appear that it breaks the rules:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c05:Cake.java</font>
+<font color=#009900>// Accesses a class in a separate compilation unit.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Cake {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Pie x = <font color=#0000ff>new</font> Pie();
+    x.f();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Pie.f()"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In a second file in the same directory:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c05:Pie.java</font>
+<font color=#009900>// The other class.</font>
+
+<font color=#0000ff>class</font> Pie {
+  <font color=#0000ff>void</font> f() { System.out.println(<font color=#004488>"Pie.f()"</font>); }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You might initially view these as completely foreign files, and yet <b>Cake</b> is able to create a <b>Pie</b> object and call its <b>f(&#160;)</b> method! (Note that you must have &#145;.&#146; in your CLASSPATH in order for the files to compile.) You&#146;d typically think that <b>Pie</b> and <b>f(&#160;)</b> have package access and therefore not available to <b>Cake</b>. They <i>do</i> have package access&#151;that part is correct. The reason that they are available in <b>Cake.java</b> is because they are in the same directory and have no explicit package name. Java treats files like this as implicitly part of the &#147;default package&#148; for that directory, and thus they provide package access to all the other files in that directory. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_864" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545298"></a><a name="_Toc24775628"></a><a name="Heading4849"></a><b>private</b>:
+you can&#146;t touch that!</h3>
+<p>The <b>private</b> keyword means that no one can access that member except the class that contains that member, inside methods of that class. Other classes in the same package cannot access <a name="Index451"></a><b>private </b>members, so it&#146;s as if you&#146;re even insulating the class against yourself. On the other hand, it&#146;s not unlikely that a package might be created by several people collaborating together, so <b>private</b> allows you to freely change that member without concern that it will affect another class in the same package. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_865" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The default package access often provides an adequate amount of hiding; remember, a package-access member is inaccessible to the client programmer using the class. This is nice, since the default access is the one that you normally use (and the one that you&#146;ll get if you forget to add any access control). Thus, you&#146;ll typically think about access for the members that you explicitly want to make <b>public</b> for the client programmer, and as a result, you might not<i> </i>initially think you&#146;ll use the <b>private </b>keyword often since it&#146;s tolerable to get away without it. (This is a distinct contrast with C++.) However, it turns out that the consistent use of <b>private</b> is very important, especially where multithreading is concerned. (As you&#146;ll see in Chapter 13.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_866" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Here&#146;s an example of the use of <b>private</b>:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c05:IceCream.java</font>
+<font color=#009900>// Demonstrates "private" keyword.</font>
+
+<font color=#0000ff>class</font> Sundae {
+  <font color=#0000ff>private</font> Sundae() {}
+  <font color=#0000ff>static</font> Sundae makeASundae() {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Sundae();
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> IceCream {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#009900>//! Sundae x = new Sundae();</font>
+    Sundae x = Sundae.makeASundae();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This shows an example in which <b>private</b> comes in handy: you might want to control how an object is created and prevent someone from directly accessing a particular constructor (or all of them). In the preceding example, you cannot create a <b>Sundae</b> object via its constructor; instead, you must call the <b>makeASundae(&#160;)</b> method to do it for you.<sup><a name="fnB28" href="#fn28">[28]</a></sup> <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_867" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Any method that you&#146;re certain is only a &#147;helper&#148; method for that class can be made <b>private,</b> to ensure that you don&#146;t accidentally use it elsewhere in the package and thus prohibit yourself from changing or removing the method. Making a method <b>private</b> guarantees that you retain this option. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_868" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The same is true for a <b>private </b>field inside a class. Unless you must expose the underlying implementation (which is less likely than you might think), you should make all fields <b>private</b>. However, just because a reference to an object is <b>private</b> inside a class doesn't mean that some other object can't have a <b>public</b> reference to the same object. (See Appendix A for issues about aliasing.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_869" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc312373839"></a><a name="_Toc375545299"></a><a name="_Toc24775629"></a><a name="Heading4874"></a><b>protected</b>:
+inheritance access</h3>
+<p>Understanding the <b>protected</b> access specifier requires a jump ahead. First, you should be aware that you don&#146;t need to understand this section to continue through this book up through inheritance (Chapter 6). But for completeness, here is a brief description and example using <a name="Index452"></a><b>protected</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_870" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The <b>protected</b> keyword deals with a concept called <a name="Index453"></a><i>inheritance</i>, which takes an existing class&#151;which we refer to as the <a name="Index454"></a><a name="Index455"></a><i>base</i> <i>class</i>&#151;and adds new members to that class without touching the existing class. You can also change the behavior of existing members of the class. To inherit from an existing class, you say that your new class <a name="Index456"></a><b>extends </b>an existing class, like this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> Foo <font color=#0000ff>extends</font> Bar {</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The rest of the class definition looks the same. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_871" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you create a new package and inherit from a class in another package, the only members you have access to are the <b>public</b> members of the original package. (Of course, if you perform the inheritance in the <i>same</i> package, you can manipulate all the members that have package access) Sometimes the creator of the base class would like to take a particular member and grant access to derived classes but not the world in general. That&#146;s what <b>protected</b> does. <b>protected</b> also gives package access&#151;that is, other classes in the same package may access <b>protected</b> elements.<br></p>
+<p>If you refer back to the file <b>Cookie.java</b>, the following class <i>cannot</i> call the package-access member <b>bite(&#160;)</b>:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c05:ChocolateChip.java</font>
+<font color=#009900>// Can't use package-access member from another package.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> c05.dessert.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ChocolateChip <font color=#0000ff>extends</font> Cookie {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> ChocolateChip() {
+   System.out.println(<font color=#004488>"ChocolateChip constructor"</font>);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    ChocolateChip x = <font color=#0000ff>new</font> ChocolateChip();
+    <font color=#009900>//! x.bite(); // Can't access bite</font>
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Cookie constructor"</font>,
+      <font color=#004488>"ChocolateChip constructor"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>One of the interesting things about inheritance is that if a method <b>bite(&#160;)</b> exists in class <b>Cookie</b>, then it also exists in any class inherited from <b>Cookie</b>. But since <b>bite(&#160;)</b> has package access and is in a foreign package, it&#146;s unavailable to us in this one. Of course, you could make it <b>public</b>, but then everyone would have access, and maybe that&#146;s not what you want. If we change the class <b>Cookie</b> as follows:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>public</font> <font color=#0000ff>class</font> Cookie {
+  <font color=#0000ff>public</font> Cookie() { 
+    System.out.println(<font color=#004488>"Cookie constructor"</font>);
+  }
+  <font color=#0000ff>protected</font> <font color=#0000ff>void</font> bite() {
+    System.out.println(<font color=#004488>"bite"</font>); 
+  }
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>then <b>bite(&#160;)</b> still has the equivalent of package access within package <b>dessert</b>, but it is also accessible to anyone inheriting from <b>Cookie</b>. However, it is <i>not</i> <a name="Index457"></a><b>public</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_872" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545301"></a><a name="_Toc24775630"></a><a name="Heading4913"></a>Interface
+and implementation</h2>
+<p>Access control is often referred to as <i>implementation hiding</i>. Wrapping data and methods within classes in combination with implementation hiding is often called <a name="Index458"></a><a name="Index459"></a><i>encapsulation</i><a name="Index460"></a>.<sup><a name="fnB29" href="#fn29">[29]</a></sup> The result is a data type with characteristics and behaviors. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_873" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Access control puts boundaries within a data type for two important reasons. The first is to establish what the client programmers can and can&#146;t use. You can build your internal mechanisms into the structure without worrying that the client programmers will accidentally treat the internals as part of the interface that they should be using. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_874" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This feeds directly into the second reason, which is to separate the interface from the implementation.  If the structure is used in a set of programs, but client programmers can&#146;t do anything but send messages to the <a name="Index461"></a><a name="Index462"></a><a name="Index463"></a><b>public</b> interface, then you are free to change anything that&#146;s <i>not</i> <b>public</b> (e.g., package access, <b>protected</b>, or <b>private</b>) without breaking client code. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_875" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>We&#146;re now in the world of object-oriented programming, where a <b>class</b> is actually describing &#147;a class of objects,&#148; as you would describe a class of fishes or a class of birds. Any object belonging to this class will share these characteristics and behaviors. The class is a description of the way all objects of this type will look and act. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_876" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In the original OOP language, Simula-67, the keyword <a name="Index464"></a><a name="Index465"></a><b>class</b> was used to describe a new data type. The same keyword has been used for most object-oriented languages. This is the focal point of the whole language: the creation of new data types that are more than just boxes containing data and methods. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_877" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index466"></a>The class is the fundamental OOP concept in Java. It is one of the keywords that will <i>not </i>be set in bold in this book&#151;it becomes annoying with a word repeated as often as &#147;class.&#148; <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_878" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>For clarity, you might prefer a style of creating classes that puts the <a name="Index467"></a><a name="Index468"></a><b>public</b> members at the beginning, followed by the <b>protected</b>, package access, and <b>private</b> members. The advantage is that the user of the class can then read down from the top and see first what&#146;s important to them (the <b>public</b> members, because they can be accessed outside the file), and stop reading when they encounter the non-<b>public</b> members, which are part of the internal implementation:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>public</font> <font color=#0000ff>class</font> X {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> pub1() { <font color=#009900>/* . . . */</font> }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> pub2() { <font color=#009900>/* . . . */</font> }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> pub3() { <font color=#009900>/* . . . */</font> }
+  <font color=#0000ff>private</font> <font color=#0000ff>void</font> priv1() { <font color=#009900>/* . . . */</font> }
+  <font color=#0000ff>private</font> <font color=#0000ff>void</font> priv2() { <font color=#009900>/* . . . */</font> }
+  <font color=#0000ff>private</font> <font color=#0000ff>void</font> priv3() { <font color=#009900>/* . . . */</font> }
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> i;
+  <font color=#009900>// . . .</font>
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This will make it only partially easier to read, because the interface and implementation are still mixed together. That is, you still see the source code&#151;the implementation&#151;because it&#146;s right there in the class. In addition, the comment documentation supported by javadoc (described in Chapter 2) lessens the importance of code readability by the client programmer. Displaying the interface to the consumer of a class is really the job of the <a name="Index469"></a><a name="Index470"></a><i>class browser</i>, a tool whose job is to look at all the available classes and show you what you can do with them (i.e., what members are available) in a useful fashion. Class browsers have become an expected part of any good Java development tool. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_879" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc312373850"></a><a name="_Toc375545302"></a><a name="_Toc24775631"></a><a name="Heading4934"></a>Class
+access<br></h2>
+<p><a name="Index471"></a><a name="Index472"></a>In Java, the access specifiers can also be used to determine which classes <i>within</i> a library will be available to the users of that library. If you want a class to be available to a client programmer, you use the <b>public</b> keyword on the entire class<b> </b>definition. This controls whether the client programmer can even create an object of the class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_880" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To control the access of a class, the specifier must appear before the keyword <b>class</b>.<b> </b>Thus you can say:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>public</font> <font color=#0000ff>class</font> Widget {</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Now if the name of your library is <b>mylib</b>, any client programmer can access <b>Widget</b> by saying<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>import</font> mylib.Widget;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>or<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>import</font> mylib.*;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>However, there&#146;s an extra set of constraints: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_881" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li>There can be only one <b>public</b> class per compilation unit (file). The
+idea is that each compilation unit has a single public interface represented by
+that <b>public</b> class. It can have as many supporting package-access classes
+as you want. If you have more than one <b>public</b> class inside a compilation
+unit, the compiler will give you an error message. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_882" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>The name of the <b>public</b> class must exactly match the name of the file
+containing the compilation unit, including capitalization. So for <b>Widget</b>,
+the name of the file must be <b>Widget.java</b>, not <b>widget.java</b> or
+<b>WIDGET.java</b>. Again, you&#146;ll get a compile-time error if they
+don&#146;t agree. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_883" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>It is possible, though not typical, to have a compilation unit with no
+<b>public</b> class at all. In this case, you can name the file whatever you
+like. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_884" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><p>What if you&#146;ve got a class inside <b>mylib</b> that you&#146;re just using to accomplish the tasks performed by <b>Widget</b> or some other <b>public</b> class in <b>mylib</b>? You don&#146;t want to go to the bother of creating documentation for the client programmer, and you think that sometime later you might want to completely change things and rip out your class altogether, substituting a different one. To give you this flexibility, you need to ensure that no client programmers become dependent on your particular implementation details hidden inside <b>mylib</b>. To accomplish this, you just leave the <b>public</b> keyword off the class, in which case it has package access. (That class can be used only within that package.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_885" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When you create a package-access class, it still makes sense to make the fields of the class <b>private</b>&#151;you should always make fields as private as possible&#151;but it&#146;s generally reasonable to give the methods the same access as the class (package access). Since a package-access class is usually used only within the package, you only need to make the methods of such a class <b>public</b> if you&#146;re forced to, and in those cases, the compiler will tell you. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0463" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Note that a class cannot be <b>private </b>(that would make it accessible to no one but the class) or <b>protected</b>.<sup><a name="fnB30" href="#fn30">[30]</a></sup> So you have only two choices for class access: package access or <b>public</b>. If you don&#146;t want anyone else to have access to that class, you can make all the constructors <b>private</b>, thereby preventing anyone but you, inside a <b>static</b> member of the class, from creating an object of that class. Here&#146;s an example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0108" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c05:Lunch.java</font>
+<font color=#009900>// Demonstrates class access specifiers. Make a class</font>
+<font color=#009900>// effectively private with private constructors:</font>
+
+<font color=#0000ff>class</font> Soup {
+  <font color=#0000ff>private</font> Soup() {}
+  <font color=#009900>// (1) Allow creation via static method:</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> Soup makeSoup() {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Soup();
+  }
+  <font color=#009900>// (2) Create a static object and return a reference</font>
+  <font color=#009900>// upon request.(The "Singleton" pattern):</font>
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Soup ps1 = <font color=#0000ff>new</font> Soup();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> Soup access() {
+    <font color=#0000ff>return</font> ps1;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+}
+
+<font color=#0000ff>class</font> Sandwich { <font color=#009900>// Uses Lunch</font>
+  <font color=#0000ff>void</font> f() { <font color=#0000ff>new</font> Lunch(); }
+}
+
+<font color=#009900>// Only one public class allowed per file:</font>
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Lunch {
+  <font color=#0000ff>void</font> test() {
+    <font color=#009900>// Can't do this! Private constructor:</font>
+    <font color=#009900>//! Soup priv1 = new Soup();</font>
+    Soup priv2 = Soup.makeSoup();
+    Sandwich f1 = <font color=#0000ff>new</font> Sandwich();
+    Soup.access().f();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Up to now, most of the methods have been returning either <b>void</b> or a primitive type, so the definition:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>  <font color=#0000ff>public</font> <font color=#0000ff>static</font> Soup access() {
+    <font color=#0000ff>return</font> ps1;
+  }</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>might look a little confusing at first. The word before the method name (<b>access</b>) tells what the method returns. So far, this has most often been <b>void,</b> which means it returns nothing. But you can also return a reference to an object, which is what happens here. This method returns a reference to an object of class <b>Soup</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_886" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The <b>class Soup</b> shows how to prevent direct creation of a class by making all the constructors <b>private</b>. Remember that if you don&#146;t explicitly create at least one constructor, the default constructor (a constructor with no arguments) will be created for you. By writing the default constructor, it won&#146;t be created automatically. By making it <b>private</b>, no one can create an object of that class. But now how does anyone use this class? The preceding example shows two options. First, a <b>static</b> method is created that creates a new <b>Soup</b> and returns a reference to it. This could be useful if you want to do some extra operations on the <b>Soup</b> before returning it, or if you want to keep count of how many <b>Soup</b> objects to create (perhaps to restrict their population). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_887" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The second option uses what&#146;s called a <a name="Index473"></a><a name="Index474"></a><a name="Index475"></a><i>design pattern</i>, which is covered in <i>Thinking in Patterns (with Java)</i> at <i>www.BruceEckel.com</i>. This particular pattern is called a &#147;singleton&#148; because it allows only a single object to ever be created. The object of class <a name="Index476"></a><b>Soup</b> is created as a <b>static</b> <b>private </b>member of <b>Soup</b>, so there&#146;s one and only one, and you can&#146;t get at it except through the <b>public</b> method <b>access(&#160;)</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_888" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As previously mentioned, if you don&#146;t put an access specifier for class access, it defaults to package access. This means that an object of that class can be created by any other class in the package, but not outside the package. (Remember, all the files within the same directory that don&#146;t have explicit <b>package </b>declarations are implicitly part of the default package for that directory.) However, if a <b>static</b> member of that class is <b>public</b>, the client programmer can still access that <b>static</b> member even though they cannot create an object of that class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_889" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545303"></a><a name="_Toc24775632"></a><a name="Heading4996"></a>Summary</h2>
+<p>In any relationship it&#146;s important to have boundaries that are respected by all parties involved. When you create a library, you establish a relationship with the user of that library&#151;the client programmer&#151;who is another programmer, but one putting together an application or using your library to build a bigger library. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_890" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Without rules, client programmers can do anything they want with all the members of a class, even if you might prefer they don&#146;t directly manipulate some of the members. Everything&#146;s naked to the world. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_891" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This chapter looked at how classes are built to form libraries: first, the way a group of classes is packaged within a library, and second, the way the class controls access to its members. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_892" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>It is estimated that a C programming project begins to break down somewhere between 50K and 100K lines of code because C has a single &#147;name space&#148;: names begin to collide, causing an extra management overhead. In Java, the <b>package</b> keyword, the package naming scheme, and the <b>import</b> keyword give you complete control over names, so the issue of name collision is easily avoided. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_893" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There are two reasons for controlling access to members. The first is to keep users&#146; hands off tools that they shouldn&#146;t touch: tools that are necessary for the internal operations of the data type, but not part of the interface that users need to solve their particular problems. So making methods and fields <a name="Index477"></a><a name="Index478"></a><b>private</b> is a service to users, because they can easily see what&#146;s important to them and what they can ignore. It simplifies their understanding of the class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_894" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The second and most important reason for access control is to allow the library designer to change the internal workings of the class without worrying about how it will affect the client programmer. You might build a class one way at first, and then discover that restructuring your code will provide much greater speed. If the interface and implementation are clearly separated and protected, you can accomplish this without forcing users to rewrite their code. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_895" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Access specifiers in Java give valuable control to the creator of a class. The users of the class can clearly see exactly what they can use and what to ignore. More important, though, is the ability to ensure that no user becomes dependent on any part of the underlying implementation of a class. If you know this as the creator of the class, you can change the underlying implementation at will, because you know that no client programmer will be affected by the changes; they can&#146;t access that part of the class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_896" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When you have the ability to change the underlying implementation, you can freely improve your design. You also have the freedom to make mistakes. No matter how carefully you plan and design, you&#146;ll make mistakes. Knowing that it&#146;s relatively safe to make these mistakes means you&#146;ll be more experimental, you&#146;ll learn more quickly, and you&#146;ll finish your project sooner. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_897" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index479"></a><a name="Index480"></a>The public interface to a class is what the user <i>does</i> see, so that is the most important part of the class to get &#147;right&#148; during analysis and design. Even that allows you some leeway for change. If you don&#146;t get the interface right the first time, you can <i>add</i> more methods<a name="Index481"></a><a name="Index482"></a>, as long as you don&#146;t remove any that client programmers have already used in their code. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_898" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545304"></a><a name="_Toc24775633"></a><a name="Heading5006"></a>Exercises</h2>
+<p>Solutions to selected exercises can be found in the electronic document <i>The Thinking in Java Annotated Solution Guide</i>, available for a small fee from <i>www.BruceEckel.com</i>.<br></p>
+<ol>
+<li>	Write a program that creates an <b>ArrayList</b> object without explicitly
+importing <b>java.util.*</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_899" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	In the section labeled &#147;package: the library unit,&#148; turn the
+code fragments concerning <b>mypackage</b> into a compiling and running set of
+Java files. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_900" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	In the section labeled &#147;Collisions,&#148; take the code fragments
+and turn them into a program and verify that collisions do in fact occur. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_901"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Generalize the class <b>P</b> defined in this chapter by adding all the
+overloaded versions of <b>rint(&#160;)</b> and <b>rintln(&#160;)</b> necessary
+to handle all the different basic Java types. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_902" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class with <b>public</b>, <b>private</b>, <b>protected,</b> and
+package-access fields and method members. Create an object of this class and see
+what kind of compiler messages you get when you try to access all the class
+members. Be aware that classes in the same directory are part of the
+&#147;default&#148; package. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_904" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class with <b>protected</b> data. Create a second class in the
+same file with a method that manipulates the <b>protected</b> data in the first
+class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_905" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Change the class <b>Cookie </b>as specified in the section labeled
+&#147;protected: inheritance access.&#148; Verify that <b>bite(&#160;) </b>is
+not <b>public</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_906" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	In the section titled &#147;Class access&#148; you&#146;ll find code
+fragments describing <b>mylib</b> and <b>Widget</b>. Create this library, then
+create a <b>Widget</b> in a class that is not part of the <b>mylib</b> package.
+<font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_907"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Create a new directory and edit your CLASSPATH to include that new
+directory. Copy the <b>P.class</b> file (produced by compiling
+<b>com.bruceeckel.tools.P.java</b>)<b> </b>to your new directory and then change
+the names of the file, the <b>P</b> class inside, and the method names. (You
+might also want to add additional output to watch how it works.) Create another
+program in a different directory that uses your new class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_908" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Following the form of the example <b>Lunch.java</b>, create a class called
+<b>ConnectionManager</b> that manages a fixed array of <b>Connection</b>
+objects. The client programmer must not be able to explicitly create
+<b>Connection</b> objects, but can only get them via a <b>static</b> method in
+<b>ConnectionManager</b>. When the <b>ConnectionManager</b> runs out of objects,
+it returns a <b>null</b> reference. Test the classes in <b>main(&#160;)</b>.
+<font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_909"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Create the following file in the c05/local directory (presumably in your
+CLASSPATH):</li></ol>
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>// c05:local:PackagedClass.java</font>
+<font color=#0000ff>package</font> c05.local;
+<font color=#0000ff>class</font> PackagedClass {
+  <font color=#0000ff>public</font> PackagedClass() {
+    System.out.println(<font color=#004488>"Creating a packaged class"</font>);
+  }
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Then create the following file in a directory other than c05:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>// c05:foreign:Foreign.java</font>
+<font color=#0000ff>package</font> c05.foreign;
+<font color=#0000ff>import</font> c05.local.*;
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Foreign {
+   <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main (String[] args) {
+      PackagedClass pc = <font color=#0000ff>new</font> PackagedClass();
+   }
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Explain why the compiler generates an error. Would making the <b>Foreign</b> class part of the <b>c05.local</b> package change anything? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap05_910" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<hr><p class="footnote text"><sup><a name="fn26" href="#fnB26">[26]</a></sup> There&#146;s nothing in Java that forces the use of an interpreter. There exist native-code Java compilers that generate a single executable file.<br></p>
+<p class="footnote text"><sup><a name="fn27" href="#fnB27">[27]</a></sup> When referring to the environment variable, capital letters will be used (CLASSPATH).<br></p>
+<p class="footnote text"><sup><a name="fn28" href="#fnB28">[28]</a></sup> There&#146;s another effect in this case: Since the default constructor is the only one defined, and it&#146;s <b>private</b>, it will prevent inheritance of this class. (A subject that will be introduced in Chapter 6.)<br></p>
+<p class="footnote text"><sup><a name="fn29" href="#fnB29">[29]</a></sup> However, people often refer to implementation hiding alone as encapsulation.<br></p>
+<p class="footnote text"><sup><a name="fn30" href="#fnB30">[30]</a></sup> Actually, an <i>inner class</i> can be private or protected, but that&#146;s a special case. These will be introduced in Chapter 7.<br></p>
+
+<!-- <hr><b>Placeholder</b> -->
+
+<hr>
+
+<div align="CENTER"><a href="TIJ306.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ308.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+
+</font></body>
+
+</html>

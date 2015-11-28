@@ -1,0 +1,1758 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<!--
+This document was converted from RTF source: 
+By r2net 5.8 r2netcmd Windows 
+See http://www.logictran.com
+-->
+<head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Thinking in Java, 3rd ed. Revision 4.0: 8: Interfaces &amp; Inner Classes</title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css"></head>
+
+<body >
+   <CENTER>     <a href="http://www.MindView.net">     <img src="mindview.gif" alt="MindView Inc." BORDER = "0"></a>     <Font FACE="Verdana, Tahoma, Arial, Helvetica, Sans">     <h2>Thinking in Java, 3<sup>rd</sup> ed. Revision 4.0</h2>     <FONT size = "-1"><br>     [ <a href="README.txt">Viewing Hints</a> ]     [ <a href="http://www.mindview.net/Books/TIJ/">Book Home Page</a> ]     [ <a href="http://www.mindview.net/Etc/MailingList.html">Free Newsletter</a> ] <br>     [ <a href="http://www.mindview.net/Seminars">Seminars</a> ]     [ <a href="http://www.mindview.net/CDs">Seminars on CD ROM</a> ]     [ <a href="http://www.mindview.net/Services">Consulting</a> ] <br><br>     </FONT></FONT>   </CENTER> 
+<font face="Georgia"><div align="CENTER"><a href="TIJ309.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ311.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+<hr>
+
+<h1>
+<a name="_Toc375545346"></a><a name="_Toc24272647"></a><a name="_Toc24775673"></a><a name="Heading6797"></a>8:
+Interfaces &amp; Inner Classes</h1>
+<p class="Intro">Interfaces and inner classes provide more sophisticated ways to organize and control the objects in your system.<br></p>
+<p>C++, for example, does not contain such mechanisms, although the clever programmer may simulate them. The fact that they exist in Java indicates that they were considered important enough to provide direct support through language keywords. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1108" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In Chapter 7 you learned about the <b>abstract</b> keyword, which allows you to create one or more methods in a class that have no definitions&#151;you provide part of the interface without providing a corresponding implementation, which is created by inheritors. The <b>interface</b> keyword produces a completely abstract class, one that provides no implementation at all. You&#146;ll learn that the <b>interface </b>is more than just an abstract class taken to the extreme, since it allows you to perform a variation on C++&#146;s &#147;multiple inheritance&#148; by creating a class that can be upcast to more than one base type. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1109" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>At first, inner classes look like a simple code-hiding mechanism: you place classes inside other classes. You&#146;ll learn, however, that the inner class does more than that&#151;it knows about and can communicate with the surrounding class&#151;and that the kind of code you can write with inner classes is more elegant and clear, although it is a new concept to most. It takes some time to become comfortable with design using inner classes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1110" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775674"></a><a name="Heading6802"></a>Interfaces</h2>
+<p>The <a name="Index687"></a><b>interface</b> keyword takes the <b>abstract </b>concept one step further. You could think of it as a &#147;pure&#148; <b>abstract </b>class. It allows the creator to establish the form for a class: method names, argument lists, and return types, but no method bodies. An <b>interface</b> can also contain fields, but these are implicitly <a name="Index688"></a><b>static</b> and <a name="Index689"></a><b>final</b>. An <b>interface</b> provides only a form, but no implementation. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1111" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index690"></a>An <b>interface</b> says, &#147;This is what all classes that <i>implement</i> this particular interface will look like.&#148; Thus, any code that uses a particular <b>interface</b> knows what methods might be called for that <b>interface</b>, and that&#146;s all. So the <b>interface</b> is used to establish a &#147;protocol&#148; between classes. (Some object-oriented programming languages have a keyword called <a name="Index691"></a><a name="Index692"></a><i>protocol</i> to do the same thing.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1112" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To create an <b>interface</b>, use the <b>interface</b> keyword instead of the <b>class</b> keyword. Like a class, you can add the <a name="Index693"></a><b>public</b> keyword before the <b>interface </b>keyword (but only if that <b>interface</b> is defined in a file of the same name) or leave it off to give package access, so that it is only usable within the same package. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1113" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To make a class that conforms to a particular <b>interface</b> (or group of <b>interface</b>s), use the <a name="Index694"></a><b>implements</b> keyword, which says, &#147;The <b>interface</b> is what it looks like, but now I&#146;m going to say how it <i>works</i>.&#148; Other than that, it looks like inheritance. The diagram for the instrument example shows this:<br></p>
+<p align="center"><img src="TIJ322.png" 	alt="TIJ322.png" border="0" ><br></p>
+<p>You can see from the <b>Woodwind </b>and <b>Brass </b>classes that once you&#146;ve implemented an <b>interface</b>, that implementation becomes an ordinary class that can be extended in the regular way. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1114" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can choose to explicitly declare the method declarations in an <b>interface</b> as <b>public</b>, but they are <b>public</b> even if you don&#146;t say it. So when you <b>implement</b> an <b>interface</b>, the methods from the <b>interface</b> must be defined as <b>public</b>. Otherwise, they would default to package access, and you&#146;d be reducing the accessibility of a method during inheritance, which is not allowed by the Java compiler. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1115" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can see this in the modified version of the <b>Instrument</b> example. Note that every method in the <b>interface</b> is strictly a declaration, which is the only thing the compiler allows. In addition, none of the methods in <b>Instrument</b> are declared as <b>public</b>, but they&#146;re automatically <b>public</b> anyway:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:music5:Music5.java</font>
+<font color=#009900>// Interfaces.</font>
+<font color=#0000ff>package</font> c08.music5;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> c07.music.Note;
+
+<font color=#0000ff>interface</font> Instrument {
+  <font color=#009900>// Compile-time constant:</font>
+  <font color=#0000ff>int</font> I = 5; <font color=#009900>// static &amp; final</font>
+  <font color=#009900>// Cannot have method definitions:</font>
+  <font color=#0000ff>void</font> play(Note n); <font color=#009900>// Automatically public</font>
+  String what();
+  <font color=#0000ff>void</font> adjust();
+}
+
+<font color=#0000ff>class</font> Wind <font color=#0000ff>implements</font> Instrument {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Wind.play() "</font> + n);
+  }
+  <font color=#0000ff>public</font> String what() { <font color=#0000ff>return</font> <font color=#004488>"Wind"</font>; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> adjust() {}
+}
+
+<font color=#0000ff>class</font> Percussion <font color=#0000ff>implements</font> Instrument {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Percussion.play() "</font> + n);
+  }
+  <font color=#0000ff>public</font> String what() { <font color=#0000ff>return</font> <font color=#004488>"Percussion"</font>; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> adjust() {}
+}
+
+<font color=#0000ff>class</font> Stringed <font color=#0000ff>implements</font> Instrument {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Stringed.play() "</font> + n);
+  }
+  <font color=#0000ff>public</font> String what() { <font color=#0000ff>return</font> <font color=#004488>"Stringed"</font>; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> adjust() {}
+}
+
+<font color=#0000ff>class</font> Brass <font color=#0000ff>extends</font> Wind {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Brass.play() "</font> + n);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> adjust() {
+    System.out.println(<font color=#004488>"Brass.adjust()"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Woodwind <font color=#0000ff>extends</font> Wind {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Woodwind.play() "</font> + n);
+  }
+  <font color=#0000ff>public</font> String what() { <font color=#0000ff>return</font> <font color=#004488>"Woodwind"</font>; }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Music5 {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#009900>// Doesn't care about type, so new types</font>
+  <font color=#009900>// added to the system still work right:</font>
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> tune(Instrument i) {
+    <font color=#009900>// ...</font>
+    i.play(Note.MIDDLE_C);
+  }
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> tuneAll(Instrument[] e) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; e.length; i++)
+      tune(e[i]);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#009900>// Upcasting during addition to the array:</font>
+    Instrument[] orchestra = {
+      <font color=#0000ff>new</font> Wind(),
+      <font color=#0000ff>new</font> Percussion(),
+      <font color=#0000ff>new</font> Stringed(),
+      <font color=#0000ff>new</font> Brass(),
+      <font color=#0000ff>new</font> Woodwind()
+    };
+    tuneAll(orchestra);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Wind.play() Middle C"</font>,
+      <font color=#004488>"Percussion.play() Middle C"</font>,
+      <font color=#004488>"Stringed.play() Middle C"</font>,
+      <font color=#004488>"Brass.play() Middle C"</font>,
+      <font color=#004488>"Woodwind.play() Middle C"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The rest of the code works the same. It doesn&#146;t matter if you are upcasting to a &#147;regular&#148; class called <a name="Index695"></a><b>Instrument</b>, an <b>abstract</b> class called <b>Instrument</b>, or to an <a name="Index696"></a><b>interface</b> called <b>Instrument</b>. The behavior is the same. In fact, you can see in the <b>tune(&#160;)</b> method that there isn&#146;t any evidence about whether <b>Instrument</b> is a &#147;regular&#148; class, an <b>abstract</b> class, or an <b>interface</b>. This is the intent: Each approach gives the programmer different control over the way objects are created and used. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1116" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545336"></a><a name="_Toc24775675"></a><a name="Heading6899"></a>&#147;Multiple
+inheritance&#148; in Java</h3>
+<p>The <b>interface</b> isn&#146;t simply a &#147;more pure&#148; form of <b>abstract</b> class. It has a higher purpose than that. Because an <b>interface</b> has no implementation at all&#151;that is, there is no storage associated with an <b>interface&#151;</b>there&#146;s nothing to prevent many <b>interface</b>s from being combined. This is valuable because there are times when you need to say &#147;An <b>x</b> is an <b>a</b> <i>and</i> a <b>b</b> <i>and</i> a <b>c</b>.&#148; In C++, this act of combining multiple class interfaces is called <a name="Index697"></a><a name="Index698"></a><i>multiple inheritance</i>, and it carries some rather sticky baggage because each class can have an implementation. In Java, you can perform the same act, but only one of the classes can have an implementation, so the problems seen in C++ do not occur with Java when combining multiple interfaces:<br></p>
+<p align="center"><img src="TIJ323.png" 	alt="TIJ323.png" border="0" ><br></p>
+<p>In a derived class, you aren&#146;t forced to have a base class that is either an <b>abstract</b> or &#147;concrete&#148; (one with no <b>abstract</b> methods). If you <i>do</i> inherit from a non-<b>interface</b>,<b> </b>you can inherit from only one. All the rest of the base elements must be <b>interface</b>s. You place all the interface names after the <b>implements </b>keyword and separate them with commas. You can have as many <b>interface</b>s as you want; each one becomes an independent type that you can upcast to. The following example shows a concrete class combined with several <b>interface</b>s to produce a new class: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1117" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Adventure.java</font>
+<font color=#009900>// Multiple interfaces.</font>
+
+<font color=#0000ff>interface</font> CanFight {
+  <font color=#0000ff>void</font> fight();
+}
+
+<font color=#0000ff>interface</font> CanSwim {
+  <font color=#0000ff>void</font> swim();
+}
+
+<font color=#0000ff>interface</font> CanFly {
+  <font color=#0000ff>void</font> fly();
+}
+
+<font color=#0000ff>class</font> ActionCharacter {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> fight() {}
+}
+
+<font color=#0000ff>class</font> Hero <font color=#0000ff>extends</font> ActionCharacter
+    <font color=#0000ff>implements</font> CanFight, CanSwim, CanFly {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> swim() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> fly() {}
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Adventure {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> t(CanFight x) { x.fight(); }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> u(CanSwim x) { x.swim(); }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> v(CanFly x) { x.fly(); }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> w(ActionCharacter x) { x.fight(); }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Hero h = <font color=#0000ff>new</font> Hero();
+    t(h); <font color=#009900>// Treat it as a CanFight</font>
+    u(h); <font color=#009900>// Treat it as a CanSwim</font>
+    v(h); <font color=#009900>// Treat it as a CanFly</font>
+    w(h); <font color=#009900>// Treat it as an ActionCharacter</font>
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that <b>Hero</b> combines the concrete class <b>ActionCharacter</b> with the interfaces <b>CanFight</b>, <b>CanSwim</b>, and <b>CanFly</b>. When you combine a concrete class with interfaces this way, the concrete class must come first, then the interfaces. (The compiler gives an error otherwise.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1118" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Note that the signature for <b>fight(&#160;)</b> is the same in the <b>interface CanFight</b> and the class <b>ActionCharacter</b>, and that <b>fight(&#160;)</b> is <i>not</i> provided with a definition in <b>Hero</b>. The rule for an <b>interface</b> is that you can inherit from it (as you will see shortly), but then you&#146;ve got another <b>interface</b>. If you want to create an object of the new type, it must be a class with all definitions provided. Even though <b>Hero</b> does not explicitly provide a definition for <b>fight(&#160;)</b>, the definition comes along with <b>ActionCharacter</b>, so it is automatically provided and it&#146;s possible to create objects of <b>Hero</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1119" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In class <b>Adventure</b>, you can see that there are four methods that take as arguments the various interfaces and the concrete class. When a <b>Hero</b> object is created, it can be passed to any of these methods, which means it is being upcast to each <b>interface</b> in turn. Because of the way interfaces are designed in Java, this works without any particular effort on the part of the programmer. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1120" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Keep in mind that the core reason for interfaces is shown in the preceding example: to be able to upcast to more than one base type. However, a second reason for using interfaces is the same as using an <b>abstract </b>base class: to prevent the client programmer from making an object of this class and to establish that it is only an interface. This brings up a question: Should you use an <a name="Index699"></a><a name="Index700"></a><b>interface</b> or an <b>abstract</b> class? An <b>interface</b> gives you the benefits of an <b>abstract</b> class <i>and</i> the benefits of an <b>interface</b>, so if it&#146;s possible to create your base class without any method definitions or member variables, you should always prefer <b>interface</b>s to <b>abstract</b> classes. In fact, if you know something is going to be a base class, your first choice should be to make it an <b>interface</b>, and only if you&#146;re forced to have method definitions or member variables should you change to an <b>abstract</b> class, or if necessary a concrete class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1121" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading6946"></a>Name collisions when combining interfaces<br></h4>
+<p><a name="Index701"></a><a name="Index702"></a>You can encounter a small pitfall when implementing multiple interfaces. In the preceding example, both <b>CanFight</b> and <b>ActionCharacter</b> have an identical <b>void fight(&#160;)</b> method. This is not a problem, because the method is identical in both cases. But what if it isn&#146;t? Here&#146;s an example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:InterfaceCollision.java</font>
+
+<font color=#0000ff>interface</font> I1 { <font color=#0000ff>void</font> f(); }
+<font color=#0000ff>interface</font> I2 { <font color=#0000ff>int</font> f(<font color=#0000ff>int</font> i); }
+<font color=#0000ff>interface</font> I3 { <font color=#0000ff>int</font> f(); }
+<font color=#0000ff>class</font> C { <font color=#0000ff>public</font> <font color=#0000ff>int</font> f() { <font color=#0000ff>return</font> 1; } }
+
+<font color=#0000ff>class</font> C2 <font color=#0000ff>implements</font> I1, I2 {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>int</font> f(<font color=#0000ff>int</font> i) { <font color=#0000ff>return</font> 1; } <font color=#009900>// overloaded</font>
+}
+
+<font color=#0000ff>class</font> C3 <font color=#0000ff>extends</font> C <font color=#0000ff>implements</font> I2 {
+  <font color=#0000ff>public</font> <font color=#0000ff>int</font> f(<font color=#0000ff>int</font> i) { <font color=#0000ff>return</font> 1; } <font color=#009900>// overloaded</font>
+}
+
+<font color=#0000ff>class</font> C4 <font color=#0000ff>extends</font> C <font color=#0000ff>implements</font> I3 {
+  <font color=#009900>// Identical, no problem:</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>int</font> f() { <font color=#0000ff>return</font> 1; }
+}
+
+<font color=#009900>// Methods differ only by return type:</font>
+<font color=#009900>//! class C5 extends C implements I1 {}</font>
+<font color=#009900>//! interface I4 extends I1, I3 {} ///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The difficulty occurs because overriding, implementation, and overloading get unpleasantly mixed together, and overloaded methods cannot differ only by return type. When the last two lines are uncommented, the error messages say it all:<br></p>
+<p><i>InterfaceCollision.java:23: f(&#160;) in C cannot implement f(&#160;) in I1; attempting to use incompatible return type </i><br><i>found : int</i><br><i>required: void</i><br><i>InterfaceCollision.java:24: interfaces I3 and I1 are incompatible; both define f(&#160;), but with different return type</i><br></p>
+<p>Using the same method names in different interfaces that are intended to be combined generally causes confusion in the readability of the code, as well. Strive to avoid it. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1122" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545337"></a><a name="_Toc24775676"></a><a name="Heading6976"></a>Extending
+an interface <br>with inheritance</h3>
+<p>You can easily add new method declarations to an <a name="Index703"></a><a name="Index704"></a><b>interface</b> by using inheritance, and you can also combine several <b>interface</b>s into a new <b>interface</b> with inheritance. In both cases you get a new <b>interface</b>, as seen in this example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:HorrorShow.java</font>
+<font color=#009900>// Extending an interface with inheritance.</font>
+
+<font color=#0000ff>interface</font> Monster {
+  <font color=#0000ff>void</font> menace();
+}
+
+<font color=#0000ff>interface</font> DangerousMonster <font color=#0000ff>extends</font> Monster {
+  <font color=#0000ff>void</font> destroy();
+}
+
+<font color=#0000ff>interface</font> Lethal {
+  <font color=#0000ff>void</font> kill();
+}
+
+<font color=#0000ff>class</font> DragonZilla <font color=#0000ff>implements</font> DangerousMonster {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> menace() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> destroy() {}
+}
+
+<font color=#0000ff>interface</font> Vampire <font color=#0000ff>extends</font> DangerousMonster, Lethal {
+  <font color=#0000ff>void</font> drinkBlood();
+}
+
+<font color=#0000ff>class</font> VeryBadVampire <font color=#0000ff>implements</font> Vampire {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> menace() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> destroy() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> kill() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> drinkBlood() {}
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> HorrorShow {
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> u(Monster b) { b.menace(); }
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> v(DangerousMonster d) {
+    d.menace();
+    d.destroy();
+  }
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> w(Lethal l) { l.kill(); }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    DangerousMonster barney = <font color=#0000ff>new</font> DragonZilla();
+    u(barney);
+    v(barney);
+    Vampire vlad = <font color=#0000ff>new</font> VeryBadVampire();
+    u(vlad);
+    v(vlad);
+    w(vlad);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><b>DangerousMonster</b> is a simple extension to <b>Monster</b> that produces a new <b>interface</b>. This is implemented in <b>DragonZilla</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1123" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The syntax used in <b>Vampire</b> works <i>only</i> when inheriting interfaces. Normally, you can use <a name="Index705"></a><b>extends</b> with only a single class, but since an <b>interface</b> can be made from multiple other interfaces, <b>extends</b> can refer to multiple base interfaces when building a new <b>interface</b>. As you can see, the <b>interface</b> names are simply separated with commas. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1124" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775677"></a><a name="Heading7029"></a>Grouping constants</h3>
+<p>Because any fields you put into an <b>interface</b> are automatically <b>static</b> and <b>final</b>, the <b>interface</b> is a convenient tool for creating groups of constant values, much as you would with an <a name="Index706"></a><a name="Index707"></a><b>enum</b> in C or C++. For example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Months.java</font>
+<font color=#009900>// Using interfaces to create groups of constants.</font>
+<font color=#0000ff>package</font> c08;
+
+<font color=#0000ff>public</font> <font color=#0000ff>interface</font> Months {
+  <font color=#0000ff>int</font>
+    JANUARY = 1, FEBRUARY = 2, MARCH = 3,
+    APRIL = 4, MAY = 5, JUNE = 6, JULY = 7,
+    AUGUST = 8, SEPTEMBER = 9, OCTOBER = 10,
+    NOVEMBER = 11, DECEMBER = 12;
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Notice the Java style of using all uppercase letters (with underscores to separate multiple words in a single identifier) for <b>static</b> <b>final</b>s that have constant initializers. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1125" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The fields in an <b>interface </b>are automatically <b>public</b>, so it&#146;s unnecessary to specify that. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1126" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can use the constants from outside the package by importing <b>c08.*</b> or <b>c08.Months</b> just as you would with any other package, and referencing the values with expressions like <b>Months.JANUARY</b>. Of course, what you get is just an <b>int</b>, so there isn&#146;t the extra type safety that C++&#146;s <b>enum</b> has, but this (commonly used) technique is certainly an improvement over hard coding numbers into your programs. (That approach is often referred to as using &#147;magic numbers,&#148; and it produces very difficult-to-maintain code.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1127" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you do want extra type safety, you can build a class like this:<sup><a name="fnB33" href="#fn33">[33]</a></sup><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Month.java</font>
+<font color=#009900>// A more robust enumeration system.</font>
+<font color=#0000ff>package</font> c08;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>final</font> <font color=#0000ff>class</font> Month {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> String name;
+  <font color=#0000ff>private</font> Month(String nm) { name = nm; }
+  <font color=#0000ff>public</font> String toString() { <font color=#0000ff>return</font> name; }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>final</font> Month
+    JAN = <font color=#0000ff>new</font> Month(<font color=#004488>"January"</font>),
+    FEB = <font color=#0000ff>new</font> Month(<font color=#004488>"February"</font>),
+    MAR = <font color=#0000ff>new</font> Month(<font color=#004488>"March"</font>),
+    APR = <font color=#0000ff>new</font> Month(<font color=#004488>"April"</font>),
+    MAY = <font color=#0000ff>new</font> Month(<font color=#004488>"May"</font>),
+    JUN = <font color=#0000ff>new</font> Month(<font color=#004488>"June"</font>),
+    JUL = <font color=#0000ff>new</font> Month(<font color=#004488>"July"</font>),
+    AUG = <font color=#0000ff>new</font> Month(<font color=#004488>"August"</font>),
+    SEP = <font color=#0000ff>new</font> Month(<font color=#004488>"September"</font>),
+    OCT = <font color=#0000ff>new</font> Month(<font color=#004488>"October"</font>),
+    NOV = <font color=#0000ff>new</font> Month(<font color=#004488>"November"</font>),
+    DEC = <font color=#0000ff>new</font> Month(<font color=#004488>"December"</font>);
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>final</font> Month[] month =  {
+    JAN, FEB, MAR, APR, MAY, JUN,
+    JUL, AUG, SEP, OCT, NOV, DEC
+  };
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>final</font> Month number(<font color=#0000ff>int</font> ord) {
+    <font color=#0000ff>return</font> month[ord - 1];
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Month m = Month.JAN;
+    System.out.println(m);
+    m = Month.number(12);
+    System.out.println(m);
+    System.out.println(m == Month.DEC);
+    System.out.println(m.equals(Month.DEC));
+    System.out.println(Month.month[3]);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"January"</font>,
+      <font color=#004488>"December"</font>,
+      <font color=#004488>"true"</font>,
+      <font color=#004488>"true"</font>,
+      <font color=#004488>"April"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><b>Month</b> is a <b>final</b> class with a <b>private</b> constructor, so no one can inherit from it or make any instances of it. The only instances are the <b>final static</b> ones created in the class itself: <b>JAN</b>, <b>FEB</b>, <b>MAR</b>, etc. These objects are also used in the array <b>month</b>, which lets you iterate through an array of <b>Month2</b> objects. The <b>number(&#160;) </b>method allows you to select a <b>Month </b>by giving its corresponding month number. In <b>main(&#160;)</b> you can see the <a name="Index708"></a>type safety; <b>m</b> is a <b>Month</b> object so it can be assigned only to a <b>Month</b>. The previous example <b>Months.java </b>provided only <b>int</b> values, so an <b>int</b> variable intended to represent a month could actually be given any integer value, which wasn&#146;t very safe. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1128" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This approach also allows you to use <b>==</b> or <b>equals(&#160;)</b> interchangeably, as shown at the end of <b>main(&#160;)</b>. This works because there can be only one instance of each value of <b>Month</b>. In Chapter 11 you&#146;ll learn about another way to set up classes so the objects can be compared to each other. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1129" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There&#146;s also a month field in <b>java.util.Calendar</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0469" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Apache&#146;s Jakarta Commons project contains tools to create enumerations similar to what&#146;s shown in the preceding example, but with less effort. See <i>http://jakarta.apache.org/commons</i>, under &#147;lang,&#148; in the package <b>org.apache.commons.lang.enum</b>. This project also has many other potentially useful libraries. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0470" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775678"></a><a name="Heading7100"></a>Initializing fields in
+interfaces<br></h3>
+<p><a name="Index709"></a><a name="Index710"></a>Fields defined in interfaces are automatically <b>static</b> and <b>final</b>. These cannot be &#147;blank finals,&#148; but they can be initialized with nonconstant expressions. For example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:RandVals.java</font>
+<font color=#009900>// Initializing interface fields with</font>
+<font color=#009900>// non-constant initializers.</font>
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>interface</font> RandVals {
+  Random rand = <font color=#0000ff>new</font> Random();
+  <font color=#0000ff>int</font> randomInt = rand.nextInt(10);
+  <font color=#0000ff>long</font> randomLong = rand.nextLong() * 10;
+  <font color=#0000ff>float</font> randomFloat = rand.nextLong() * 10;
+  <font color=#0000ff>double</font> randomDouble = rand.nextDouble() * 10;
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Since the fields are <b>static</b>, they are initialized when the class is first loaded, which happens when any of the fields are accessed for the first time. Here&#146;s a simple test: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1130" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:TestRandVals.java</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> TestRandVals {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    System.out.println(RandVals.randomInt);
+    System.out.println(RandVals.randomLong);
+    System.out.println(RandVals.randomFloat);
+    System.out.println(RandVals.randomDouble);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"%% -?\\d+"</font>,
+      <font color=#004488>"%% -?\\d+"</font>,
+      <font color=#004488>"%% -?\\d\\.\\d+E?-?\\d+"</font>,
+      <font color=#004488>"%% -?\\d\\.\\d+E?-?\\d+"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The fields, of course, are not part of the interface but instead are stored in the static storage area for that interface. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1131" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775679"></a><a name="Heading7136"></a>Nesting interfaces<br></h3>
+<p><a name="Index711"></a><a name="Index712"></a>Interfaces may be nested within classes and within other interfaces.<sup><a name="fnB34" href="#fn34">[34]</a></sup> This reveals a number of very interesting features:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:nesting:NestingInterfaces.java</font>
+<font color=#0000ff>package</font> c08.nesting;
+
+<font color=#0000ff>class</font> A {
+  <font color=#0000ff>interface</font> B {
+    <font color=#0000ff>void</font> f();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> BImp <font color=#0000ff>implements</font> B {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  }
+  <font color=#0000ff>private</font> <font color=#0000ff>class</font> BImp2 <font color=#0000ff>implements</font> B {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>interface</font> C {
+    <font color=#0000ff>void</font> f();
+  }
+  <font color=#0000ff>class</font> CImp <font color=#0000ff>implements</font> C {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  }
+  <font color=#0000ff>private</font> <font color=#0000ff>class</font> CImp2 <font color=#0000ff>implements</font> C {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  }
+  <font color=#0000ff>private</font> <font color=#0000ff>interface</font> D {
+    <font color=#0000ff>void</font> f();
+  }
+  <font color=#0000ff>private</font> <font color=#0000ff>class</font> DImp <font color=#0000ff>implements</font> D {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> DImp2 <font color=#0000ff>implements</font> D {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  }
+  <font color=#0000ff>public</font> D getD() { <font color=#0000ff>return</font> <font color=#0000ff>new</font> DImp2(); }
+  <font color=#0000ff>private</font> D dRef;
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> receiveD(D d) {
+    dRef = d;
+    dRef.f();
+  }
+}
+
+<font color=#0000ff>interface</font> E {
+  <font color=#0000ff>interface</font> G {
+    <font color=#0000ff>void</font> f();
+  }
+  <font color=#009900>// Redundant "public":</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>interface</font> H {
+    <font color=#0000ff>void</font> f();
+  }
+  <font color=#0000ff>void</font> g();
+  <font color=#009900>// Cannot be private within an interface:</font>
+  <font color=#009900>//! private interface I {}</font>
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> NestingInterfaces {
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> BImp <font color=#0000ff>implements</font> A.B {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  }
+  <font color=#0000ff>class</font> CImp <font color=#0000ff>implements</font> A.C {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  }
+  <font color=#009900>// Cannot implement a private interface except</font>
+  <font color=#009900>// within that interface's defining class:</font>
+  <font color=#009900>//! class DImp implements A.D {</font>
+  <font color=#009900>//!  public void f() {}</font>
+  <font color=#009900>//! }</font>
+  <font color=#0000ff>class</font> EImp <font color=#0000ff>implements</font> E {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> g() {}
+  }
+  <font color=#0000ff>class</font> EGImp <font color=#0000ff>implements</font> E.G {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  }
+  <font color=#0000ff>class</font> EImp2 <font color=#0000ff>implements</font> E {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> g() {}
+    <font color=#0000ff>class</font> EG <font color=#0000ff>implements</font> E.G {
+      <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    A a = <font color=#0000ff>new</font> A();
+    <font color=#009900>// Can't access A.D:</font>
+    <font color=#009900>//! A.D ad = a.getD();</font>
+    <font color=#009900>// Doesn't return anything but A.D:</font>
+    <font color=#009900>//! A.DImp2 di2 = a.getD();</font>
+    <font color=#009900>// Cannot access a member of the interface:</font>
+    <font color=#009900>//! a.getD().f();</font>
+    <font color=#009900>// Only another A can do anything with getD():</font>
+    A a2 = <font color=#0000ff>new</font> A();
+    a2.receiveD(a.getD());
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The syntax for nesting an interface within a class is reasonably obvious, and just like non-nested interfaces, these can have <b>public</b> or package-access visibility. You can also see that both <b>public</b> and package-access nested interfaces can be implemented as <b>public</b>, package-access, and <b>private</b> nested classes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1132" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As a new twist, interfaces can also be <a name="Index713"></a><a name="Index714"></a><b>private</b>, as seen in <b>A.D</b> (the same qualification syntax is used for nested interfaces as for nested classes). What good is a <b>private</b> nested interface? You might guess that it can only be implemented as a <b>private</b> inner class as in <b>DImp</b>, but <b>A.DImp2</b> shows that it can also be implemented as a <b>public</b> class. However, <b>A.DImp2</b> can only be used as itself. You are not allowed to mention the fact that it implements the <b>private</b> interface, so implementing a <b>private</b> interface is a way to force the definition of the methods in that interface without adding any type information (that is, without allowing any upcasting). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1133" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The method <b>getD(&#160;)</b> produces a further quandary concerning the <b>private</b> interface: It&#146;s a <b>public</b> method that returns a reference to a <b>private</b> interface. What can you do with the return value of this method? In <b>main(&#160;)</b>, you can see several attempts to use the return value, all of which fail. The only thing that works is if the return value is handed to an object that has permission to use it&#151;in this case, another <b>A</b>, via the <b>receiveD(&#160;)</b> method. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1134" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Interface <b>E</b> shows that interfaces can be nested within each other. However, the rules about interfaces&#151;in particular, that all interface elements must be <b>public</b>&#151;are strictly enforced here, so an interface nested within another interface is automatically <b>public</b> and cannot be made <b>private</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1135" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><b>NestingInterfaces</b> shows the various ways that nested interfaces can be implemented. In particular, notice that when you implement an interface, you are not required to implement any interfaces nested within. Also, <b>private</b> interfaces cannot be implemented outside of their defining classes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1136" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Initially, these features may seem like they are added strictly for syntactic consistency, but I generally find that once you know about a feature, you often discover places where it is useful. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1137" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775680"></a><a name="Heading7235"></a>Inner classes</h2>
+<p>It&#146;s possible to place a class definition within another class definition. This is called an <i>inner class</i>. The inner class is a valuable feature because it allows you to group classes that logically belong together and to control the visibility of one within the other. However, it&#146;s important to understand that inner classes are distinctly different from composition. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1138" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index715"></a><a name="Index716"></a>While you&#146;re learning about them, the need for inner classes isn&#146;t always obvious. At the end of this section, after all of the syntax and semantics of inner classes have been described, you&#146;ll find examples that should begin to make clear the benefits of inner classes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1139" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You create an inner class just as you&#146;d expect&#151;by placing the class definition inside a surrounding class: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1140" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Parcel1.java</font>
+<font color=#009900>// Creating inner classes.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Parcel1 {
+  <font color=#0000ff>class</font> Contents {
+    <font color=#0000ff>private</font> <font color=#0000ff>int</font> i = 11;
+    <font color=#0000ff>public</font> <font color=#0000ff>int</font> value() { <font color=#0000ff>return</font> i; }
+  }
+  <font color=#0000ff>class</font> Destination {
+    <font color=#0000ff>private</font> String label;
+    Destination(String whereTo) {
+      label = whereTo;
+    }
+    String readLabel() { <font color=#0000ff>return</font> label; }
+  }
+  <font color=#009900>// Using inner classes looks just like</font>
+  <font color=#009900>// using any other class, within Parcel1:</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> ship(String dest) {
+    Contents c = <font color=#0000ff>new</font> Contents();
+    Destination d = <font color=#0000ff>new</font> Destination(dest);
+    System.out.println(d.readLabel());
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Parcel1 p = <font color=#0000ff>new</font> Parcel1();
+    p.ship(<font color=#004488>"Tanzania"</font>);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The inner classes, when used inside <b>ship(&#160;)</b>, look just like the use of any other classes. Here, the only practical difference is that the names are nested within <b>Parcel1</b>. You&#146;ll see in a while that this isn&#146;t the only difference. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1141" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>More typically, an outer class will have a method that returns a reference to an inner class, like this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Parcel2.java</font>
+<font color=#009900>// Returning a reference to an inner class.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Parcel2 {
+  <font color=#0000ff>class</font> Contents {
+    <font color=#0000ff>private</font> <font color=#0000ff>int</font> i = 11;
+    <font color=#0000ff>public</font> <font color=#0000ff>int</font> value() { <font color=#0000ff>return</font> i; }
+  }
+  <font color=#0000ff>class</font> Destination {
+    <font color=#0000ff>private</font> String label;
+    Destination(String whereTo) {
+      label = whereTo;
+    }
+    String readLabel() { <font color=#0000ff>return</font> label; }
+  }
+  <font color=#0000ff>public</font> Destination to(String s) {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Destination(s);
+  }
+  <font color=#0000ff>public</font> Contents cont() {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Contents();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> ship(String dest) {
+    Contents c = cont();
+    Destination d = to(dest);
+    System.out.println(d.readLabel());
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Parcel2 p = <font color=#0000ff>new</font> Parcel2();
+    p.ship(<font color=#004488>"Tanzania"</font>);
+    Parcel2 q = <font color=#0000ff>new</font> Parcel2();
+    <font color=#009900>// Defining references to inner classes:</font>
+    Parcel2.Contents c = q.cont();
+    Parcel2.Destination d = q.to(<font color=#004488>"Borneo"</font>);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>If you want to make an object of the inner class anywhere except from within a non-<b>static</b> method of the outer class, you must specify the type of that object as <i>OuterClassName.InnerClassName</i>, as seen in <b>main(&#160;)</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1142" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775681"></a><a name="Heading7306"></a>Inner classes and
+upcasting<br></h3>
+<p><a name="Index717"></a><a name="Index718"></a><a name="Index719"></a>So far, inner classes don&#146;t seem that dramatic. After all, if it&#146;s hiding you&#146;re after, Java already has a perfectly good hiding mechanism&#151;just give the class package access (visible only within a package) rather than creating it as an inner class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1143" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index720"></a><a name="Index721"></a><a name="Index722"></a>However, inner classes really come into their own when you start upcasting to a base class, and in particular to an <b>interface</b>. (The effect of producing an interface reference from an object that implements it is essentially the same as upcasting to a base class.) That&#146;s because the inner class&#151;the implementation of the <b>interface</b>&#151;can then be completely unseen and unavailable to anyone, which is convenient for hiding the implementation. All you get back is a reference to the base class or the <b>interface</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1144" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>First, the common interfaces will be defined in their own files so they can be used in all the examples:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Destination.java</font>
+<font color=#0000ff>public</font> <font color=#0000ff>interface</font> Destination {
+  String readLabel();
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Contents.java</font>
+<font color=#0000ff>public</font> <font color=#0000ff>interface</font> Contents {
+  <font color=#0000ff>int</font> value();
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Now <b>Contents</b> and <b>Destination</b> represent interfaces available to the client programmer. (The <b>interface</b>, remember, automatically makes all of its members <b>public</b>.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1145" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When you get back a reference to the base class or the <b>interface</b>, it&#146;s possible that you can&#146;t even find out the exact type, as shown here:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:TestParcel.java</font>
+<font color=#009900>// Returning a reference to an inner class.</font>
+
+<font color=#0000ff>class</font> Parcel3 {
+  <font color=#0000ff>private</font> <font color=#0000ff>class</font> PContents <font color=#0000ff>implements</font> Contents {
+    <font color=#0000ff>private</font> <font color=#0000ff>int</font> i = 11;
+    <font color=#0000ff>public</font> <font color=#0000ff>int</font> value() { <font color=#0000ff>return</font> i; }
+  }
+  <font color=#0000ff>protected</font> <font color=#0000ff>class</font> PDestination <font color=#0000ff>implements</font> Destination {
+    <font color=#0000ff>private</font> String label;
+    <font color=#0000ff>private</font> PDestination(String whereTo) {
+      label = whereTo;
+    }
+    <font color=#0000ff>public</font> String readLabel() { <font color=#0000ff>return</font> label; }
+  }
+  <font color=#0000ff>public</font> Destination dest(String s) {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> PDestination(s);
+  }
+  <font color=#0000ff>public</font> Contents cont() {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> PContents();
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> TestParcel {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Parcel3 p = <font color=#0000ff>new</font> Parcel3();
+    Contents c = p.cont();
+    Destination d = p.dest(<font color=#004488>"Tanzania"</font>);
+    <font color=#009900>// Illegal -- can't access private class:</font>
+    <font color=#009900>//! Parcel3.PContents pc = p.new PContents();</font>
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In the example, <b>main(&#160;) </b>must be in a separate class in order to demonstrate the privateness of the inner class <b>PContents</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1146" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In <b>Parcel3</b>, something new has been added: The inner class <b>PContents</b> is <b>private</b>,<b> </b>so no one but <b>Parcel3</b> can access it. <b>PDestination</b> is <b>protected</b>, so no one but <b>Parcel3</b>, classes in the same package (since <b>protected</b> also gives package access), and the inheritors of <b>Parcel3 </b>can access <b>PDestination</b>. This means that the client programmer has restricted knowledge and access to these members. In fact, you can&#146;t even downcast to a <b>private</b> inner class (or a <b>protected</b> inner class unless you&#146;re an inheritor), because you can&#146;t access the name, as you can see in <b>class TestParcel</b>. Thus, the <b>private</b> inner class provides a way for the class designer to completely prevent any type-coding dependencies and to completely hide details about implementation. In addition, extension of an <b>interface</b> is useless from the client programmer&#146;s perspective since the client programmer cannot access any additional methods that aren&#146;t part of the <b>public</b> <b>interface</b>. This also provides an opportunity for the Java compiler to generate more efficient code. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1147" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Normal (non-inner) classes cannot be made <b>private</b> or <b>protected</b>; they may only be given <b>public</b> or package access. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1148" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775682"></a><a name="Heading7358"></a>Inner classes <br>in
+methods and scopes<br></h3>
+<p><a name="Index723"></a><a name="Index724"></a><a name="Index725"></a><a name="Index726"></a>What you&#146;ve seen so far encompasses the typical use for inner classes. In general, the code that you&#146;ll write and read involving inner classes will be &#147;plain&#148; inner classes that are simple and easy to understand. However, the design for inner classes is quite complete, and there are a number of other, more obscure, ways that you can use them if you choose; inner classes can be created within a method or even an arbitrary scope. There are two reasons for doing this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1149" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li>As shown previously, you&#146;re implementing an interface of some kind so
+that you can create and return a reference. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1150" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>You&#146;re solving a complicated problem and you want to create a class to
+aid in your solution, but you don&#146;t want it publicly available. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1151"
+title="Send BackTalk
+Comment">Feedback</a></font></li></ol><p>In the following examples, the previous code will be modified to use:  <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1152" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li><a name="Index727"></a><a name="Index728"></a><a name="Index729"></a>A class
+defined within a method </li>
+<li>A class defined within a scope inside a method</li>
+<li>An anonymous class implementing an interface</li>
+<li>An anonymous class extending a class that has a nondefault constructor</li>
+<li>An anonymous class that performs field initialization</li>
+<li>An anonymous class that performs construction using instance initialization
+(anonymous inner classes cannot have
+constructors)</li></ol><p>Although it&#146;s an ordinary class with an implementation, <b>Wrapping</b> is also being used as a common &#147;interface&#148; to its derived classes:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Wrapping.java</font>
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Wrapping {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> i;
+  <font color=#0000ff>public</font> Wrapping(<font color=#0000ff>int</font> x) { i = x; }
+  <font color=#0000ff>public</font> <font color=#0000ff>int</font> value() { <font color=#0000ff>return</font> i; }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You&#146;ll notice that <b>Wrapping</b> has a constructor that requires an argument, to make things a bit more interesting. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1153" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The first example shows the creation of an entire class within the scope of a method (instead of the scope of another class). This is called a <i>local inner class</i>:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Parcel4.java</font>
+<font color=#009900>// Nesting a class within a method.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Parcel4 {
+  <font color=#0000ff>public</font> Destination dest(String s) {
+    <font color=#0000ff>class</font> PDestination <font color=#0000ff>implements</font> Destination {
+      <font color=#0000ff>private</font> String label;
+      <font color=#0000ff>private</font> PDestination(String whereTo) {
+        label = whereTo;
+      }
+      <font color=#0000ff>public</font> String readLabel() { <font color=#0000ff>return</font> label; }
+    }
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> PDestination(s);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Parcel4 p = <font color=#0000ff>new</font> Parcel4();
+    Destination d = p.dest(<font color=#004488>"Tanzania"</font>);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The class <b>PDestination</b> is part of <b>dest(&#160;)</b> rather than being part of <b>Parcel4</b>. (Also notice that you could use the class identifier <b>PDestination </b>for an inner class inside each class in the same subdirectory without a name clash.) Therefore, <b>PDestination </b>cannot be accessed outside of <b>dest(&#160;)</b>.<b> </b>Notice the upcasting that occurs in the return statement&#151;nothing comes out of <b>dest(&#160;)</b> except a reference to <b>Destination</b>, the base class. Of course, the fact that the name of the class <b>PDestination</b> is placed inside <b>dest(&#160;)</b> doesn&#146;t mean that <b>PDestination</b> is not a valid object once <b>dest(&#160;)</b> returns. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1154" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The next example shows how you can nest an inner class within any arbitrary scope:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Parcel5.java</font>
+<font color=#009900>// Nesting a class within a scope.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Parcel5 {
+  <font color=#0000ff>private</font> <font color=#0000ff>void</font> internalTracking(<font color=#0000ff>boolean</font> b) {
+    <font color=#0000ff>if</font>(b) {
+      <font color=#0000ff>class</font> TrackingSlip {
+        <font color=#0000ff>private</font> String id;
+        TrackingSlip(String s) {
+          id = s;
+        }
+        String getSlip() { <font color=#0000ff>return</font> id; }
+      }
+      TrackingSlip ts = <font color=#0000ff>new</font> TrackingSlip(<font color=#004488>"slip"</font>);
+      String s = ts.getSlip();
+    }
+    <font color=#009900>// Can't use it here! Out of scope:</font>
+    <font color=#009900>//! TrackingSlip ts = new TrackingSlip("x");</font>
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> track() { internalTracking(<font color=#0000ff>true</font>); }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Parcel5 p = <font color=#0000ff>new</font> Parcel5();
+    p.track();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The class <b>TrackingSlip</b> is nested inside the scope of an <b>if</b> statement. This does not mean that the <i>class</i> is conditionally created&#151;it gets compiled along with everything else. However, it&#146;s not available outside the scope in which it is defined.<b> </b>Other than that, it looks just like an ordinary class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1155" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775683"></a><a name="Heading7428"></a>Anonymous inner
+classes</h3>
+<p>The next example looks a little strange:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Parcel6.java</font>
+<font color=#009900>// A method that returns an anonymous inner class.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Parcel6 {
+  <font color=#0000ff>public</font> Contents cont() {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Contents() {
+      <font color=#0000ff>private</font> <font color=#0000ff>int</font> i = 11;
+      <font color=#0000ff>public</font> <font color=#0000ff>int</font> value() { <font color=#0000ff>return</font> i; }
+    }; <font color=#009900>// Semicolon required in this case</font>
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Parcel6 p = <font color=#0000ff>new</font> Parcel6();
+    Contents c = p.cont();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>cont(&#160;)</b> method combines the creation of the return value with the definition of the class that represents that return value! In addition, the class is anonymous; it has no name. To make matters a bit worse, it looks like you&#146;re starting out to create a <b>Contents</b> object: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1156" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>return</font> <font color=#0000ff>new</font> Contents()</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>But then, before you get to the semicolon, you say, &#147;But wait, I think I&#146;ll slip in a class definition&#148;: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1157" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>return</font> <font color=#0000ff>new</font> Contents() {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> i = 11;
+  <font color=#0000ff>public</font> <font color=#0000ff>int</font> value() { <font color=#0000ff>return</font> i; }
+};</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>What this strange syntax means is: &#147;Create an object of an anonymous class that&#146;s inherited from <b>Contents</b>.&#148; The reference returned by the <b>new</b> expression is automatically upcast to a <b>Contents</b> reference. The anonymous inner-class syntax is a shorthand for: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1158" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>class</font> MyContents <font color=#0000ff>implements</font> Contents {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> i = 11;
+  <font color=#0000ff>public</font> <font color=#0000ff>int</font> value() { <font color=#0000ff>return</font> i; }
+}
+<font color=#0000ff>return</font> <font color=#0000ff>new</font> MyContents();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In the anonymous inner class, <b>Contents</b> is created by using a default constructor. The following code shows what to do if your base class needs a constructor with an argument: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1159" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Parcel7.java</font>
+<font color=#009900>// An anonymous inner class that calls</font>
+<font color=#009900>// the base-class constructor.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Parcel7 {
+  <font color=#0000ff>public</font> Wrapping wrap(<font color=#0000ff>int</font> x) {
+    <font color=#009900>// Base constructor call:</font>
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Wrapping(x) { <font color=#009900>// Pass constructor argument.</font>
+      <font color=#0000ff>public</font> <font color=#0000ff>int</font> value() {
+        <font color=#0000ff>return</font> <font color=#0000ff>super</font>.value() * 47;
+      }
+    }; <font color=#009900>// Semicolon required</font>
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Parcel7 p = <font color=#0000ff>new</font> Parcel7();
+    Wrapping w = p.wrap(10);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>That is, you simply pass the appropriate argument to the base-class constructor, seen here as the <b>x </b>passed in <b>new Wrapping(x)</b>. <br></p>
+<p>The semicolon at the end of the anonymous inner class doesn&#146;t mark the end of the class body (as it does in C++). Instead, it marks the end of the expression that happens to contain the anonymous class. Thus, it&#146;s identical to the use of the semicolon everywhere else. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1161" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can also perform initialization when you define fields in an anonymous class:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Parcel8.java</font>
+<font color=#009900>// An anonymous inner class that performs</font>
+<font color=#009900>// initialization. A briefer version of Parcel4.java.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Parcel8 {
+  <font color=#009900>// Argument must be final to use inside</font>
+  <font color=#009900>// anonymous inner class:</font>
+  <font color=#0000ff>public</font> Destination dest(<font color=#0000ff>final</font> String dest) {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Destination() {
+      <font color=#0000ff>private</font> String label = dest;
+      <font color=#0000ff>public</font> String readLabel() { <font color=#0000ff>return</font> label; }
+    };
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Parcel8 p = <font color=#0000ff>new</font> Parcel8();
+    Destination d = p.dest(<font color=#004488>"Tanzania"</font>);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>If you&#146;re defining an anonymous inner class and want to use an object that&#146;s defined outside the anonymous inner class, the compiler requires that the argument reference be <b>final</b>, like the argument to <b>dest(&#160;)</b>.<b> </b>If you forget, you&#146;ll get a compile-time error message. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1162" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As long as you&#146;re simply assigning a field, the approach in this example is fine. But what if you need to perform some constructor-like activity? You can&#146;t have a named constructor in an anonymous class (since there&#146;s no name!), but with <a name="Index733"></a><a name="Index734"></a><i>instance initialization</i>, you can, in effect, create a constructor for an anonymous inner class, like this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1160" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:AnonymousConstructor.java</font>
+<font color=#009900>// Creating a constructor for an anonymous inner class.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>abstract</font> <font color=#0000ff>class</font> Base {
+  <font color=#0000ff>public</font> Base(<font color=#0000ff>int</font> i) {
+    System.out.println(<font color=#004488>"Base constructor, i = "</font> + i);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>abstract</font> <font color=#0000ff>void</font> f();
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> AnonymousConstructor {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> Base getBase(<font color=#0000ff>int</font> i) {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Base(i) {
+      {
+        System.out.println(<font color=#004488>"Inside instance initializer"</font>);
+      }
+      <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {
+        System.out.println(<font color=#004488>"In anonymous f()"</font>);
+      }
+    };
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Base base = getBase(47);
+    base.f();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Base constructor, i = 47"</font>,
+      <font color=#004488>"Inside instance initializer"</font>,
+      <font color=#004488>"In anonymous f()"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In this case, the variable <b>i</b> did <i>not</i> have to be final. While <b>i</b> is passed to the base constructor of the anonymous class, it is never directly used <i>inside</i> the anonymous class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0475" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Here&#146;s the &#147;parcel&#148; theme with instance initialization. Note that the arguments to <b>dest(&#160;)</b> must be final since they are used within the anonymous class:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Parcel9.java</font>
+<font color=#009900>// Using "instance initialization" to perform</font>
+<font color=#009900>// construction on an anonymous inner class.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Parcel9 {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> Destination
+  dest(<font color=#0000ff>final</font> String dest, <font color=#0000ff>final</font> <font color=#0000ff>float</font> price) {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Destination() {
+      <font color=#0000ff>private</font> <font color=#0000ff>int</font> cost;
+      <font color=#009900>// Instance initialization for each object:</font>
+      {
+        cost = Math.round(price);
+        <font color=#0000ff>if</font>(cost &gt; 100)
+          System.out.println(<font color=#004488>"Over budget!"</font>);
+      }
+      <font color=#0000ff>private</font> String label = dest;
+      <font color=#0000ff>public</font> String readLabel() { <font color=#0000ff>return</font> label; }
+    };
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Parcel9 p = <font color=#0000ff>new</font> Parcel9();
+    Destination d = p.dest(<font color=#004488>"Tanzania"</font>, 101.395F);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Over budget!"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Inside the instance initializer you can see code that couldn&#146;t be executed as part of a field initializer (that is, the <b>if</b> statement). So in effect, an instance initializer is the constructor for an anonymous inner class. Of course, it&#146;s limited; you can&#146;t overload instance initializers, so you can have only one of these constructors. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1163" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775684"></a><a name="Heading7573"></a>The link to the outer
+class</h3>
+<p>So far, it appears that inner classes are just a name-hiding and code-organization scheme, which is helpful but not totally compelling. However, there&#146;s another twist. When you create an inner class, an object of that inner class has a link to the enclosing object that made it, and so it can access the members of that enclosing object&#151;<i>without </i>any special qualifications. In addition, inner classes have access rights to all the elements in the enclosing class.<a name="Index735"></a><a name="Index736"></a><a name="Index737"></a><sup><a name="fnB35" href="#fn35">[35]</a></sup> The following example demonstrates this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0118" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Sequence.java</font>
+<font color=#009900>// Holds a sequence of Objects.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>interface</font> Selector {
+  <font color=#0000ff>boolean</font> end();
+  Object current();
+  <font color=#0000ff>void</font> next();
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Sequence {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> Object[] objects;
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> next = 0;
+  <font color=#0000ff>public</font> Sequence(<font color=#0000ff>int</font> size) { objects = <font color=#0000ff>new</font> Object[size]; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> add(Object x) {
+    <font color=#0000ff>if</font>(next &lt; objects.length)
+      objects[next++] = x;
+  }
+  <font color=#0000ff>private</font> <font color=#0000ff>class</font> SSelector <font color=#0000ff>implements</font> Selector {
+    <font color=#0000ff>private</font> <font color=#0000ff>int</font> i = 0;
+    <font color=#0000ff>public</font> <font color=#0000ff>boolean</font> end() { <font color=#0000ff>return</font> i == objects.length; }
+    <font color=#0000ff>public</font> Object current() { <font color=#0000ff>return</font> objects[i]; }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> next() { <font color=#0000ff>if</font>(i &lt; objects.length) i++; }
+  }
+  <font color=#0000ff>public</font> Selector getSelector() { <font color=#0000ff>return</font> <font color=#0000ff>new</font> SSelector(); }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Sequence sequence = <font color=#0000ff>new</font> Sequence(10);
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 10; i++)
+      sequence.add(Integer.toString(i));
+    Selector selector = sequence.getSelector();
+    <font color=#0000ff>while</font>(!selector.end()) {
+      System.out.println(selector.current());
+      selector.next();
+    }
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"0"</font>,
+      <font color=#004488>"1"</font>,
+      <font color=#004488>"2"</font>,
+      <font color=#004488>"3"</font>,
+      <font color=#004488>"4"</font>,
+      <font color=#004488>"5"</font>,
+      <font color=#004488>"6"</font>,
+      <font color=#004488>"7"</font>,
+      <font color=#004488>"8"</font>,
+      <font color=#004488>"9"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>Sequence</b> is simply a fixed-sized array of <b>Object</b> with a class wrapped around it. You call <b>add(&#160;)</b> to add a new <b>Object</b> to the end of the sequence (if there&#146;s room left). To fetch each of the objects in a <b>Sequence</b>, there&#146;s an interface called <b>Selector</b>, which allows you to see if you&#146;re at the <b>end(&#160;)</b>, to look at the <b>current(&#160;)</b> <b>Object</b>, and to move to the <b>next(&#160;)</b> <b>Object</b> in the <b>Sequence</b>. Because <b>Selector</b> is an <b>interface</b>, many other classes can implement the <b>interface</b> in their own ways, and many methods can take the <b>interface</b> as an argument, in order to create generic code. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1164" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Here, the <b>SSelector</b> is a <b>private</b> class that provides <b>Selector</b> functionality. In <b>main(&#160;)</b>, you can see the creation of a <b>Sequence</b>, followed by the addition of a number of <b>String</b> objects. Then, a <b>Selector</b> is produced with a call to <b>getSelector(&#160;)</b>, and this is used to move through the <b>Sequence</b> and select each item. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1165" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>At first, the creation of <b>SSelector</b> looks like just another inner class. But examine it closely. Note that each of the methods&#151;<b>end(&#160;)</b>, <b>current(&#160;),</b> and <b>next(&#160;)</b>&#151;refer to <b>objects</b>, which is a reference that isn&#146;t part of <b>SSelector</b>, but is instead a <b>private </b>field in the enclosing class. However, the inner class can access methods and fields from the enclosing class as if it owned them. This turns out to be very convenient, as you can see in the preceding example. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1166" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>So an inner class has automatic access to the members of the enclosing class. How can this happen? The inner class must keep a reference to the particular object of the enclosing class that was responsible for creating it. Then, when you refer to a member of the enclosing class, that (hidden) reference is used to select that member. Fortunately, the compiler takes care of all these details for you, but you can also understand now that an object of an inner class can be created only in association with an object of the enclosing class. Construction of the inner class object requires the reference to the object of the enclosing class, and the compiler will complain if it cannot access that reference. Most of the time this occurs without any intervention on the part of the programmer. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1167" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="Index738"></a><a name="_Toc24775685"></a><a name="Heading7630"></a>Nested
+classes<br></h3>
+<p><a name="Index739"></a><a name="Index740"></a><a name="Index741"></a>If you don&#146;t need a connection between the inner class object and the outer class object, then you can make the inner class <b>static</b>. This is commonly called a <i>nested class</i>.<sup><i><a name="fnB36" href="#fn36">[36]</a></i></sup> To understand the meaning of <b>static</b> when applied to inner classes, you must remember that the object of an ordinary inner class implicitly keeps a reference to the object of the enclosing class that created it. This is not true, however, when you say an inner class is <b>static</b>. A nested class means: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1168" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li>You don&#146;t need an outer-class object in order to create an object of a
+nested class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1169" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>You can&#146;t access a non-<b>static</b> outer-class object from an object
+of a nested class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1170" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><p>Nested classes are different from ordinary inner classes in another way, as well. Fields and methods in ordinary inner classes can only be at the outer level of a class, so ordinary inner classes cannot have <b>static</b> data, <b>static</b> fields, or nested classes. However, nested classes can have all of these: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1171" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Parcel10.java</font>
+<font color=#009900>// Nested classes (static inner classes).</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Parcel10 {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> <font color=#0000ff>class</font> ParcelContents <font color=#0000ff>implements</font> Contents {
+    <font color=#0000ff>private</font> <font color=#0000ff>int</font> i = 11;
+    <font color=#0000ff>public</font> <font color=#0000ff>int</font> value() { <font color=#0000ff>return</font> i; }
+  }
+  <font color=#0000ff>protected</font> <font color=#0000ff>static</font> <font color=#0000ff>class</font> ParcelDestination
+  <font color=#0000ff>implements</font> Destination {
+    <font color=#0000ff>private</font> String label;
+    <font color=#0000ff>private</font> ParcelDestination(String whereTo) {
+      label = whereTo;
+    }
+    <font color=#0000ff>public</font> String readLabel() { <font color=#0000ff>return</font> label; }
+    <font color=#009900>// Nested classes can contain other static elements:</font>
+    <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> f() {}
+    <font color=#0000ff>static</font> <font color=#0000ff>int</font> x = 10;
+    <font color=#0000ff>static</font> <font color=#0000ff>class</font> AnotherLevel {
+      <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> f() {}
+      <font color=#0000ff>static</font> <font color=#0000ff>int</font> x = 10;
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> Destination dest(String s) {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> ParcelDestination(s);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> Contents cont() {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> ParcelContents();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Contents c = cont();
+    Destination d = dest(<font color=#004488>"Tanzania"</font>);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In <b>main(&#160;)</b>, no object of <b>Parcel10</b> is necessary; instead, you use the normal syntax for selecting a <b>static</b> member to call the methods that return references to <b>Contents</b> and <b>Destination</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1172" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As you will see shortly, in an ordinary (non-<b>static</b>) inner class, the link to the outer class object is achieved with a special <b>this</b> reference. A nested class does not have this special <b>this</b> reference, which makes it analogous to a <b>static</b> method. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1173" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Normally, you can&#146;t put any code inside an <b>interface</b>, but a nested class can be part of an <b>interface</b>. Since the class is <b>static</b>,<b> </b>it doesn&#146;t violate the rules for interfaces&#151;the nested class is only placed inside the namespace of the interface:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:IInterface.java</font>
+<font color=#009900>// Nested classes inside interfaces.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>interface</font> IInterface {
+  <font color=#0000ff>static</font> <font color=#0000ff>class</font> Inner {
+    <font color=#0000ff>int</font> i, j, k;
+    <font color=#0000ff>public</font> Inner() {}
+    <font color=#0000ff>void</font> f() {}
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Earlier in this book I suggested putting a <b>main(&#160;) </b>in every class to act as a test bed for that class. One drawback to this is the amount of extra compiled code you must carry around. If this is a problem, you can use a nested class to hold your test code: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1174" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:TestBed.java</font>
+<font color=#009900>// Putting test code in a nested class.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> TestBed {
+  <font color=#0000ff>public</font> TestBed() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() { System.out.println(<font color=#004488>"f()"</font>); }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>class</font> Tester {
+    <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+      TestBed t = <font color=#0000ff>new</font> TestBed();
+      t.f();
+    }
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This generates a separate class called <b>TestBed$Tester</b> (to run the program, you say <b>java TestBed$Tester</b>). You can use this class for testing, but you don&#146;t need to include it in your shipping product; you can simply delete <b>TestBed$Tester.class</b> before packaging things up. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1175" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775686"></a><a name="Heading7701"></a>Referring to the outer
+class object<br></h3>
+<p><a name="Index743"></a><a name="Index744"></a>If you need to produce the reference to the outer class object, you name the outer class followed by a dot and <b>this</b>. For example, in the class <b>Sequence.SSelector</b>, any of its methods can produce the stored reference to the outer class <b>Sequence</b> by saying <b>Sequence.this</b>. The resulting reference is automatically the correct type. (This is known and checked at compile time, so there is no run-time overhead.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1176" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Sometimes you want to tell some other object to create an object of one of its inner classes. To do this you must provide a reference to the other outer class object in the <b>new</b> expression, like this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Parcel11.java</font>
+<font color=#009900>// Creating instances of inner classes.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Parcel11 {
+  <font color=#0000ff>class</font> Contents {
+    <font color=#0000ff>private</font> <font color=#0000ff>int</font> i = 11;
+    <font color=#0000ff>public</font> <font color=#0000ff>int</font> value() { <font color=#0000ff>return</font> i; }
+  }
+  <font color=#0000ff>class</font> Destination {
+    <font color=#0000ff>private</font> String label;
+    Destination(String whereTo) { label = whereTo; }
+    String readLabel() { <font color=#0000ff>return</font> label; }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Parcel11 p = <font color=#0000ff>new</font> Parcel11();
+    <font color=#009900>// Must use instance of outer class</font>
+    <font color=#009900>// to create an instances of the inner class:</font>
+    Parcel11.Contents c = p.<font color=#0000ff>new</font> Contents();
+    Parcel11.Destination d = p.<font color=#0000ff>new</font> Destination(<font color=#004488>"Tanzania"</font>);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>To create an object of the inner class directly, you don&#146;t follow the same form and refer to the outer class name <b>Parcel11</b> as you might expect, but instead you must use an <i>object</i> of the outer class to make an object of the inner class:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>Parcel11.Contents c = p.<font color=#0000ff>new</font> Contents();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Thus, it&#146;s not possible to create an object of the inner class unless you already have an object of the outer class. This is because the object of the inner class is quietly connected to the object of the outer class that it was made from. However, if you make a nested class (a <b>static</b> inner class), then it doesn&#146;t need a reference to the outer class object. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1177" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775687"></a><a name="Heading7730"></a>Reaching outward from a
+multiply-nested class</h3>
+<p><sup><a name="fnB37" href="#fn37">[37]</a></sup><a name="Index745"></a><a name="Index746"></a>It doesn&#146;t matter how deeply an inner class may be nested&#151;it can transparently access all of the members of all the classes it is nested within, as seen here:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:MultiNestingAccess.java</font>
+<font color=#009900>// Nested classes can access all members of all</font>
+<font color=#009900>// levels of the classes they are nested within.</font>
+
+<font color=#0000ff>class</font> MNA {
+  <font color=#0000ff>private</font> <font color=#0000ff>void</font> f() {}
+  <font color=#0000ff>class</font> A {
+    <font color=#0000ff>private</font> <font color=#0000ff>void</font> g() {}
+    <font color=#0000ff>public</font> <font color=#0000ff>class</font> B {
+      <font color=#0000ff>void</font> h() {
+        g();
+        f();
+      }
+    }
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> MultiNestingAccess {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    MNA mna = <font color=#0000ff>new</font> MNA();
+    MNA.A mnaa = mna.<font color=#0000ff>new</font> A();
+    MNA.A.B mnaab = mnaa.<font color=#0000ff>new</font> B();
+    mnaab.h();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that in <b>MNA.A.B</b>, the methods <b>g(&#160;)</b> and <b>f(&#160;)</b> are callable without any qualification (despite the fact that they are <b>private</b>). This example also demonstrates the syntax necessary to create objects of multiply-nested inner classes when you create the objects in a different class. The &#147;<b>.new</b>&#148; syntax produces the correct scope, so you do not have to qualify the class name in the constructor call. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1178" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775688"></a><a name="Heading7760"></a>Inheriting from inner
+classes<br></h3>
+<p><a name="Index747"></a><a name="Index748"></a><a name="Index749"></a>Because the inner class constructor must attach to a reference of the enclosing class object, things are slightly complicated when you inherit from an inner class. The problem is that the &#147;secret&#148; reference to the enclosing class object <i>must</i> be initialized, and yet in the derived class there&#146;s no longer a default object to attach to. The answer is to use a syntax provided to make the association explicit: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0119" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:InheritInner.java</font>
+<font color=#009900>// Inheriting an inner class.</font>
+
+<font color=#0000ff>class</font> WithInner {
+  <font color=#0000ff>class</font> Inner {}
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> InheritInner <font color=#0000ff>extends</font> WithInner.Inner {
+  <font color=#009900>//! InheritInner() {} // Won't compile</font>
+  InheritInner(WithInner wi) {
+    wi.<font color=#0000ff>super</font>();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    WithInner wi = <font color=#0000ff>new</font> WithInner();
+    InheritInner ii = <font color=#0000ff>new</font> InheritInner(wi);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that <b>InheritInner</b> is extending only the inner class, not the outer one. But when it comes time to create a constructor, the default one is no good, and you can&#146;t just pass a reference to an enclosing object. In addition, you must use the syntax <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1179" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>enclosingClassReference.<font color=#0000ff>super</font>();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><a name="Index750"></a><a name="Index751"></a><a name="Index752"></a>inside the constructor. This provides the necessary reference, and the program will then compile. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1180" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775689"></a><a name="Heading7784"></a>Can inner classes be
+overridden?</h3>
+<p>What happens when you create an inner class, then inherit from the enclosing class and redefine the inner class? That is, is it possible to override the entire inner class? This seems like it would be a powerful concept, but &#147;overriding&#148; an inner class as if it were another method of the outer class doesn&#146;t really do anything: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0120" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:BigEgg.java</font>
+<font color=#009900>// An inner class cannot be overriden like a method.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Egg {
+  <font color=#0000ff>private</font> Yolk y;
+  <font color=#0000ff>protected</font> <font color=#0000ff>class</font> Yolk {
+    <font color=#0000ff>public</font> Yolk() { System.out.println(<font color=#004488>"Egg.Yolk()"</font>); }
+  }
+  <font color=#0000ff>public</font> Egg() {
+    System.out.println(<font color=#004488>"New Egg()"</font>);
+    y = <font color=#0000ff>new</font> Yolk();
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> BigEgg <font color=#0000ff>extends</font> Egg {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> Yolk {
+    <font color=#0000ff>public</font> Yolk() { System.out.println(<font color=#004488>"BigEgg.Yolk()"</font>); }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>new</font> BigEgg();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"New Egg()"</font>,
+      <font color=#004488>"Egg.Yolk()"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The default constructor is synthesized automatically by the compiler, and this calls the base-class default constructor. You might think that since a <b>BigEgg</b> is being created, the &#147;overridden&#148; version of <b>Yolk</b> would be used, but this is not the case, as you can see from the output. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1181" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This example shows that there isn&#146;t any extra inner class magic going on when you inherit from the outer class. The two inner classes are completely separate entities, each in their own namespace. However, it&#146;s still possible to explicitly inherit from the inner class: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1182" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:BigEgg2.java</font>
+<font color=#009900>// Proper inheritance of an inner class.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Egg2 {
+  <font color=#0000ff>protected</font> <font color=#0000ff>class</font> Yolk {
+    <font color=#0000ff>public</font> Yolk() { System.out.println(<font color=#004488>"Egg2.Yolk()"</font>); }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() { System.out.println(<font color=#004488>"Egg2.Yolk.f()"</font>);}
+  }
+  <font color=#0000ff>private</font> Yolk y = <font color=#0000ff>new</font> Yolk();
+  <font color=#0000ff>public</font> Egg2() { System.out.println(<font color=#004488>"New Egg2()"</font>); }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> insertYolk(Yolk yy) { y = yy; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> g() { y.f(); }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> BigEgg2 <font color=#0000ff>extends</font> Egg2 {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> Yolk <font color=#0000ff>extends</font> Egg2.Yolk {
+    <font color=#0000ff>public</font> Yolk() { System.out.println(<font color=#004488>"BigEgg2.Yolk()"</font>); }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {
+      System.out.println(<font color=#004488>"BigEgg2.Yolk.f()"</font>);
+    }
+  }
+  <font color=#0000ff>public</font> BigEgg2() { insertYolk(<font color=#0000ff>new</font> Yolk()); }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Egg2 e2 = <font color=#0000ff>new</font> BigEgg2();
+    e2.g();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Egg2.Yolk()"</font>,
+      <font color=#004488>"New Egg2()"</font>,
+      <font color=#004488>"Egg2.Yolk()"</font>,
+      <font color=#004488>"BigEgg2.Yolk()"</font>,
+      <font color=#004488>"BigEgg2.Yolk.f()"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Now <b>BigEgg2.Yolk</b> explicitly <b>extends</b> <b>Egg2.Yolk</b> and overrides its methods. The method <b>insertYolk(&#160;) </b>allows <b>BigEgg2 </b>to upcast one of its own <b>Yolk </b>objects into the <b>y</b> reference in <b>Egg2</b>, so when <b>g(&#160;)</b> calls <b>y.f(&#160;)</b>, the overridden version of <b>f(&#160;)</b> is used. The second call to <b>Egg2.Yolk(&#160;)</b> is the base-class constructor call of the <b>BigEgg2.Yolk</b> constructor. You can see that the overridden version of <b>f(&#160;)</b> is used when <b>g(&#160;)</b> is called. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1183" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775690"></a><a name="Heading7855"></a>Local inner classes</h3>
+<p>As noted earlier, inner classes can also be created inside code blocks, typically inside the body of a method. A local inner class cannot have an access specifier because it isn&#146;t part of the outer class, but it does have access to the final variables in the current code block and all the members of the enclosing class. Here&#146;s an example comparing the creation of a local inner class with an anonymous inner class: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0476" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:LocalInnerClass.java</font>
+<font color=#009900>// Holds a sequence of Objects.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>interface</font> Counter {
+  <font color=#0000ff>int</font> next();
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> LocalInnerClass {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> count = 0;
+  Counter getCounter(<font color=#0000ff>final</font> String name) {
+    <font color=#009900>// A local inner class:</font>
+    <font color=#0000ff>class</font> LocalCounter <font color=#0000ff>implements</font> Counter {
+      <font color=#0000ff>public</font> LocalCounter() {
+        <font color=#009900>// Local inner class can have a constructor</font>
+        System.out.println(<font color=#004488>"LocalCounter()"</font>);
+      }
+      <font color=#0000ff>public</font> <font color=#0000ff>int</font> next() {
+        System.out.print(name); <font color=#009900>// Access local final</font>
+        <font color=#0000ff>return</font> count++;
+      }
+    }
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> LocalCounter();
+  }
+  <font color=#009900>// The same thing with an anonymous inner class:</font>
+  Counter getCounter2(<font color=#0000ff>final</font> String name) {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Counter() {
+      <font color=#009900>// Anonymous inner class cannot have a named</font>
+      <font color=#009900>// constructor, only an instance initializer:</font>
+      {
+        System.out.println(<font color=#004488>"Counter()"</font>);
+      }
+      <font color=#0000ff>public</font> <font color=#0000ff>int</font> next() {
+        System.out.print(name); <font color=#009900>// Access local final</font>
+        <font color=#0000ff>return</font> count++;
+      }
+    };
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    LocalInnerClass lic = <font color=#0000ff>new</font> LocalInnerClass();
+    Counter
+      c1 = lic.getCounter(<font color=#004488>"Local inner "</font>),
+      c2 = lic.getCounter2(<font color=#004488>"Anonymous inner "</font>);
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 5; i++)
+      System.out.println(c1.next());
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 5; i++)
+      System.out.println(c2.next());
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"LocalCounter()"</font>,
+      <font color=#004488>"Counter()"</font>,
+      <font color=#004488>"Local inner 0"</font>,
+      <font color=#004488>"Local inner 1"</font>,
+      <font color=#004488>"Local inner 2"</font>,
+      <font color=#004488>"Local inner 3"</font>,
+      <font color=#004488>"Local inner 4"</font>,
+      <font color=#004488>"Anonymous inner 5"</font>,
+      <font color=#004488>"Anonymous inner 6"</font>,
+      <font color=#004488>"Anonymous inner 7"</font>,
+      <font color=#004488>"Anonymous inner 8"</font>,
+      <font color=#004488>"Anonymous inner 9"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><b>Counter</b> returns the next value in a sequence. It is implemented as both a local class and an anonymous inner class, both of which have the same behaviors and capabilities. Since the name of the local inner class is not accessible outside the method, the only justification for using a local inner class instead of an anonymous inner class is if you need a named constructor and/or overloaded constructor, since an anonymous inner class can only use instance initialization. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0477" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The only reason to make a local inner class rather than an anonymous inner class is if you need to make more than one object of that class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0478" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775691"></a><a name="Heading7924"></a>Inner class
+identifiers</h3>
+<p>Since every class produces a <b>.class </b>file that holds all the information about how to create objects of this type (this information produces a &#147;meta-class&#148; called the <b>Class </b>object), you might guess that inner classes must also produce <a name="Index756"></a><a name="Index757"></a><b>.class</b> files to contain the information for <i>their</i> <b>Class</b> objects. The names of these files/classes have a strict formula: the name of the enclosing class, followed by a &#145;<b>$</b>&#146;, followed by the name of the inner class. For example, the <b>.class</b> files created by <b>LocalInnerClass.java</b> include: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0121" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>Counter.<font color=#0000ff>class</font>
+LocalInnerClass$2.<font color=#0000ff>class</font>
+LocalInnerClass$1LocalCounter.<font color=#0000ff>class</font>
+LocalInnerClass.<font color=#0000ff>class</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>If inner classes are anonymous, the compiler simply starts generating numbers as inner class identifiers. If inner classes are nested within inner classes, their names are simply appended after a &#145;<b>$</b>&#146; and the outer class identifier(s). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1184" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Although this scheme of generating internal names is simple and straightforward, it&#146;s also robust and handles most situations.<sup><a name="fnB38" href="#fn38">[38]</a></sup> Since it is the standard naming scheme for Java, the generated files are automatically platform-independent. (Note that the Java compiler is changing your inner classes in all sorts of other ways in order to make them work.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1185" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775692"></a><a name="Heading7934"></a>Why inner classes?</h2>
+<p>At this point you&#146;ve seen a lot of syntax and semantics describing the way inner classes work, but this doesn&#146;t answer the question of why they exist. Why did Sun go to so much trouble to add this fundamental language feature? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1186" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Typically, the inner class inherits from a class or implements an <b>interface</b>, and the code in the inner class manipulates the outer class object that it was created within. So you could say that an inner class provides a kind of window into the outer class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1187" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A question that cuts to the heart of inner classes is this: If I just need a reference to an <b>interface</b>, why don&#146;t I just make the outer class implement that <b>interface</b>? The answer is &#147;If that&#146;s all you need, then that&#146;s how you should do it.&#148; So what is it that distinguishes an inner class implementing an <b>interface</b> from an outer class implementing the same <b>interface</b>? The answer is that you can&#146;t always have the convenience of <b>interface</b>s&#151;sometimes you&#146;re working with implementations. So the most compelling reason for inner classes is: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0122" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p class="FollowedHyperlink"><i>Each inner class can independently inherit from an implementation. Thus, the inner class is not limited by whether the outer class is already inheriting from an implementation.</i><br></p>
+<p>Without the ability that inner classes provide to inherit&#151;in effect&#151;from more than one concrete or <b>abstract </b>class, some design and programming problems would be intractable. So one way to look at the inner class is as the rest of the solution of the multiple-inheritance problem. Interfaces solve part of the problem, but inner classes effectively allow &#147;multiple implementation inheritance.&#148; That is, inner classes effectively allow you to inherit from more than one non-<b>interface</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1188" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To see this in more detail, consider a situation in which you have two interfaces that must somehow be implemented within a class. Because of the flexibility of interfaces, you have two choices: a single class or an inner class:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:MultiInterfaces.java</font>
+<font color=#009900>// Two ways that a class can implement multiple interfaces.</font>
+
+<font color=#0000ff>interface</font> A {}
+<font color=#0000ff>interface</font> B {}
+
+<font color=#0000ff>class</font> X <font color=#0000ff>implements</font> A, B {}
+
+<font color=#0000ff>class</font> Y <font color=#0000ff>implements</font> A {
+  B makeB() {
+    <font color=#009900>// Anonymous inner class:</font>
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> B() {};
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> MultiInterfaces {
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> takesA(A a) {}
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> takesB(B b) {}
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    X x = <font color=#0000ff>new</font> X();
+    Y y = <font color=#0000ff>new</font> Y();
+    takesA(x);
+    takesA(y);
+    takesB(x);
+    takesB(y.makeB());
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Of course, this assumes that the structure of your code makes logical sense either way. However, you&#146;ll ordinarily have some kind of guidance from the nature of the problem about whether to use a single class or an inner class. But without any other constraints, the approach in the preceding example doesn&#146;t really make much difference from an implementation standpoint. Both of them work. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1189" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>However, if you have <b>abstract</b> or concrete classes instead of <b>interface</b>s, you are suddenly limited to using inner classes if your class must somehow implement both of the others:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:MultiImplementation.java</font>
+<font color=#009900>// With concrete or abstract classes, inner</font>
+<font color=#009900>// classes are the only way to produce the effect</font>
+<font color=#009900>// of "multiple implementation inheritance."</font>
+<font color=#0000ff>package</font> c08;
+
+<font color=#0000ff>class</font> D {}
+<font color=#0000ff>abstract</font> <font color=#0000ff>class</font> E {}
+
+<font color=#0000ff>class</font> Z <font color=#0000ff>extends</font> D {
+  E makeE() { <font color=#0000ff>return</font> <font color=#0000ff>new</font> E() {}; }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> MultiImplementation {
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> takesD(D d) {}
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> takesE(E e) {}
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Z z = <font color=#0000ff>new</font> Z();
+    takesD(z);
+    takesE(z.makeE());
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>If you didn&#146;t need to solve the &#147;multiple implementation inheritance&#148; problem, you could conceivably code around everything else without the need for inner classes. But with inner classes you have these additional features: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1190" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li>The inner class can have multiple instances, each with its own state
+information that is independent of the information in the outer class object.
+<font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1191"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>In a single outer class you can have several inner classes, each of which
+implement the same <b>interface</b> or inherit from the same class in a
+different way. An example of this will be shown shortly. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1192" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>The point of creation of the inner class object is not tied to the creation
+of the outer class object. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1193" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>There is no potentially confusing &#147;is-a&#148; relationship with the
+inner class; it&#146;s a separate entity. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1194" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><p>As an example, if <b>Sequence.java</b> did not use inner classes, you&#146;d have to say &#147;a <b>Sequence</b> is a <b>Selector</b>,&#148; and you&#146;d only be able to have one <b>Selector</b> in existence for a particular <b>Sequence</b>. You can easily have a second method, <b>getRSelector(&#160;)</b>, that produces a <b>Selector</b> that moves backward through the sequence. This kind of flexibility is only available with inner classes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1195" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775693"></a><a name="Heading8000"></a>Closures &amp;
+Callbacks<br></h3>
+<p><a name="Index758"></a><a name="Index759"></a>A <i>closure</i> is a callable object that retains information from the scope in which it was created. From this definition, you can see that an inner class is an object-oriented closure, because it doesn&#146;t just contain each piece of information from the outer class object (&#147;the scope in which it was created&#148;), but it automatically holds a reference back to the whole outer class object, where it has permission to manipulate all the members, even <b>private</b> ones. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1196" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index760"></a><a name="Index761"></a>One of the most compelling arguments made to include some kind of pointer mechanism in Java was to allow <a name="Index762"></a><i>callbacks</i>. With a callback, some other object is given a piece of information that allows it to call back into the originating object at some later point. This is a very powerful concept, as you will see later in the book. If a callback is implemented using a pointer, however, you must rely on the programmer to behave and not misuse the pointer. As you&#146;ve seen by now, Java tends to be more careful than that, so pointers were not included in the language. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1197" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The closure provided by the inner class is a perfect solution&#151;more flexible and far safer than a pointer. Here&#146;s an example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:Callbacks.java</font>
+<font color=#009900>// Using inner classes for callbacks</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>interface</font> Incrementable {
+  <font color=#0000ff>void</font> increment();
+}
+
+<font color=#009900>// Very simple to just implement the interface:</font>
+<font color=#0000ff>class</font> Callee1 <font color=#0000ff>implements</font> Incrementable {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> i = 0;
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> increment() {
+    i++;
+    System.out.println(i);
+  }
+}
+
+<font color=#0000ff>class</font> MyIncrement {
+  <font color=#0000ff>void</font> increment() {
+    System.out.println(<font color=#004488>"Other operation"</font>);
+  }
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> f(MyIncrement mi) { mi.increment(); }
+}
+
+<font color=#009900>// If your class must implement increment() in</font>
+<font color=#009900>// some other way, you must use an inner class:</font>
+<font color=#0000ff>class</font> Callee2 <font color=#0000ff>extends</font> MyIncrement {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> i = 0;
+  <font color=#0000ff>private</font> <font color=#0000ff>void</font> incr() {
+    i++;
+    System.out.println(i);
+  }
+  <font color=#0000ff>private</font> <font color=#0000ff>class</font> Closure <font color=#0000ff>implements</font> Incrementable {
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> increment() { incr(); }
+  }
+  Incrementable getCallbackReference() {
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Closure();
+  }
+}
+
+<font color=#0000ff>class</font> Caller {
+  <font color=#0000ff>private</font> Incrementable callbackReference;
+  Caller(Incrementable cbh) { callbackReference = cbh; }
+  <font color=#0000ff>void</font> go() { callbackReference.increment(); }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Callbacks {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Callee1 c1 = <font color=#0000ff>new</font> Callee1();
+    Callee2 c2 = <font color=#0000ff>new</font> Callee2();
+    MyIncrement.f(c2);
+    Caller caller1 = <font color=#0000ff>new</font> Caller(c1);
+    Caller caller2 = <font color=#0000ff>new</font> Caller(c2.getCallbackReference());
+    caller1.go();
+    caller1.go();
+    caller2.go();
+    caller2.go();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Other operation"</font>,
+      <font color=#004488>"1"</font>,
+      <font color=#004488>"2"</font>,
+      <font color=#004488>"1"</font>,
+      <font color=#004488>"2"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This example also provides a further distinction between implementing an interface in an outer class versus doing so in an inner class. <b>Callee1</b> is clearly the simpler solution in terms of the code. <b>Callee2</b> inherits from <b>MyIncrement</b>, which already has a different <b>increment(&#160;)</b> method that does something unrelated to the one expected by the <b>Incrementable</b> interface. When <b>MyIncrement</b> is inherited into <b>Callee2</b>, <b>increment(&#160;)</b> can&#146;t be overridden for use by <b>Incrementable</b>, so you&#146;re forced to provide a separate implementation using an inner class. Also note that when you create an inner class, you do not add to or modify the interface of the outer class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1198" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Notice that everything except <b>getCallbackReference(&#160;)</b> in <b>Callee2</b> is <b>private</b>. To allow <i>any</i> connection to the outside world, the <b>interface Incrementable</b> is essential. Here you can see how <b>interface</b>s allow for a complete separation of interface from implementation. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1199" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The inner class <b>Closure</b> implements <b>Incrementable</b> to provide a hook back into <b>Callee2</b>&#151;but a safe hook. Whoever gets the <b>Incrementable</b> reference can, of course, only call <b>increment(&#160;)</b> and has no other abilities (unlike a pointer, which would allow you to run wild). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1200" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><b>Caller</b> takes an <b>Incrementable</b> reference in its constructor (although the capturing of the callback reference could happen at any time) and then, sometime later, uses the reference to &#147;call back&#148; into the <b>Callee</b> class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1201" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The value of the callback is in its flexibility; you can dynamically decide what methods will be called at run time. The benefit of this will become more evident in Chapter 14, where callbacks are used everywhere to implement GUI functionality. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1202" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775694"></a><a name="Heading8077"></a>Inner classes &amp; control
+frameworks</h3>
+<p>A more concrete example of the use of inner classes can be found in something that I will refer to here as a <a name="Index763"></a><a name="Index764"></a><a name="Index765"></a><i>control framework</i>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1203" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>An <a name="Index766"></a><i>application framework</i> is a class or a set of classes that&#146;s designed to solve a particular type of problem. To apply an application framework, you typically inherit from one or more classes and override some of the methods. The code that you write in the overridden methods customizes the general solution provided by that application framework in order to solve your specific problem  (this is an example of the <a name="Index767"></a><a name="Index768"></a><i>Template Method</i> design pattern; see <i>Thinking in Patterns (with Java)</i> at <i>www.BruceEckel.com</i>). The control framework is a particular type of application<i> </i>framework dominated by the need to respond to events; a system that primarily responds to events is called an <a name="Index769"></a><i>event-driven</i> <i>system</i>. One of the most important problems in application programming is the graphical user interface (GUI), which is almost entirely event-driven. As you will see in Chapter 14, the Java Swing library is a control framework that elegantly solves the GUI problem and that heavily uses inner classes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1204" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index770"></a><a name="Index771"></a><a name="Index772"></a>To see how inner classes allow the simple creation and use of control frameworks, consider a control framework whose job is to execute events whenever those events are &#147;ready.&#148; Although &#147;ready&#148; could mean anything, in this case the default will be based on clock time. What follows is a control framework that contains no specific information about what it&#146;s controlling. That information is supplied during inheritance, when the &#147;template method&#148; is implemented. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0471" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>First, here is the interface that describes any control event. It&#146;s an <b>abstract</b> class instead of an actual <b>interface</b> because the default behavior is to perform the control based on time. Thus, some of the implementation is included here: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0123" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:controller:Event.java</font>
+<font color=#009900>// The common methods for any control event.</font>
+<font color=#0000ff>package</font> c08.controller;
+
+<font color=#0000ff>public</font> <font color=#0000ff>abstract</font> <font color=#0000ff>class</font> Event {
+  <font color=#0000ff>private</font> <font color=#0000ff>long</font> eventTime;
+  <font color=#0000ff>protected</font> <font color=#0000ff>final</font> <font color=#0000ff>long</font> delayTime;
+  <font color=#0000ff>public</font> Event(<font color=#0000ff>long</font> delayTime) {
+    <font color=#0000ff>this</font>.delayTime = delayTime;
+    start();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> start() { <font color=#009900>// Allows restarting</font>
+    eventTime = System.currentTimeMillis() + delayTime;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>boolean</font> ready() {
+    <font color=#0000ff>return</font> System.currentTimeMillis() &gt;= eventTime;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>abstract</font> <font color=#0000ff>void</font> action();
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The constructor captures the time (from the time of creation of the object) when you want the <b>Event</b> to run and then calls <b>start(&#160;)</b>, which takes the current time and adds the delay time to produce the time when the event will occur. Rather than being included in the constructor, <b>start(&#160;)</b> is a separate method because this way, it allows you to restart the timer after the event has run out so the <b>Event</b> object can be reused.<b> </b>For example, if you want a repeating event, you can simply call <b>start(&#160;) </b>inside your <b>action(&#160;)</b> method. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1206" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><b>ready(&#160;)</b> tells you when it&#146;s time to run the <b>action(&#160;)</b> method. Of course, <b>ready(&#160;)</b> could be overridden in a derived class to base the <b>Event</b> on something other than time. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1205" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The following file contains the actual control framework that manages and fires events. The <b>Event</b> objects are held inside a container object of type <b>ArrayList</b>, which you&#146;ll learn more about in Chapter 11. For now, all you need to know is that <b>add(&#160;)</b> will append an <b>Object</b> to the end of the <b>ArrayList</b>, <b>size(&#160;)</b> produces the number of entries in the <b>ArrayList</b>, <b>get(&#160;)</b> will fetch an element from the <b>ArrayList</b> at a particular index, and <b>remove(&#160;)</b> removes an element from the <b>ArrayList</b>, given the element number you want to remove. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0472" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:controller:Controller.java</font>
+<font color=#009900>// With Event, the generic framework for control systems.</font>
+<font color=#0000ff>package</font> c08.controller;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Controller {
+  <font color=#009900>// An object from java.util to hold Event objects:</font>
+  <font color=#0000ff>private</font> List eventList = <font color=#0000ff>new</font> ArrayList();
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> addEvent(Event c) { eventList.add(c); }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(eventList.size() &gt; 0) {
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; eventList.size(); i++) {
+        Event e = (Event)eventList.get(i);
+        <font color=#0000ff>if</font>(e.ready()) {
+          System.out.println(e);
+          e.action();
+          eventList.remove(i);
+        }
+      }
+    }
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>run(&#160;)</b> method loops through <b>eventList</b>, hunting for an <b>Event</b> object that&#146;s <b>ready(&#160;)</b> to run. For each one it finds <b>ready(&#160;)</b>,<b> </b>it prints information using the object&#146;s <b>toString(&#160;) </b>method, calls the <b>action(&#160;)</b> method<b>,</b> and then removes the <b>Event</b> from the list. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1209" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Note that so far in this design you know nothing about exactly <i>what</i> an <b>Event</b> does. And this is the crux of the design&#151;how it &#147;separates the things that change from the things that stay the same.&#148; Or, to use my term, the &#147;vector of change&#148; is the different actions of the various kinds of <a name="Index773"></a><a name="Index774"></a><b>Event</b> objects, and you express different actions by creating different <b>Event</b> subclasses. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1210" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This is where inner classes come into play. They allow two things: <br></p>
+<ol>
+<li><a name="Index775"></a><a name="Index776"></a><a name="Index777"></a>To
+create the entire implementation of a control framework in a single class,
+thereby encapsulating everything that&#146;s unique about that implementation.
+Inner classes are used to express the many different kinds of
+<b>action(&#160;)</b> necessary to solve the problem. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1211" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>Inner classes keep this implementation from becoming awkward, since
+you&#146;re able to easily access any of the members in the outer class.
+Without this ability the code might become unpleasant enough that you&#146;d
+end up seeking an alternative. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1212" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><p>Consider a particular implementation of the control framework designed to control greenhouse functions.<sup><a name="fnB39" href="#fn39">[39]</a></sup> Each action is entirely different: turning lights, water, and thermostats on and off, ringing bells, and restarting the system. But the control framework is designed to easily isolate this different code. Inner classes allow you to have multiple derived versions of the same base class, <b>Event</b>, within a single class. For each type of action, you inherit a new <b>Event</b> inner class, and write the control code in the <b>action(&#160;)</b> implementation. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1213" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As is typical with an application framework, the class <b>GreenhouseControls</b> is inherited from <b>Controller</b>:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:GreenhouseControls.java</font>
+<font color=#009900>// This produces a specific application of the</font>
+<font color=#009900>// control system, all in a single class. Inner</font>
+<font color=#009900>// classes allow you to encapsulate different</font>
+<font color=#009900>// functionality for each type of event.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> c08.controller.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> GreenhouseControls <font color=#0000ff>extends</font> Controller {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>boolean</font> light = <font color=#0000ff>false</font>;
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> LightOn <font color=#0000ff>extends</font> Event {
+    <font color=#0000ff>public</font> LightOn(<font color=#0000ff>long</font> delayTime) { <font color=#0000ff>super</font>(delayTime); }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> action() {
+      <font color=#009900>// Put hardware control code here to</font>
+      <font color=#009900>// physically turn on the light.</font>
+      light = <font color=#0000ff>true</font>;
+    }
+    <font color=#0000ff>public</font> String toString() { <font color=#0000ff>return</font> <font color=#004488>"Light is on"</font>; }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> LightOff <font color=#0000ff>extends</font> Event {
+    <font color=#0000ff>public</font> LightOff(<font color=#0000ff>long</font> delayTime) { <font color=#0000ff>super</font>(delayTime); }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> action() {
+      <font color=#009900>// Put hardware control code here to</font>
+      <font color=#009900>// physically turn off the light.</font>
+      light = <font color=#0000ff>false</font>;
+    }
+    <font color=#0000ff>public</font> String toString() { <font color=#0000ff>return</font> <font color=#004488>"Light is off"</font>; }
+  }
+  <font color=#0000ff>private</font> <font color=#0000ff>boolean</font> water = <font color=#0000ff>false</font>;
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> WaterOn <font color=#0000ff>extends</font> Event {
+    <font color=#0000ff>public</font> WaterOn(<font color=#0000ff>long</font> delayTime) { <font color=#0000ff>super</font>(delayTime); }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> action() {
+      <font color=#009900>// Put hardware control code here.</font>
+      water = <font color=#0000ff>true</font>;
+    }
+    <font color=#0000ff>public</font> String toString() {
+      <font color=#0000ff>return</font> <font color=#004488>"Greenhouse water is on"</font>;
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> WaterOff <font color=#0000ff>extends</font> Event {
+    <font color=#0000ff>public</font> WaterOff(<font color=#0000ff>long</font> delayTime) { <font color=#0000ff>super</font>(delayTime); }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> action() {
+      <font color=#009900>// Put hardware control code here.</font>
+      water = <font color=#0000ff>false</font>;
+    }
+    <font color=#0000ff>public</font> String toString() {
+      <font color=#0000ff>return</font> <font color=#004488>"Greenhouse water is off"</font>;
+    }
+  }
+  <font color=#0000ff>private</font> String thermostat = <font color=#004488>"Day"</font>;
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> ThermostatNight <font color=#0000ff>extends</font> Event {
+    <font color=#0000ff>public</font> ThermostatNight(<font color=#0000ff>long</font> delayTime) {
+      <font color=#0000ff>super</font>(delayTime);
+    }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> action() {
+      <font color=#009900>// Put hardware control code here.</font>
+      thermostat = <font color=#004488>"Night"</font>;
+    }
+    <font color=#0000ff>public</font> String toString() {
+      <font color=#0000ff>return</font> <font color=#004488>"Thermostat on night setting"</font>;
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> ThermostatDay <font color=#0000ff>extends</font> Event {
+    <font color=#0000ff>public</font> ThermostatDay(<font color=#0000ff>long</font> delayTime) {
+      <font color=#0000ff>super</font>(delayTime);
+    }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> action() {
+      <font color=#009900>// Put hardware control code here.</font>
+      thermostat = <font color=#004488>"Day"</font>;
+    }
+    <font color=#0000ff>public</font> String toString() {
+      <font color=#0000ff>return</font> <font color=#004488>"Thermostat on day setting"</font>;
+    }
+  }
+  <font color=#009900>// An example of an action() that inserts a</font>
+  <font color=#009900>// new one of itself into the event list:</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> Bell <font color=#0000ff>extends</font> Event {
+    <font color=#0000ff>public</font> Bell(<font color=#0000ff>long</font> delayTime) { <font color=#0000ff>super</font>(delayTime); }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> action() {
+      addEvent(<font color=#0000ff>new</font> Bell(delayTime));
+    }
+    <font color=#0000ff>public</font> String toString() { <font color=#0000ff>return</font> <font color=#004488>"Bing!"</font>; }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> Restart <font color=#0000ff>extends</font> Event {
+    <font color=#0000ff>private</font> Event[] eventList;
+    <font color=#0000ff>public</font> Restart(<font color=#0000ff>long</font> delayTime, Event[] eventList) {
+      <font color=#0000ff>super</font>(delayTime);
+      <font color=#0000ff>this</font>.eventList = eventList;
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; eventList.length; i++)
+        addEvent(eventList[i]);
+    }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> action() {
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; eventList.length; i++) {
+        eventList[i].start(); <font color=#009900>// Rerun each event</font>
+        addEvent(eventList[i]);
+      }
+      start(); <font color=#009900>// Rerun this Event</font>
+      addEvent(<font color=#0000ff>this</font>);
+    }
+    <font color=#0000ff>public</font> String toString() {
+      <font color=#0000ff>return</font> <font color=#004488>"Restarting system"</font>;
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> Terminate <font color=#0000ff>extends</font> Event {
+    <font color=#0000ff>public</font> Terminate(<font color=#0000ff>long</font> delayTime) { <font color=#0000ff>super</font>(delayTime); }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> action() { System.exit(0); }
+    <font color=#0000ff>public</font> String toString() { <font color=#0000ff>return</font> <font color=#004488>"Terminating"</font>;  }
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Note that <b>light</b>, <b>water</b>, and <b>thermostat </b>belong to the outer class <b>GreenhouseControls</b>, and yet the inner classes can access those fields without qualification or special permission. Also, most of the <b>action(&#160;)</b> methods involve some sort of hardware control. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1214" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Most of the <b>Event</b> classes look similar, but <b>Bell</b> and <b>Restart</b> are special. <b>Bell</b> rings and then adds a new <b>Bell</b> object to the event list, so it will ring again later. Notice how inner classes <i>almost</i> look like multiple inheritance: <b>Bell</b> and <b>Restart</b> have all the methods of <b>Event</b> and also appear to have all the methods of the outer class <b>GreenhouseControls</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1215" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><b>Restart </b>is given an array of <b>Event </b>objects that it adds to the controller. Since <b>Restart(&#160;)</b> is just another <b>Event</b> object, you can also add a <b>Restart</b> object within <b>Restart.action(&#160;)</b> so that the system regularly restarts itself. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0473" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The following class configures the system by creating a <b>GreenhouseControls</b> object and adding various kinds of <b>Event </b>objects. This is an example of the <i>Command</i> design pattern: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1216" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c08:GreenhouseController.java</font>
+<font color=#009900>// Configure and execute the greenhouse system.</font>
+<font color=#009900>// {Args: 5000}</font>
+<font color=#0000ff>import</font> c08.controller.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> GreenhouseController {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    GreenhouseControls gc = <font color=#0000ff>new</font> GreenhouseControls();
+    <font color=#009900>// Instead of hard-wiring, you could parse</font>
+    <font color=#009900>// configuration information from a text file here:</font>
+    gc.addEvent(gc.<font color=#0000ff>new</font> Bell(900));
+    Event[] eventList = {
+      gc.<font color=#0000ff>new</font> ThermostatNight(0),
+      gc.<font color=#0000ff>new</font> LightOn(200),
+      gc.<font color=#0000ff>new</font> LightOff(400),
+      gc.<font color=#0000ff>new</font> WaterOn(600),
+      gc.<font color=#0000ff>new</font> WaterOff(800),
+      gc.<font color=#0000ff>new</font> ThermostatDay(1400)
+    };
+    gc.addEvent(gc.<font color=#0000ff>new</font> Restart(2000, eventList));
+    <font color=#0000ff>if</font>(args.length == 1)
+      gc.addEvent(
+        gc.<font color=#0000ff>new</font> Terminate(Integer.parseInt(args[0])));
+    gc.run();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This class initializes the system, so it adds all the appropriate events. Of course, a more flexible way to accomplish this is to avoid hard-coding the events and instead read them from a file. (An exercise in Chapter 12 asks you to modify this example to do just that.) If you provide a command-line argument, it uses this to terminate the program after that many milliseconds (this is used for testing). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0474" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This example should move you toward an appreciation of the value of inner classes, especially when used within a control framework. However, in Chapter 14 you&#146;ll see how elegantly inner classes are used to describe the actions of a graphical user interface. By the time you finish that chapter, you should be fully convinced. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0124" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775695"></a><a name="Heading8280"></a>Summary</h2>
+<p>Interfaces and inner classes are more sophisticated concepts than what you&#146;ll find in many OOP languages; for example, there&#146;s nothing like them in C++. Together, they solve the same problem that C++ attempts to solve with its multiple inheritance (MI) feature. However, MI in C++ turns out to be rather difficult to use, whereas Java interfaces and inner classes are, by comparison, much more accessible. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1217" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Although the features themselves are reasonably straightforward, the use of these features is a design issue, much the same as polymorphism. Over time, you&#146;ll become better at recognizing situations where you should use an interface, or an inner class, or both. But at this point in this book, you should at least be comfortable with the syntax and semantics. As you see these language features in use, you&#146;ll eventually internalize them. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1218" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775696"></a><a name="Heading8283"></a>Exercises</h2>
+<p>Solutions to selected exercises can be found in the electronic document <i>The Thinking in Java Annotated Solution Guide</i>, available for a small fee from <i>www.BruceEckel.com</i>.<br></p>
+<ol>
+<li>	Prove that the fields in an <b>interface</b> are implicitly <b>static</b>
+and <b>final</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1219" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create an <b>interface</b> containing three methods, in its own
+<b>package</b>. Implement the interface in a different <b>package</b>. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1220"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Prove that all the methods in an <b>interface</b> are automatically
+<b>public</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1221" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	In <b>c07:Sandwich.java</b>, create an interface called <b>FastFood</b>
+(with appropriate methods) and change <b>Sandwich</b> so that it also implements
+<b>FastFood</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1222" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create three <b>interface</b>s, each with two methods. Inherit a new
+<b>interface</b> from the three, adding a new method. Create a class by
+implementing the new <b>interface</b> and also inheriting from a concrete class.
+Now write four methods, each of which takes one of the four <b>interface</b>s as
+an argument. In <b>main(&#160;)</b>, create an object of your class and pass it
+to each of the methods. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1223" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify Exercise 5 by creating an <b>abstract</b> class and inheriting that
+into the derived class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1224" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify <b>Music5.java</b> by adding a <b>Playable</b> <b>interface</b>.
+Move the <b>play(&#160;)</b> declaration from <b>Instrument</b> to
+<b>Playable</b>. Add <b>Playable</b> to the derived classes by including it in
+the <b>implements</b> list. Change <b>tune(&#160;)</b> so that it takes a
+<b>Playable</b> instead of an <b>Instrument</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1225" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Change Exercise 6 in Chapter 7 so that <b>Rodent</b> is an
+<b>interface</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1226" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	In <b>Adventure.java</b>, add an <b>interface</b> called <b>CanClimb</b>,
+following the form of the other interfaces. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1227" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Write a program that imports and uses <b>Month.java</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1228" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Following the example given in <b>Month.java</b>, create an enumeration of
+days of the week. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1229" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create an <b>interface</b> with at least one method, in its own package.
+Create a class in a separate package. Add a <b>protected</b> inner class that
+implements the <b>interface</b>. In a third package, inherit from your class
+and, inside a method, return an object of the <b>protected</b> inner class,
+upcasting to the <b>interface</b> during the return. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1230" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create an <b>interface</b> with at least one method, and implement that
+<b>interface</b> by defining an inner class within a method, which returns a
+reference to your <b>interface</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1231" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Repeat Exercise 13 but define the inner class within a scope within a
+method. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1232" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Repeat Exercise 13 using an anonymous inner class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1233" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify <b>HorrorShow.java</b> to implement <b>DangerousMonster</b> and
+<b>Vampire</b> using anonymous classes.</li>
+<li>	Create a <b>private</b> inner class that implements a <b>public</b>
+<b>interface</b>. Write a method that returns a reference to an instance of the
+<b>private</b> inner class, upcast to the <b>interface</b>. Show that the inner
+class is completely hidden by trying to downcast to it. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1234" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class with a nondefault constructor (one with arguments) and no
+default constructor (no &#147;no-arg&#148; constructor). Create a second class
+that has a method that returns a reference to the first class. Create the object
+to return by making an anonymous inner class that inherits from the first class.
+<font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1235"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Create a class with a <b>private</b> field and a <b>private</b> method.
+Create an inner class with a method that modifies the outer class field and
+calls the outer class method. In a second outer class method, create an object
+of the inner class and call its method, then show the effect on the outer class
+object. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1236" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Repeat Exercise 19 using an anonymous inner class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1237" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class containing a nested class. In <b>main(&#160;)</b>, create an
+instance of the inner class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1238" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create an <b>interface</b> containing a nested class. Implement this
+<b>interface</b> and create an instance of the nested class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1239" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class containing an inner class that itself contains an inner
+class. Repeat this using nested classes. Note the names of the <b>.class</b>
+files produced by the compiler. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1240" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class with an inner class. In a separate class, make an instance
+of the inner class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1241" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class with an inner class that has a nondefault constructor (one
+that takes arguments). Create a second class with an inner class that inherits
+from the first inner class. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1242" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Repair the problem in <b>WindError.java</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1243" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify <b>Sequence.java</b> by adding a method <b>getRSelector(&#160;)</b>
+that produces a different implementation of the <b>Selector</b> <b>interface</b>
+that moves backward through the sequence from the end to the beginning. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1244"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Create an <b>interface</b> <b>U </b>with three methods. Create a class <b>A
+</b>with a method that produces a reference to a <b>U</b> by building an
+anonymous inner class. Create a second class <b>B </b>that contains an array of
+<b>U</b>. <b>B</b> should have one method that accepts and stores a reference to
+a <b>U</b> in the array, a second method that sets a reference in the array
+(specified by the method argument) to <b>null</b>, and a third method that moves
+through the array and calls the methods in <b>U</b>. In <b>main(&#160;)</b>,
+create a group of <b>A</b> objects and a single <b>B</b>. Fill the <b>B</b> with
+<b>U</b> references produced by the <b>A</b> objects. Use the <b>B</b> to call
+back into all the <b>A</b> objects. Remove some of the <b>U</b> references from
+the <b>B</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1245" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	In <b>GreenhouseControls.java</b>, add <b>Event</b> inner classes that turn
+fans on and off. Configure <b>GreenhouseController.java</b> to use these new
+<b>Event</b> objects. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1246" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Inherit from <b>GreenhouseControls</b> in <b>GreenhouseControls.java</b> to
+add <b>Event</b> inner classes that turn water mist generators on and off. Write
+a new version of <b>GreenhouseController.java</b> to use these new <b>Event</b>
+objects.</li>
+<li>	Show that an inner class has access to the <b>private</b> elements of its
+outer class. Determine whether the reverse is true. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap08_1247" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><p><br></p>
+<hr><p><sup><a name="fn33" href="#fnB33">[33]</a></sup> This approach was inspired by an e-mail from Rich Hoffarth. Item 21 in Joshua Bloch&#146;s <i>Effective Java</i> (Addison-Wesley, 2001) covers the topic in much more detail.<br></p>
+<p class="footnote text"><sup><a name="fn34" href="#fnB34">[34]</a></sup> Thanks to Martin Danner for asking this question during a seminar.<br></p>
+<p class="footnote text"><sup><a name="fn35" href="#fnB35">[35]</a></sup> This is very different from the design of <i>nested classes</i> in C++, which is simply a name-hiding mechanism. There is no link to an enclosing object and no implied permissions in C++.<br></p>
+<p class="footnote text"><sup><a name="fn36" href="#fnB36">[36]</a></sup> Roughly similar to nested classes in C++, except that those classes cannot access private members as they can in Java.<br></p>
+<p class="footnote text"><sup><a name="fn37" href="#fnB37">[37]</a></sup> Thanks again to Martin Danner.<br></p>
+<p class="footnote text"><sup><a name="fn38" href="#fnB38">[38]</a></sup> On the other hand, &#145;$&#146; is a meta-character to the Unix shell and so you&#146;ll sometimes have trouble when listing the <b>.class</b> files. This is a bit strange coming from Sun, a Unix-based company. My guess is that they weren&#146;t considering this issue, but instead thought you&#146;d naturally focus on the source-code files.<br></p>
+<p class="footnote text"><sup><a name="fn39" href="#fnB39">[39]</a></sup> For some reason this has always been a pleasing problem for me to solve; it came from my earlier book <i>C++ Inside &amp; Out</i>, but Java allows a much more elegant solution.<br></p>
+
+<!-- <hr><b>Placeholder</b> -->
+
+<hr>
+
+<div align="CENTER"><a href="TIJ309.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ311.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+
+</font></body>
+
+</html>

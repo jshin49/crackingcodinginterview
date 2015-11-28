@@ -1,0 +1,1862 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<!--
+This document was converted from RTF source: 
+By r2net 5.8 r2netcmd Windows 
+See http://www.logictran.com
+-->
+<head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Thinking in Java, 3rd ed. Revision 4.0: 13: Concurrency</title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css"></head>
+
+<body >
+   <CENTER>     <a href="http://www.MindView.net">     <img src="mindview.gif" alt="MindView Inc." BORDER = "0"></a>     <Font FACE="Verdana, Tahoma, Arial, Helvetica, Sans">     <h2>Thinking in Java, 3<sup>rd</sup> ed. Revision 4.0</h2>     <FONT size = "-1"><br>     [ <a href="README.txt">Viewing Hints</a> ]     [ <a href="http://www.mindview.net/Books/TIJ/">Book Home Page</a> ]     [ <a href="http://www.mindview.net/Etc/MailingList.html">Free Newsletter</a> ] <br>     [ <a href="http://www.mindview.net/Seminars">Seminars</a> ]     [ <a href="http://www.mindview.net/CDs">Seminars on CD ROM</a> ]     [ <a href="http://www.mindview.net/Services">Consulting</a> ] <br><br>     </FONT></FONT>   </CENTER> 
+<font face="Georgia"><div align="CENTER"><a href="TIJ314.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ316.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+<hr>
+
+<h1>
+<a name="_Toc375545444"></a><a name="_Toc375545471"></a><a name="_Toc24272652"></a><a name="_Toc24775835"></a><a name="Heading16832"></a>13:
+Concurrency</h1>
+<p class="Intro">Objects provide a way to divide a program into independent sections. Often, you also need to turn a program into separate, independently running subtasks.<br></p>
+<p>Each of these independent subtasks is called a <a name="Index1527"></a><a name="Index1528"></a><i>thread</i>, and you program as if each thread runs by itself and has the CPU to itself. Some underlying mechanism is actually dividing up the CPU time for you, but in general, you don&#146;t have to think about it, which makes programming with multiple threads a much easier task. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2194" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A <a name="Index1529"></a><i>process</i> is a self-contained running program with its own address space. A <a name="Index1530"></a><i>multitasking</i> operating system is capable of running more than one process (program) at a time, while making it look like each one is chugging along on its own, by periodically switching the CPU from one task to another. A thread is a single sequential flow of control within a process. A single process can thus have multiple concurrently executing threads. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2195" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There are many possible uses for multithreading, but in general, you&#146;ll have some part of your program tied to a particular event or resource, and you don&#146;t want that to hold up the rest of your program. So, you create a thread associated with that event or resource and let it run independently of the main program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2196" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Concurrent programming is like stepping into an entirely new world and learning a new programming language, or at least a new set of language concepts. With the appearance of thread support in most microcomputer operating systems, extensions for threads have also been appearing in programming languages or libraries. In all cases, thread programming:<br></p>
+<ol>
+<li>Seems mysterious and requires a shift in the way you think about
+programming</li>
+<li>Looks similar to thread support in other languages, so when you understand
+threads, you understand a common tongue
+</li></ol><p>And although support for threads can make Java a more complicated language, this isn&#146;t entirely the fault of Java&#151;threads are tricky. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2348" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Understanding concurrent programming is on the same order of difficulty as understanding polymorphism. If you apply some effort, you can fathom the basic mechanism, but it generally takes deep study and understanding in order to develop a true grasp of the subject. The goal of this chapter is to give you a solid foundation in the basics of concurrency so that you can understand the concepts and write reasonable multithreaded programs. Be aware that you can easily become overconfident, so if you are writing anything complex, you will need to study dedicated books on the topic. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0170" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775836"></a><a name="Heading16842"></a>Motivation</h2>
+<p>One of the most compelling reasons for concurrency is to produce a responsive user interface. Consider a program that performs some CPU-intensive operation and thus ends up ignoring user input and being unresponsive. The basic problem is that the program needs to continue performing its operations, and at the same time it needs to return control to the user interface so that the program can respond to the user. If you have a &#147;quit&#148; button, you don&#146;t want to be forced to poll it in every piece of code you write in your program, and yet you want the quit button to be responsive, as if you <a name="Index1531"></a><i>were</i> checking it regularly. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0169" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A conventional method cannot continue performing its operations and at the same time return control to the rest of the program. In fact, this sounds like an impossible thing to accomplish, as if the CPU must be in two places at once, but this is precisely the illusion that concurrency provides. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2201" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Concurrency can also be used to optimize throughput. For example, you might be able to do important work while you&#146;re stuck waiting for input to arrive on an I/O port. Without threading, the only reasonable solution is to poll the I/O port, which is awkward and can be difficult. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0361" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you have a multiprocessor machine, multiple threads may be distributed across multiple processors, which can dramatically improve throughput. This is often the case with powerful multiprocessor web servers, which can distribute large numbers of user requests across CPUs in a program that allocates one thread per request. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0171" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>One thing to keep in mind is that a program with many threads must be able to run on a single-CPU machine. Therefore, it must also be possible to write the same program without using any threads. However, multithreading provides a very important organizational benefit, so that the design of your program can be greatly simplified. Some types of problems, such as simulation&#151;a video game, for example&#151;are very difficult to solve without support for concurrency. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0362" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The threading model is a programming convenience to simplify juggling several operations at the same time within a single program. With threads, the CPU will pop around and give each thread some of its time. Each thread has the consciousness of constantly having the CPU to itself, but the CPU&#146;s time is actually sliced between all the threads. The exception to this is if your program is running on multiple CPUs, but one of the great things about threading is that you are abstracted away from this layer, so your code does not need to know whether it is actually running on a single CPU or many. Thus, threads are a way to create transparently scalable programs&#151;if a program is running too slowly, it can easily be made faster by adding CPUs to your computer. Multitasking and multithreading tend to be the most reasonable ways to utilize multiprocessor systems. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2202" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index1532"></a><a name="Index1533"></a>Threading can reduce computing efficiency somewhat in single-CPU machines, but the net improvement in program design, resource balancing, and user convenience is often quite valuable. In general, threads enable you to create a more loosely-coupled design; otherwise, parts of your code would be forced to pay explicit attention to tasks that would normally be handled by threads. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2203" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775837"></a><a name="Heading16850"></a>Basic threads</h2>
+<p>The simplest way to create a thread is to inherit from <b>java.lang.Thread</b>, which has all the wiring necessary to create and run threads. The most important method for <b>Thread</b> is <b>run(&#160;)</b>, which you must override to make the thread do your bidding. Thus, <b>run(&#160;)</b> is the code that will be executed &#147;simultaneously&#148; with the other threads in a program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2204" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The following example creates five threads, each with a unique identification number generated with a <b>static</b> variable. The <a name="Index1534"></a><b>Thread</b>&#146;s <b>run(&#160;)</b> method is overridden to count down each time it passes through its loop and to return when the count is zero (at the point when <b>run(&#160;)</b> returns, the thread is terminated by the threading mechanism). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0177" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:SimpleThread.java</font>
+<font color=#009900>// Very simple Threading example.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SimpleThread <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> countDown = 5;
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> <font color=#0000ff>int</font> threadCount = 0;
+  <font color=#0000ff>public</font> SimpleThread() {
+    <font color=#0000ff>super</font>(<font color=#004488>""</font> + ++threadCount); <font color=#009900>// Store the thread name</font>
+    start();
+  }
+  <font color=#0000ff>public</font> String toString() {
+    <font color=#0000ff>return</font> <font color=#004488>"#"</font> + getName() + <font color=#004488>": "</font> + countDown;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      System.out.println(<font color=#0000ff>this</font>);
+      <font color=#0000ff>if</font>(--countDown == 0) <font color=#0000ff>return</font>;
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 5; i++)
+      <font color=#0000ff>new</font> SimpleThread();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"#1: 5"</font>,
+      <font color=#004488>"#2: 5"</font>,
+      <font color=#004488>"#3: 5"</font>,
+      <font color=#004488>"#5: 5"</font>,
+      <font color=#004488>"#1: 4"</font>,
+      <font color=#004488>"#4: 5"</font>,
+      <font color=#004488>"#2: 4"</font>,
+      <font color=#004488>"#3: 4"</font>,
+      <font color=#004488>"#5: 4"</font>,
+      <font color=#004488>"#1: 3"</font>,
+      <font color=#004488>"#4: 4"</font>,
+      <font color=#004488>"#2: 3"</font>,
+      <font color=#004488>"#3: 3"</font>,
+      <font color=#004488>"#5: 3"</font>,
+      <font color=#004488>"#1: 2"</font>,
+      <font color=#004488>"#4: 3"</font>,
+      <font color=#004488>"#2: 2"</font>,
+      <font color=#004488>"#3: 2"</font>,
+      <font color=#004488>"#5: 2"</font>,
+      <font color=#004488>"#1: 1"</font>,
+      <font color=#004488>"#4: 2"</font>,
+      <font color=#004488>"#2: 1"</font>,
+      <font color=#004488>"#3: 1"</font>,
+      <font color=#004488>"#5: 1"</font>,
+      <font color=#004488>"#4: 1"</font>
+    }, Test.IGNORE_ORDER + Test.WAIT);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The thread objects are given specific names by calling the appropriate <b>Thread</b> constructor. This name is retrieved in <b>toString(&#160;) </b>using <b>getName(&#160;)</b>.<br></p>
+<p>A <b>Thread </b>object&#146;s <b>run(&#160;)</b> method virtually always has some kind of loop that continues until the thread is no longer necessary, so you must establish the condition on which to break out of this loop (or, as in the preceding program, simply <b>return</b> from <b>run(&#160;)</b>). Often, <b>run(&#160;)</b> is cast in the form of an infinite loop, which means that, barring some factor that causes <b>run(&#160;)</b> to terminate, it will continue forever (later in the chapter you&#146;ll see how to safely signal a thread to stop). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2205" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In <b>main(&#160;) </b>you can see a number of threads being created and run. The <b>start(&#160;) </b>method in the <a name="Index1535"></a><b>Thread</b> class performs special initialization for the thread and then calls <b>run(&#160;)</b>. So the steps are: the constructor is called to build the object, it calls <b>start(&#160;)</b> to configure the thread, and the thread execution mechanism calls <b>run(&#160;)</b>. If you don&#146;t call <b>start(&#160;)</b> (which you don&#146;t have to do in the constructor, as you will see in subsequent examples), the thread will never be started. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2206" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The output for one run of this program will be different from that of another, because the thread scheduling mechanism is not deterministic. In fact, you may see dramatic differences in the output of this simple program between one version of the JDK and the next. For example, a previous JDK didn&#146;t time-slice very often, so thread 1 might loop to extinction first, then thread 2 would go through all of its loops, etc. This was virtually the same as calling a routine that would do all the loops at once, except that starting up all those threads is more expensive. In JDK 1.4 you get something like the output from <b>SimpleThread.java</b>, which indicates better time-slicing behavior by the scheduler&#151;each thread seems to be getting regular service. Generally, these kinds of JDK behavioral changes have not been mentioned by Sun, so you cannot plan on any consistent threading behavior. The best approach is to be as conservative as possible while writing threading code. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0172" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When <b>main(&#160;)</b> creates the <b>Thread</b> objects, it isn&#146;t capturing the references for any of them. With an ordinary object, this would make it fair game for garbage collection, but not with a <b>Thread</b>. Each <b>Thread</b> &#147;registers&#148; itself so there is actually a reference to it someplace, and the garbage collector can&#146;t clean it up until the thread exits its <b>run(&#160;)</b> and dies. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2209" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775838"></a><a name="Heading16912"></a>Yielding</h3>
+<p>If you know that you&#146;ve accomplished what you need to in your <b>run(&#160;)</b> method, you can give a hint to the thread scheduling mechanism that you&#146;ve done enough and that some other thread might as well have the CPU. This hint (and it <i>is</i> a hint&#151;there&#146;s no guarantee your implementation will listen to it) takes the form of the <a name="Index1536"></a><b>yield(&#160;)</b> method. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0176" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>We can modify the preceding example by yielding after each loop:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:YieldingThread.java</font>
+<font color=#009900>// Suggesting when to switch threads with yield().</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> YieldingThread <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> countDown = 5;
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> <font color=#0000ff>int</font> threadCount = 0;
+  <font color=#0000ff>public</font> YieldingThread() {
+    <font color=#0000ff>super</font>(<font color=#004488>""</font> + ++threadCount);
+    start();
+  }
+  <font color=#0000ff>public</font> String toString() {
+    <font color=#0000ff>return</font> <font color=#004488>"#"</font> + getName() + <font color=#004488>": "</font> + countDown;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      System.out.println(<font color=#0000ff>this</font>);
+      <font color=#0000ff>if</font>(--countDown == 0) <font color=#0000ff>return</font>;
+      yield();
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 5; i++)
+      <font color=#0000ff>new</font> YieldingThread();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"#1: 5"</font>,
+      <font color=#004488>"#2: 5"</font>,
+      <font color=#004488>"#4: 5"</font>,
+      <font color=#004488>"#5: 5"</font>,
+      <font color=#004488>"#3: 5"</font>,
+      <font color=#004488>"#1: 4"</font>,
+      <font color=#004488>"#2: 4"</font>,
+      <font color=#004488>"#4: 4"</font>,
+      <font color=#004488>"#5: 4"</font>,
+      <font color=#004488>"#3: 4"</font>,
+      <font color=#004488>"#1: 3"</font>,
+      <font color=#004488>"#2: 3"</font>,
+      <font color=#004488>"#4: 3"</font>,
+      <font color=#004488>"#5: 3"</font>,
+      <font color=#004488>"#3: 3"</font>,
+      <font color=#004488>"#1: 2"</font>,
+      <font color=#004488>"#2: 2"</font>,
+      <font color=#004488>"#4: 2"</font>,
+      <font color=#004488>"#5: 2"</font>,
+      <font color=#004488>"#3: 2"</font>,
+      <font color=#004488>"#1: 1"</font>,
+      <font color=#004488>"#2: 1"</font>,
+      <font color=#004488>"#4: 1"</font>,
+      <font color=#004488>"#5: 1"</font>,
+      <font color=#004488>"#3: 1"</font>
+    }, Test.IGNORE_ORDER + Test.WAIT);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>By using <b>yield(&#160;)</b>, the output is evened up quite a bit. But note that if the output string is longer, you will see output that is roughly the same as it was in <b>SimpleThread.java</b> (try it&#151;change <b>toString(&#160;)</b> to put out longer and longer strings to see what happens). Since the scheduling mechanism is <i>preemptive</i>, it decides to interrupt a thread and switch to another whenever it wants, so if I/O (which is executed via the <b>main(&#160;) </b>thread) takes too long, it is interrupted before <b>run(&#160;)</b> has a chance to <b>yield(&#160;)</b>. In general, <b>yield(&#160;) </b>is useful only in rare situations, and you can&#146;t rely on it to do any serious tuning of your application. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0178" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775839"></a><a name="Heading16971"></a>Sleeping</h3>
+<p>Another way you can control the behavior of your threads is by calling <b>sleep(&#160;)</b> to cease execution for a given number of milliseconds. In the preceding example, if you replace the call to <b>yield(&#160;)</b> with a call to <a name="Index1537"></a><b>sleep(&#160;)</b>, you get the following: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0179" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:SleepingThread.java</font>
+<font color=#009900>// Calling sleep() to wait for awhile.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SleepingThread <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> countDown = 5;
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> <font color=#0000ff>int</font> threadCount = 0;
+  <font color=#0000ff>public</font> SleepingThread() {
+    <font color=#0000ff>super</font>(<font color=#004488>""</font> + ++threadCount);
+    start();
+  }
+  <font color=#0000ff>public</font> String toString() {
+    <font color=#0000ff>return</font> <font color=#004488>"#"</font> + getName() + <font color=#004488>": "</font> + countDown;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      System.out.println(<font color=#0000ff>this</font>);
+      <font color=#0000ff>if</font>(--countDown == 0) <font color=#0000ff>return</font>;
+      <font color=#0000ff>try</font> {
+        sleep(100);
+      } <font color=#0000ff>catch</font> (InterruptedException e) {
+        <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+      }
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font>
+  main(String[] args) <font color=#0000ff>throws</font> InterruptedException {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 5; i++)
+      <font color=#0000ff>new</font> SleepingThread().join();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"#1: 5"</font>,
+      <font color=#004488>"#1: 4"</font>,
+      <font color=#004488>"#1: 3"</font>,
+      <font color=#004488>"#1: 2"</font>,
+      <font color=#004488>"#1: 1"</font>,
+      <font color=#004488>"#2: 5"</font>,
+      <font color=#004488>"#2: 4"</font>,
+      <font color=#004488>"#2: 3"</font>,
+      <font color=#004488>"#2: 2"</font>,
+      <font color=#004488>"#2: 1"</font>,
+      <font color=#004488>"#3: 5"</font>,
+      <font color=#004488>"#3: 4"</font>,
+      <font color=#004488>"#3: 3"</font>,
+      <font color=#004488>"#3: 2"</font>,
+      <font color=#004488>"#3: 1"</font>,
+      <font color=#004488>"#4: 5"</font>,
+      <font color=#004488>"#4: 4"</font>,
+      <font color=#004488>"#4: 3"</font>,
+      <font color=#004488>"#4: 2"</font>,
+      <font color=#004488>"#4: 1"</font>,
+      <font color=#004488>"#5: 5"</font>,
+      <font color=#004488>"#5: 4"</font>,
+      <font color=#004488>"#5: 3"</font>,
+      <font color=#004488>"#5: 2"</font>,
+      <font color=#004488>"#5: 1"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>When you call <b>sleep(&#160;)</b>, it must be placed inside a <b>try</b> block because it&#146;s possible for <b>sleep(&#160;)</b> to be interrupted before it times out. This happens if someone else has a reference to the thread and they call <b>interrupt(&#160;)</b> on the thread (<a name="Index1538"></a><b>interrupt(&#160;)</b> also affects the thread if <b>wait(&#160;)</b> or <b>join(&#160;)</b> has been called for it, so those calls must be in a similar <b>try</b> block&#151;you&#146;ll learn about those methods later). Usually, if you&#146;re going to break out of a suspended thread using <b>interrupt(&#160;)</b> you will use <b>wait(&#160;)</b> rather than <b>sleep(&#160;)</b>, so that ending up inside the <b>catch</b> clause is unlikely. Here, we follow the maxim &#147;don&#146;t catch an exception unless you know what to do with it&#148; by re-throwing it as a <b>RuntimeException</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0175" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You&#146;ll notice that the output is deterministic&#151;each thread counts down before the next one starts. This is because <b>join(&#160;)</b> (which you&#146;ll learn about shortly) is used on each thread, so that <b>main(&#160;)</b> waits for the thread to complete before continuing. If you did not use <b>join(&#160;)</b>, you&#146;d see that the threads tend to run in any order, which means that <b>sleep(&#160;)</b> is also not a way for you to control the order of thread execution. It just stops the execution of the thread for awhile. The only guarantee that you have is that the thread will sleep at least 100 milliseconds, but it may take longer before the thread resumes execution, because the thread scheduler still has to get back to it after the sleep interval expires. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2207" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you must control the order of execution of threads, your best bet is not to use threads at all, but instead to write your own cooperative routines that hand control to each other in a specified order. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0174" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775840"></a><a name="Heading17036"></a>Priority</h3>
+<p>The <a name="Index1539"></a><a name="Index1540"></a><i>priority</i> of a thread tells the scheduler how important this thread is. Although the order that the CPU attends to an existing set of threads is indeterminate, if there are a number of threads blocked and waiting to be run, the scheduler will lean toward the one with the highest priority first. However, this doesn&#146;t mean that threads with lower priority aren&#146;t run (that is, you can&#146;t get deadlocked because of priorities). Lower priority threads just tend to run less often. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2306" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Here&#146;s <b>SimpleThread.java</b> modified so that the priority levels are demonstrated. The priorities are adjusting by using <b>Thread</b>&#146;s <b>setPriority(&#160;)</b> method.<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:SimplePriorities.java</font>
+<font color=#009900>// Shows the use of thread priorities.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SimplePriorities <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> countDown = 5;
+  <font color=#0000ff>private</font> <font color=#0000ff>volatile</font> <font color=#0000ff>double</font> d = 0; <font color=#009900>// No optimization</font>
+  <font color=#0000ff>public</font> SimplePriorities(<font color=#0000ff>int</font> priority) {
+    setPriority(priority);
+    start();
+  }
+  <font color=#0000ff>public</font> String toString() {
+    <font color=#0000ff>return</font> <font color=#0000ff>super</font>.toString() + <font color=#004488>": "</font> + countDown;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      <font color=#009900>// An expensive, interruptable operation:</font>
+      <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 1; i &lt; 100000; i++)
+        d = d + (Math.PI + Math.E) / (<font color=#0000ff>double</font>)i;
+      System.out.println(<font color=#0000ff>this</font>);
+      <font color=#0000ff>if</font>(--countDown == 0) <font color=#0000ff>return</font>;
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>new</font> SimplePriorities(Thread.MAX_PRIORITY);
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 5; i++)
+      <font color=#0000ff>new</font> SimplePriorities(Thread.MIN_PRIORITY);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Thread[Thread-1,10,main]: 5"</font>,
+      <font color=#004488>"Thread[Thread-1,10,main]: 4"</font>,
+      <font color=#004488>"Thread[Thread-1,10,main]: 3"</font>,
+      <font color=#004488>"Thread[Thread-1,10,main]: 2"</font>,
+      <font color=#004488>"Thread[Thread-1,10,main]: 1"</font>,
+      <font color=#004488>"Thread[Thread-2,1,main]: 5"</font>,
+      <font color=#004488>"Thread[Thread-2,1,main]: 4"</font>,
+      <font color=#004488>"Thread[Thread-2,1,main]: 3"</font>,
+      <font color=#004488>"Thread[Thread-2,1,main]: 2"</font>,
+      <font color=#004488>"Thread[Thread-2,1,main]: 1"</font>,
+      <font color=#004488>"Thread[Thread-3,1,main]: 5"</font>,
+      <font color=#004488>"Thread[Thread-4,1,main]: 5"</font>,
+      <font color=#004488>"Thread[Thread-5,1,main]: 5"</font>,
+      <font color=#004488>"Thread[Thread-6,1,main]: 5"</font>,
+      <font color=#004488>"Thread[Thread-3,1,main]: 4"</font>,
+      <font color=#004488>"Thread[Thread-4,1,main]: 4"</font>,
+      <font color=#004488>"Thread[Thread-5,1,main]: 4"</font>,
+      <font color=#004488>"Thread[Thread-6,1,main]: 4"</font>,
+      <font color=#004488>"Thread[Thread-3,1,main]: 3"</font>,
+      <font color=#004488>"Thread[Thread-4,1,main]: 3"</font>,
+      <font color=#004488>"Thread[Thread-5,1,main]: 3"</font>,
+      <font color=#004488>"Thread[Thread-6,1,main]: 3"</font>,
+      <font color=#004488>"Thread[Thread-3,1,main]: 2"</font>,
+      <font color=#004488>"Thread[Thread-4,1,main]: 2"</font>,
+      <font color=#004488>"Thread[Thread-5,1,main]: 2"</font>,
+      <font color=#004488>"Thread[Thread-6,1,main]: 2"</font>,
+      <font color=#004488>"Thread[Thread-4,1,main]: 1"</font>,
+      <font color=#004488>"Thread[Thread-3,1,main]: 1"</font>,
+      <font color=#004488>"Thread[Thread-6,1,main]: 1"</font>,
+      <font color=#004488>"Thread[Thread-5,1,main]: 1"</font>
+    }, Test.IGNORE_ORDER + Test.WAIT);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In this version, <b>toString(&#160;)</b> is overridden to use <b>Thread.toString(&#160;)</b>, which prints the thread name (which you can set yourself via the constructor; here it&#146;s automatically generated as <b>Thread-1</b>, <b>Thread-2</b>, etc.), the priority level, and the &#147;thread group&#148; that the thread belongs to. Because the threads are self-identifying, there is no <b>threadNumber </b>in this example. The overridden <b>toString(&#160;)</b> also shows the countdown value of the thread. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0180" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can see that the priority level of thread 1 is at the highest level, and all the rest of the threads are at the lowest level. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0181" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Inside <b>run(&#160;)</b>, 100,000 repetitions of a rather expensive floating-point calculation have been added, involving <b>double</b> addition and division. The variable <b>d</b> has been made <b>volatile</b> to ensure that no optimization is performed. Without this calculation, you don&#146;t see the effect of setting the priority levels (try it: comment out the <b>for</b> loop containing the <b>double</b> calculations). With the calculation, you see that thread 1 is given a higher preference by the thread scheduler (at least, this was the behavior on my Windows 2000 machine). Even though printing to the console is also an expensive behavior, you won&#146;t see the priority levels that way, because console printing doesn&#146;t get interrupted (otherwise, the console display would get garbled during threading), whereas the math calculation can be interrupted. The calculation takes long enough that the thread scheduling mechanism jumps in and changes threads, and pays attention to the priorities so that thread 1 gets preference. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0182" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can also read the priority of an existing thread with <a name="Index1541"></a><a name="Index1542"></a><b>getPriority(&#160;) </b>and change it at any time (not just in the constructor, as in <b>SimplePriorities.java</b>) with <a name="Index1543"></a><a name="Index1544"></a><b>setPriority(&#160;)</b>.<br></p>
+<p>Although the JDK has 10 priority levels, this doesn&#146;t map well to many operating systems. For example, Windows 2000 has 7 priority levels that are not fixed, so the mapping is indeterminate (although Sun&#146;s Solaris has 2<sup>31 </sup>levels). The only portable approach is to stick to <b>MAX_PRIORITY</b>, <b>NORM_PRIORITY</b>, and <b>MIN_PRIORITY</b> when you&#146;re adjusting priority levels. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0173" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545474"></a><a name="_Toc375545477"></a><a name="_Toc24775841"></a><a name="Heading17107"></a>Daemon
+threads<br></h3>
+<p><a name="Index1545"></a><a name="Index1546"></a>A &#147;daemon&#148; thread is one that is supposed to provide a general service in the background as long as the program is running, but is not part of the essence of the program. Thus, when all of the non-daemon threads complete, the program is terminated. Conversely, if there are any non-daemon threads still running, the program doesn&#146;t terminate. There is, for instance, a non-daemon thread that runs <b>main(&#160;)</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2230" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:SimpleDaemons.java</font>
+<font color=#009900>// Daemon threads don't prevent the program from ending.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SimpleDaemons <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>public</font> SimpleDaemons() {
+    setDaemon(<font color=#0000ff>true</font>); <font color=#009900>// Must be called before start()</font>
+    start();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      <font color=#0000ff>try</font> {
+        sleep(100);
+      } <font color=#0000ff>catch</font> (InterruptedException e) {
+        <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+      }
+      System.out.println(<font color=#0000ff>this</font>);
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 10; i++)
+      <font color=#0000ff>new</font> SimpleDaemons();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You must set the thread to be a daemon by calling <b>setDaemon(&#160;) </b>before it is started. In <b>run(&#160;)</b>, the thread is put to sleep for a little bit. Once the threads are all started, the program terminates immediately, before any threads can print themselves, because there are no non-daemon threads (other than <b>main(&#160;)</b>) holding the program open. Thus, the program terminates without printing any output.<br></p>
+<p>You can find out if a thread is a daemon by calling <a name="Index1547"></a><a name="Index1548"></a><b>isDaemon(&#160;)</b>. If a thread is a daemon, then any threads it creates will automatically be daemons, as the following example demonstrates: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2231" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:Daemons.java</font>
+<font color=#009900>// Daemon threads spawn other daemon threads.</font>
+<font color=#0000ff>import</font> java.io.*;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Daemon <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> Thread[] t = <font color=#0000ff>new</font> Thread[10];
+  <font color=#0000ff>public</font> Daemon() {
+    setDaemon(<font color=#0000ff>true</font>);
+    start();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; t.length; i++)
+      t[i] = <font color=#0000ff>new</font> DaemonSpawn(i);
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; t.length; i++)
+      System.out.println(<font color=#004488>"t["</font> + i + <font color=#004488>"].isDaemon() = "</font>
+        + t[i].isDaemon());
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>)
+      yield();
+  }
+}
+
+<font color=#0000ff>class</font> DaemonSpawn <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>public</font> DaemonSpawn(<font color=#0000ff>int</font> i) {
+    start();
+    System.out.println(<font color=#004488>"DaemonSpawn "</font> + i + <font color=#004488>" started"</font>);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>)
+      yield();
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Daemons {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) <font color=#0000ff>throws</font> Exception {
+    Thread d = <font color=#0000ff>new</font> Daemon();
+    System.out.println(<font color=#004488>"d.isDaemon() = "</font> + d.isDaemon());
+    <font color=#009900>// Allow the daemon threads to</font>
+    <font color=#009900>// finish their startup processes:</font>
+    Thread.sleep(1000);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"d.isDaemon() = true"</font>,
+      <font color=#004488>"DaemonSpawn 0 started"</font>,
+      <font color=#004488>"DaemonSpawn 1 started"</font>,
+      <font color=#004488>"DaemonSpawn 2 started"</font>,
+      <font color=#004488>"DaemonSpawn 3 started"</font>,
+      <font color=#004488>"DaemonSpawn 4 started"</font>,
+      <font color=#004488>"DaemonSpawn 5 started"</font>,
+      <font color=#004488>"DaemonSpawn 6 started"</font>,
+      <font color=#004488>"DaemonSpawn 7 started"</font>,
+      <font color=#004488>"DaemonSpawn 8 started"</font>,
+      <font color=#004488>"DaemonSpawn 9 started"</font>,
+      <font color=#004488>"t[0].isDaemon() = true"</font>,
+      <font color=#004488>"t[1].isDaemon() = true"</font>,
+      <font color=#004488>"t[2].isDaemon() = true"</font>,
+      <font color=#004488>"t[3].isDaemon() = true"</font>,
+      <font color=#004488>"t[4].isDaemon() = true"</font>,
+      <font color=#004488>"t[5].isDaemon() = true"</font>,
+      <font color=#004488>"t[6].isDaemon() = true"</font>,
+      <font color=#004488>"t[7].isDaemon() = true"</font>,
+      <font color=#004488>"t[8].isDaemon() = true"</font>,
+      <font color=#004488>"t[9].isDaemon() = true"</font>
+    }, Test.IGNORE_ORDER + Test.WAIT);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>Daemon</b> thread sets its daemon flag to &#147;true&#148; and then spawns a bunch of other threads&#151;which <i>do not </i>set themselves to daemon mode&#151;to show that they are daemons anyway. Then it goes into an infinite loop that calls <b>yield(&#160;)</b> to give up control to the other processes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2232" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There&#146;s nothing to keep the program from terminating once <b>main(&#160;)</b> finishes its job, since there are nothing but daemon threads running. So that you can see the results of starting all the daemon threads, the <b>main(&#160;)</b> thread is put to sleep for a second. Without this, you see only some of the results from the creation of the daemon threads. (Try <b>sleep(&#160;)</b> calls of various lengths to see this behavior.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2233" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775842"></a><a name="Heading17204"></a>Joining a thread</h3>
+<p>One thread may call <a name="Index1549"></a><b>join(&#160;)</b> on another thread to wait for the second thread to complete before proceeding. If a thread calls <b>t.join(&#160;) </b>on another thread <b>t</b>, then the calling thread is suspended until the target thread <b>t</b> finishes (when <b>t.isAlive(&#160;)</b> is <b>false</b>).<br></p>
+<p>You may also call <b>join(&#160;)</b> with a timeout argument (in either milliseconds or milliseconds and nanoseconds) so that if the target thread doesn&#146;t finish in that period of time, the call to <b>join(&#160;)</b> returns anyway.<br></p>
+<p>The call to <b>join(&#160;)</b> may be aborted by calling <a name="Index1550"></a><b>interrupt(&#160;)</b> on the calling thread, so a <b>try-catch</b> clause is required.<br></p>
+<p>All of these operations are shown in the following example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:Joining.java</font>
+<font color=#009900>// Understanding join().</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Sleeper <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> duration;
+  <font color=#0000ff>public</font> Sleeper(String name, <font color=#0000ff>int</font> sleepTime) {
+    <font color=#0000ff>super</font>(name);
+    duration = sleepTime;
+    start();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>try</font> {
+      sleep(duration);
+    } <font color=#0000ff>catch</font> (InterruptedException e) {
+      System.out.println(getName() + <font color=#004488>" was interrupted. "</font> +
+        <font color=#004488>"isInterrupted(): "</font> + isInterrupted());
+      <font color=#0000ff>return</font>;
+    }
+    System.out.println(getName() + <font color=#004488>" has awakened"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Joiner <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> Sleeper sleeper;
+  <font color=#0000ff>public</font> Joiner(String name, Sleeper sleeper) {
+    <font color=#0000ff>super</font>(name);
+    <font color=#0000ff>this</font>.sleeper = sleeper;
+    start();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+   <font color=#0000ff>try</font> {
+      sleeper.join();
+    } <font color=#0000ff>catch</font> (InterruptedException e) {
+      <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+    }
+    System.out.println(getName() + <font color=#004488>" join completed"</font>);
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Joining {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Sleeper
+      sleepy = <font color=#0000ff>new</font> Sleeper(<font color=#004488>"Sleepy"</font>, 1500),
+      grumpy = <font color=#0000ff>new</font> Sleeper(<font color=#004488>"Grumpy"</font>, 1500);
+    Joiner
+      dopey = <font color=#0000ff>new</font> Joiner(<font color=#004488>"Dopey"</font>, sleepy),
+      doc = <font color=#0000ff>new</font> Joiner(<font color=#004488>"Doc"</font>, grumpy);
+    grumpy.interrupt();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Grumpy was interrupted. isInterrupted(): false"</font>,
+      <font color=#004488>"Doc join completed"</font>,
+      <font color=#004488>"Sleepy has awakened"</font>,
+      <font color=#004488>"Dopey join completed"</font>
+    }, Test.AT_LEAST + Test.WAIT);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>A <b>Sleeper</b> is a type of <b>Thread</b> that goes to sleep for a time specified in its constructor. In <b>run(&#160;)</b>, the call to <b>sleep(&#160;)</b> may terminate when the time expires, but it may also be interrupted. Inside the <b>catch</b> clause, the interruption is reported, along with the value of <b>isInterrupted(&#160;)</b>. When another thread calls <b>interrupt(&#160;)</b> on this thread, a flag is set to indicate that the thread has been interrupted. However, this flag is cleared when the exception is caught, so the result will always be false inside the <b>catch</b> clause. The flag is used for other situations where a thread may examine its interrupted state apart from the exception.<br></p>
+<p>A <b>Joiner</b> is a thread that waits for a <b>Sleeper</b> to wake up by calling <b>join(&#160;)</b> on the <b>Sleeper</b> object. In <b>main(&#160;)</b>, each <b>Sleeper</b> has a <b>Joiner</b>, and you can see in the output that if the <b>Sleeper</b> is either interrupted or if it ends normally, the <b>Joiner</b> completes in conjunction with the <b>Sleeper</b>.<br></p>
+<h3>
+<a name="_Toc24775843"></a><a name="Heading17270"></a>Coding variations</h3>
+<p>In the simple examples that you&#146;ve seen so far, the thread objects are all inherited from <b>Thread</b>. This makes sense because the objects are clearly only being created <i>as</i> threads and have no other behavior. However, your class may already be inheriting from another class, in which case you can&#146;t also inherit from <b>Thread</b> (Java doesn&#146;t support multiple inheritance). In this case, you can use the alternative approach of implementing the <b>Runnable</b> interface. <b>Runnable</b> specifies only that there be a <b>run(&#160;)</b> method implemented, and <b>Thread</b> also implements <b>Runnable</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2215" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This example demonstrates the basics:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:RunnableThread.java</font>
+<font color=#009900>// SimpleThread using the Runnable interface.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> RunnableThread <font color=#0000ff>implements</font> Runnable {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> countDown = 5;
+  <font color=#0000ff>public</font> String toString() {
+    <font color=#0000ff>return</font> <font color=#004488>"#"</font> + Thread.currentThread().getName() +
+      <font color=#004488>": "</font> + countDown;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      System.out.println(<font color=#0000ff>this</font>);
+      <font color=#0000ff>if</font>(--countDown == 0) <font color=#0000ff>return</font>;
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 1; i &lt;= 5; i++)
+      <font color=#0000ff>new</font> Thread(<font color=#0000ff>new</font> RunnableThread(), <font color=#004488>""</font> + i).start();
+    <font color=#009900>// Output is like SimpleThread.java</font>
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The only thing required by a <b>Runnable</b> class is a <b>run(&#160;)</b> method, but if you want to do anything else to the <b>Thread</b> object (such as <b>getName(&#160;) </b>in <b>toString(&#160;)</b>) you must explicitly get a reference to it by calling <b>Thread.currentThread(&#160;)</b>. This particular <b>Thread</b> constructor takes a <b>Runnable</b> and a name for the thread.<br></p>
+<p>When something has a <a name="Index1551"></a><a name="Index1552"></a><a name="Index1553"></a><b>Runnable</b> interface, it simply means that it has a <b>run(&#160;)</b> method, but there&#146;s nothing special about that&#151;it doesn&#146;t produce any innate threading abilities, like those of a class inherited from <b>Thread</b>. So to produce a thread from a <b>Runnable</b> object, you must create a separate <b>Thread</b> object as shown in this example, handing the <b>Runnable</b> object to the special <b>Thread </b>constructor. You can then call <b>start(&#160;)</b> for that thread, which performs the usual initialization and then calls <b>run(&#160;)</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2217" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The convenient aspect about the <b>Runnable interface</b> is that everything belongs to the same class; that is, <b>Runnable</b> allows a mixin in combination with a base class and other interfaces. If you need to access something, you simply do it without going through a separate object. However, inner classes have this same easy access to all the parts of an outer class, so member access is not a compelling reason to use <b>Runnable</b> as a mixin rather than an inner subclass of <b>Thread</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2219" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When you use <b>Runnable</b>, you&#146;re generally saying that you want to create a <i>process</i> in a piece of code&#151;implemented in the <b>run(&#160;)</b> method&#151;rather than an object representing that process. This is a matter of some debate, depending on whether you feel that it makes more sense to represent a thread as an object or as a completely different entity, a process.<sup><a name="fnB68" href="#fn68">[68]</a></sup> If you choose to think of it as a process, then you are freed from the object-oriented imperative that &#147;everything is an object.&#148; This also means that there&#146;s no reason to make your whole class <b>Runnable</b> if you only want to start a process to drive some part of your program. Because of this, it often makes more sense to hide your threading code inside your class by using an inner class, as shown here:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:ThreadVariations.java</font>
+<font color=#009900>// Creating threads with inner classes.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#009900>// Using a named inner class:</font>
+<font color=#0000ff>class</font> InnerThread1 {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> countDown = 5;
+  <font color=#0000ff>private</font> Inner inner;
+  <font color=#0000ff>private</font> <font color=#0000ff>class</font> Inner <font color=#0000ff>extends</font> Thread {
+    Inner(String name) {
+      <font color=#0000ff>super</font>(name);
+      start();
+    }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+      <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+        System.out.println(<font color=#0000ff>this</font>);
+        <font color=#0000ff>if</font>(--countDown == 0) <font color=#0000ff>return</font>;
+        <font color=#0000ff>try</font> {
+          sleep(10);
+        } <font color=#0000ff>catch</font> (InterruptedException e) {
+          <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+        }
+      }
+    }
+    <font color=#0000ff>public</font> String toString() {
+      <font color=#0000ff>return</font> getName() + <font color=#004488>": "</font> + countDown;
+    }
+  }
+  <font color=#0000ff>public</font> InnerThread1(String name) {
+    inner = <font color=#0000ff>new</font> Inner(name);
+  }
+}
+
+<font color=#009900>// Using an anonymous inner class:</font>
+<font color=#0000ff>class</font> InnerThread2 {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> countDown = 5;
+  <font color=#0000ff>private</font> Thread t;
+  <font color=#0000ff>public</font> InnerThread2(String name) {
+    t = <font color=#0000ff>new</font> Thread(name) {
+      <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+        <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+          System.out.println(<font color=#0000ff>this</font>);
+          <font color=#0000ff>if</font>(--countDown == 0) <font color=#0000ff>return</font>;
+          <font color=#0000ff>try</font> {
+            sleep(10);
+          } <font color=#0000ff>catch</font> (InterruptedException e) {
+            <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+          }
+        }
+      }
+      <font color=#0000ff>public</font> String toString() {
+        <font color=#0000ff>return</font> getName() + <font color=#004488>": "</font> + countDown;
+      }
+    };
+    t.start();
+  }
+}
+
+<font color=#009900>// Using a named Runnable implementation:</font>
+<font color=#0000ff>class</font> InnerRunnable1 {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> countDown = 5;
+  <font color=#0000ff>private</font> Inner inner;
+  <font color=#0000ff>private</font> <font color=#0000ff>class</font> Inner <font color=#0000ff>implements</font> Runnable {
+    Thread t;
+    Inner(String name) {
+      t = <font color=#0000ff>new</font> Thread(<font color=#0000ff>this</font>, name);
+      t.start();
+    }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+      <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+        System.out.println(<font color=#0000ff>this</font>);
+        <font color=#0000ff>if</font>(--countDown == 0) <font color=#0000ff>return</font>;
+        <font color=#0000ff>try</font> {
+          Thread.sleep(10);
+        } <font color=#0000ff>catch</font> (InterruptedException e) {
+          <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+        }
+      }
+    }
+    <font color=#0000ff>public</font> String toString() {
+      <font color=#0000ff>return</font> t.getName() + <font color=#004488>": "</font> + countDown;
+    }
+  }
+  <font color=#0000ff>public</font> InnerRunnable1(String name) {
+    inner = <font color=#0000ff>new</font> Inner(name);
+  }
+}
+
+<font color=#009900>// Using an anonymous Runnable implementation:</font>
+<font color=#0000ff>class</font> InnerRunnable2 {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> countDown = 5;
+  <font color=#0000ff>private</font> Thread t;
+  <font color=#0000ff>public</font> InnerRunnable2(String name) {
+    t = <font color=#0000ff>new</font> Thread(<font color=#0000ff>new</font> Runnable() {
+      <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+        <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+          System.out.println(<font color=#0000ff>this</font>);
+          <font color=#0000ff>if</font>(--countDown == 0) <font color=#0000ff>return</font>;
+          <font color=#0000ff>try</font> {
+            Thread.sleep(10);
+          } <font color=#0000ff>catch</font> (InterruptedException e) {
+            <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+          }
+        }
+      }
+      <font color=#0000ff>public</font> String toString() {
+        <font color=#0000ff>return</font> Thread.currentThread().getName() +
+          <font color=#004488>": "</font> + countDown;
+      }
+    }, name);
+    t.start();
+  }
+}
+
+<font color=#009900>// A separate method to run some code as a thread:</font>
+<font color=#0000ff>class</font> ThreadMethod {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> countDown = 5;
+  <font color=#0000ff>private</font> Thread t;
+  <font color=#0000ff>private</font> String name;
+  <font color=#0000ff>public</font> ThreadMethod(String name) { <font color=#0000ff>this</font>.name = name; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> runThread() {
+    <font color=#0000ff>if</font>(t == <font color=#0000ff>null</font>) {
+      t = <font color=#0000ff>new</font> Thread(name) {
+        <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+          <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+            System.out.println(<font color=#0000ff>this</font>);
+            <font color=#0000ff>if</font>(--countDown == 0) <font color=#0000ff>return</font>;
+            <font color=#0000ff>try</font> {
+              sleep(10);
+            } <font color=#0000ff>catch</font> (InterruptedException e) {
+              <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+            }
+          }
+        }
+        <font color=#0000ff>public</font> String toString() {
+          <font color=#0000ff>return</font> getName() + <font color=#004488>": "</font> + countDown;
+        }
+      };
+      t.start();
+    }
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ThreadVariations {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>new</font> InnerThread1(<font color=#004488>"InnerThread1"</font>);
+    <font color=#0000ff>new</font> InnerThread2(<font color=#004488>"InnerThread2"</font>);
+    <font color=#0000ff>new</font> InnerRunnable1(<font color=#004488>"InnerRunnable1"</font>);
+    <font color=#0000ff>new</font> InnerRunnable2(<font color=#004488>"InnerRunnable2"</font>);
+    <font color=#0000ff>new</font> ThreadMethod(<font color=#004488>"ThreadMethod"</font>).runThread();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"InnerThread1: 5"</font>,
+      <font color=#004488>"InnerThread2: 5"</font>,
+      <font color=#004488>"InnerThread2: 4"</font>,
+      <font color=#004488>"InnerRunnable1: 5"</font>,
+      <font color=#004488>"InnerThread1: 4"</font>,
+      <font color=#004488>"InnerRunnable2: 5"</font>,
+      <font color=#004488>"ThreadMethod: 5"</font>,
+      <font color=#004488>"InnerRunnable1: 4"</font>,
+      <font color=#004488>"InnerThread2: 3"</font>,
+      <font color=#004488>"InnerRunnable2: 4"</font>,
+      <font color=#004488>"ThreadMethod: 4"</font>,
+      <font color=#004488>"InnerThread1: 3"</font>,
+      <font color=#004488>"InnerRunnable1: 3"</font>,
+      <font color=#004488>"ThreadMethod: 3"</font>,
+      <font color=#004488>"InnerThread1: 2"</font>,
+      <font color=#004488>"InnerThread2: 2"</font>,
+      <font color=#004488>"InnerRunnable2: 3"</font>,
+      <font color=#004488>"InnerThread2: 1"</font>,
+      <font color=#004488>"InnerRunnable2: 2"</font>,
+      <font color=#004488>"InnerRunnable1: 2"</font>,
+      <font color=#004488>"ThreadMethod: 2"</font>,
+      <font color=#004488>"InnerThread1: 1"</font>,
+      <font color=#004488>"InnerRunnable1: 1"</font>,
+      <font color=#004488>"InnerRunnable2: 1"</font>,
+      <font color=#004488>"ThreadMethod: 1"</font>
+    }, Test.IGNORE_ORDER + Test.WAIT);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><b>InnerThread1</b> creates a named inner class that extends <b>Thread</b>, and makes an instance of this inner class inside the constructor. This makes sense if the inner class has special capabilities (new methods) that you need to access in other methods. However, most of the time the reason for creating a thread is only to use the <b>Thread</b> capabilities, so it&#146;s not necessary to create a named inner class. <b>InnerThread2</b> shows the alternative: An anonymous inner subclass of <b>Thread</b> is created inside the constructor and is upcast to a <b>Thread</b> reference <b>t</b>. If other methods of the class need to access <b>t</b>, they can do so through the <b>Thread</b> interface, and they don&#146;t need to know the exact type of the object.<br></p>
+<p>The third and fourth classes in the example repeat the first two classes, but they use the <b>Runnable</b> interface rather than the <b>Thread</b> class. This is just to show that <b>Runnable</b> doesn&#146;t buy you anything more in this situation, but is in fact slightly more complicated to code (and to read the code). As a result, my inclination is to use <b>Thread</b> unless I&#146;m somehow compelled to use <b>Runnable</b>.<br></p>
+<p>The <b>ThreadMethod</b> class shows the creation of a thread inside a method. You call the method when you&#146;re ready to run the thread, and the method returns after the thread begins. If the thread is only performing an auxiliary operation rather than being fundamental to the class, this is probably a more useful/appropriate approach than starting a thread inside the constructor of the class.<br></p>
+<h3>
+<a name="_Toc24775844"></a><a name="Heading17484"></a>Creating responsive user
+interfaces<br></h3>
+<p><a name="Index1554"></a><a name="Index1555"></a><a name="Index1556"></a>As stated earlier, one of the motivations for using threading is to create a responsive user interface. Although we won&#146;t get to <i>graphical </i>user interfaces until Chapter 14, you can see a simple example of a console-based user interface. The following example has two versions: one that gets stuck in a calculation and thus can never read console input, and a second that puts the calculation inside a thread and thus can be performing the calculation <i>and </i>listening for console input.<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:ResponsiveUI.java</font>
+<font color=#009900>// User interface responsiveness.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> UnresponsiveUI {
+  <font color=#0000ff>private</font> <font color=#0000ff>volatile</font> <font color=#0000ff>double</font> d = 1;
+  <font color=#0000ff>public</font> UnresponsiveUI() <font color=#0000ff>throws</font> Exception {
+    <font color=#0000ff>while</font>(d &gt; 0)
+      d = d + (Math.PI + Math.E) / d;
+    System.in.read(); <font color=#009900>// Never gets here</font>
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ResponsiveUI <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> <font color=#0000ff>volatile</font> <font color=#0000ff>double</font> d = 1;
+  <font color=#0000ff>public</font> ResponsiveUI() {
+    setDaemon(<font color=#0000ff>true</font>);
+    start();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      d = d + (Math.PI + Math.E) / d;
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) <font color=#0000ff>throws</font> Exception {
+    <font color=#009900>//! new UnresponsiveUI(); // Must kill this process</font>
+    <font color=#0000ff>new</font> ResponsiveUI();
+    Thread.sleep(300);
+    System.in.read(); <font color=#009900>// 'monitor' provides input</font>
+    System.out.println(d); <font color=#009900>// Shows progress</font>
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><b>UnresponsiveUI</b> performs a calculation inside an infinite <b>while</b> loop, so it can obviously never reach the console input line (the compiler is fooled into believing that the input line is reachable by the <b>while</b> conditional). If you run the program with the line that creates an <b>UnresponsiveUI </b>uncommented, you&#146;ll have to kill the process to get out.<br></p>
+<p>To make the program responsive, putting the calculation inside a <b>run(&#160;)</b> method allows it to be preempted, and when you press the Enter key you&#146;ll see that the calculation has indeed been running in the background while waiting for your user input (for testing purposes, the console input line is automatically provided to <b>System.in.read(&#160;)</b> by the <b>com.bruceeckel.simpletest.Test</b> object, which is explained in Chapter 15).<br></p>
+<h2>
+<a name="_Toc375545478"></a><a name="_Toc24775845"></a><a name="Heading17522"></a>Sharing
+limited resources<br></h2>
+<p><a name="Index1557"></a>You can think of a single-threaded program as one lonely entity moving around through your problem space and doing one thing at a time. Because there&#146;s only one entity, you never have to think about the problem of two entities trying to use the same resource at the same time, problems like two people trying to park in the same space, walk through a door at the same time, or even talk at the same time. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2234" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>With multithreading, things aren&#146;t lonely anymore, but you now have the possibility of two or more threads trying to use the same limited resource at once. Colliding over a resource must be prevented, or else you&#146;ll have two threads trying to access the same bank account at the same time, print to the same printer, adjust the same valve, and so on. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2235" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545479"></a><a name="_Toc24775846"></a><a name="Heading17525"></a>Improperly
+accessing resources</h3>
+<p>Consider the following example in which the class &#147;guarantees&#148; that it will always deliver an even number when you call <b>getValue(&#160;)</b>. However, there&#146;s a second thread named &#147;Watcher&#148; that is constantly calling <b>getValue(&#160;)</b> and checking to see if this value is truly even. This seems like a needless activity, since it appears obvious by looking at the code that the value will indeed be even. But that&#146;s where the surprise comes in. Here&#146;s the first version of the program: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0190" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:AlwaysEven.java</font>
+<font color=#009900>// Demonstrating thread collision over resources by</font>
+<font color=#009900>// reading an object in an unstable intermediate state.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> AlwaysEven {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> i;
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> next() { i++; i++; }
+  <font color=#0000ff>public</font> <font color=#0000ff>int</font> getValue() { <font color=#0000ff>return</font> i; }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>final</font> AlwaysEven ae = <font color=#0000ff>new</font> AlwaysEven();
+    <font color=#0000ff>new</font> Thread(<font color=#004488>"Watcher"</font>) {
+      <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+        <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+          <font color=#0000ff>int</font> val = ae.getValue();
+          <font color=#0000ff>if</font>(val % 2 != 0) {
+            System.out.println(val);
+            System.exit(0);
+          }
+        }
+      }
+    }.start();
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>)
+      ae.next();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In <b>main(&#160;)</b>, an <b>AlwaysEven</b> object is created&#151;it must be <b>final</b> because it is accessed inside the anonymous inner class defined as a <b>Thread</b>. If the value read by the thread is not even, it prints it out (as proof that it has caught the object in an unstable state) and then exits the program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2236" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This example shows a fundamental problem with using threads. You never know when a thread might be run. Imagine sitting at a table with a fork, about to spear the last piece of food on your plate, and as your fork reaches for it, the food suddenly vanishes (because your thread was suspended and another thread came in and stole the food). That&#146;s the problem that you&#146;re dealing with when writing concurrent programs. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2244" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Sometimes you don&#146;t care if a resource is being accessed at the same time you&#146;re trying to use it (the food is on some other plate). But for multithreading to work, you need some way to prevent two threads from accessing the same resource, at least during critical periods. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2245" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Preventing this kind of collision is simply a matter of putting a lock on a resource when one thread is using it. The first thread that accesses a resource locks it, and then the other threads cannot access that resource until it is unlocked, at which time another thread locks and uses it, etc. If the front seat of the car is the limited resource, the child who shouts &#147;Dibs!&#148; asserts the lock. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2246" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="_Toc375545480"></a><a name="Heading17557"></a>A resource testing
+framework</h4>
+<p>Before going on, let&#146;s try to simplify things a bit by creating a little framework for performing tests on these types of threading examples. We can accomplish this by separating out the common code that might appear across multiple examples. First, note that the &#147;watcher&#148; thread is actually watching for a violated invariant in a particular object. That is, the object is supposed to preserve rules about its internal state, and if you can see the object from outside in an invalid intermediate state, then the invariant has been violated from the standpoint of the client (this is not to say that the object can never exist in the invalid intermediate state, just that it should not be visible by the client in such a state). Thus, we want to be able to detect that the invariant is violated, and also know what the violation value is. To get both of these values from one method call, we combine them in a tagging interface that exists only to provide a meaningful name in the code: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0364" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:InvariantState.java</font>
+<font color=#009900>// Messenger carrying invariant data</font>
+<font color=#0000ff>public</font> <font color=#0000ff>interface</font> InvariantState {} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In this scheme, the information about success or failure is encoded in the class name and type to make the result more readable. The class indicating success is: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0365" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:InvariantOK.java</font>
+<font color=#009900>// Indicates that the invariant test succeeded</font>
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> InvariantOK <font color=#0000ff>implements</font> InvariantState {} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>To indicate failure, the <b>InvariantFailure</b> object will carry an object with information about what caused the failure, typically so that it can be displayed: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0366" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:InvariantFailure.java</font>
+<font color=#009900>// Indicates that the invariant test failed</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> InvariantFailure <font color=#0000ff>implements</font> InvariantState {
+  <font color=#0000ff>public</font> Object value;
+  <font color=#0000ff>public</font> InvariantFailure(Object value) {
+    <font color=#0000ff>this</font>.value = value;
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Now we can define an interface that must be implemented by any class that wishes to have its invariance tested: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0367" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:Invariant.java</font>
+<font color=#0000ff>public</font> <font color=#0000ff>interface</font> Invariant {
+  InvariantState invariant();
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Before creating the generic &#147;watcher&#148; thread, note that some of the examples in this chapter will not behave as expected on all platforms. Many of the examples here attempt to show violations of single-threaded behavior when multiple threads are present, and this may not always happen.<sup><a name="fnB69" href="#fn69">[69]</a></sup> Alternatively, an example may attempt to show that the violation does <i>not</i> occur by attempting (and failing) to demonstrate the violation. In these cases, we&#146;ll need a way to stop the program after a few seconds. The following class does this by subclassing the standard library <a name="Index1558"></a><b>Timer</b> class: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0368" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:Timeout.java</font>
+<font color=#009900>// Set a time limit on the execution of a program</font>
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Timeout <font color=#0000ff>extends</font> Timer {
+  <font color=#0000ff>public</font> Timeout(<font color=#0000ff>int</font> delay, <font color=#0000ff>final</font> String msg) {
+    <font color=#0000ff>super</font>(<font color=#0000ff>true</font>); <font color=#009900>// Daemon thread</font>
+    schedule(<font color=#0000ff>new</font> TimerTask() {
+      <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+        System.out.println(msg);
+        System.exit(0);
+      }
+    }, delay);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The delay is in milliseconds, and the message will be printed if the timeout expires. Note that by calling <b>super(true)</b>, this is created as a daemon thread so that if your program completes in some other way, this thread will not prevent it from exiting. The <b>Timer.schedule(&#160;)</b> method is given a <b>TimerTask</b> subclass (created here as an anonymous inner class) whose <b>run(&#160;)</b> is executed after the second <b>schedule(&#160;) </b>argument <b>delay</b> (in milliseconds) runs out. Using <b>Timer</b> is generally simpler and clearer than writing the code directly with an explicit <b>sleep(&#160;)</b>. In addition, <b>Timer</b> is designed to scale to large numbers of concurrently scheduled tasks (in the thousands), so it can be a very useful tool. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0369" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Now we can use the <b>Invariant</b> interface and the <b>Timeout</b> class in the <b>InvariantWatcher</b> thread:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:InvariantWatcher.java</font>
+<font color=#009900>// Repeatedly checks to ensure invariant is not violated</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> InvariantWatcher <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> Invariant invariant;
+  <font color=#0000ff>public</font> InvariantWatcher(Invariant invariant) {
+    <font color=#0000ff>this</font>.invariant = invariant;
+    setDaemon(<font color=#0000ff>true</font>);
+    start();
+  }
+  <font color=#009900>// Stop everything after awhile:</font>
+  <font color=#0000ff>public</font>
+  InvariantWatcher(Invariant invariant, <font color=#0000ff>final</font> <font color=#0000ff>int</font> timeOut){
+    <font color=#0000ff>this</font>(invariant);
+    <font color=#0000ff>new</font> Timeout(timeOut,
+      <font color=#004488>"Timed out without violating invariant"</font>);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      InvariantState state = invariant.invariant();
+      <font color=#0000ff>if</font>(state <font color=#0000ff>instanceof</font> InvariantFailure) {
+        System.out.println(<font color=#004488>"Invariant violated: "</font>
+          + ((InvariantFailure)state).value);
+        System.exit(0);
+      }
+    }
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The constructor captures a reference to the <b>Invariant</b> object to be tested, and starts the thread. The second constructor calls the first constructor, then creates a <b>Timeout</b> that stops everything after a desired delay&#151;this is used in situations where the program may not exit by violating an invariant. In <b>run(&#160;)</b>, the current <b>InvariantState</b> is captured and tested, and if it fails, the <b>value</b> is printed. Note that we cannot throw an exception inside this thread, because that would only terminate the thread, not the program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0370" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Now <b>AlwaysEven.java</b> can be rewritten using the framework:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:EvenGenerator.java</font>
+<font color=#009900>// AlwaysEven.java using the invariance tester</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> EvenGenerator <font color=#0000ff>implements</font> Invariant {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> i;
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> next() { i++; i++; }
+  <font color=#0000ff>public</font> <font color=#0000ff>int</font> getValue() { <font color=#0000ff>return</font> i; }
+  <font color=#0000ff>public</font> InvariantState invariant() {
+    <font color=#0000ff>int</font> val = i; <font color=#009900>// Capture it in case it changes</font>
+    <font color=#0000ff>if</font>(val % 2 == 0)
+      <font color=#0000ff>return</font> <font color=#0000ff>new</font> InvariantOK();
+    <font color=#0000ff>else</font>
+      <font color=#0000ff>return</font> <font color=#0000ff>new</font> InvariantFailure(<font color=#0000ff>new</font> Integer(val));
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    EvenGenerator gen = <font color=#0000ff>new</font> EvenGenerator();
+    <font color=#0000ff>new</font> InvariantWatcher(gen);
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>)
+      gen.next();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>When defining the <b>invariant(&#160;)</b> method, you must capture all the values of interest into local variables. This way, you can return the actual value you have tested, not one that may have been changed (by another thread) in the meantime. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0371" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In this case, the problem is not that the object goes through a state that violates invariance, but that methods can be called by threads while the object is in that intermediate unstable state. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0372" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775847"></a><a name="Heading17660"></a>Colliding over
+resources</h3>
+<p>The worst thing that happens with <b>EvenGenerator</b> is that a client thread might see it in an unstable intermediate state. The object&#146;s internal consistency is maintained, however, and it eventually becomes visible in a good state. But if two threads are actually modifying an object, the contention over shared resources is much worse, because the object can be put into an incorrect state. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0373" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Consider the simple concept of a <a name="Index1559"></a><i>semaphore</i>, which is a flag object used for communication between threads. If the semaphore&#146;s value is zero, then whatever it is monitoring is available, but if the value is nonzero, then the monitored entity is unavailable, and the thread must wait for it. When it&#146;s available, the thread increments the semaphore and then goes ahead and uses the monitored entity. Because incrementing and decrementing are <i>atomic </i>operations (that is, they cannot be interrupted), the semaphore keeps two threads from using the same entity at the same time. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0374" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If the semaphore is going to properly guard the entity that it is monitoring, then it must never get into an unstable state. Here&#146;s a simple version of the semaphore idea:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:Semaphore.java</font>
+<font color=#009900>// A simple threading flag</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Semaphore <font color=#0000ff>implements</font> Invariant {
+  <font color=#0000ff>private</font> <font color=#0000ff>volatile</font> <font color=#0000ff>int</font> semaphore = 0;
+  <font color=#0000ff>public</font> <font color=#0000ff>boolean</font> available() { <font color=#0000ff>return</font> semaphore == 0; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> acquire() { ++semaphore; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> release() { --semaphore; }
+  <font color=#0000ff>public</font> InvariantState invariant() {
+    <font color=#0000ff>int</font> val = semaphore;
+    <font color=#0000ff>if</font>(val == 0 || val == 1)
+      <font color=#0000ff>return</font> <font color=#0000ff>new</font> InvariantOK();
+    <font color=#0000ff>else</font>
+      <font color=#0000ff>return</font> <font color=#0000ff>new</font> InvariantFailure(<font color=#0000ff>new</font> Integer(val));
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The core part of the class is straightforward, consisting of <b>available(&#160;)</b>,<b> acquire(&#160;)</b>, and <b>release(&#160;)</b>. Since a thread should check for availability before acquiring, the value of <b>semaphore</b> should never be other than one or zero, and this is tested by <b>invariant(&#160;)</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0375" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>But look what happens when <b>Semaphore</b> is tested for thread consistency:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:SemaphoreTester.java</font>
+<font color=#009900>// Colliding over shared resources</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SemaphoreTester <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> <font color=#0000ff>volatile</font> Semaphore semaphore;
+  <font color=#0000ff>public</font> SemaphoreTester(Semaphore semaphore) {
+    <font color=#0000ff>this</font>.semaphore = semaphore;
+    setDaemon(<font color=#0000ff>true</font>);
+    start();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>)
+      <font color=#0000ff>if</font>(semaphore.available()) {
+        yield(); <font color=#009900>// Makes it fail faster</font>
+        semaphore.acquire();
+        yield();
+        semaphore.release();
+        yield();
+      }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) <font color=#0000ff>throws</font> Exception {
+    Semaphore sem = <font color=#0000ff>new</font> Semaphore();
+    <font color=#0000ff>new</font> SemaphoreTester(sem);
+    <font color=#0000ff>new</font> SemaphoreTester(sem);
+    <font color=#0000ff>new</font> InvariantWatcher(sem).join();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>SemaphoreTester</b> creates a thread that continuously tests to see if a <b>Semaphore</b> object is available, and if so acquires and releases it. Note that the <b>semaphore</b> field is <b>volatile</b> to make sure that the compiler doesn&#146;t optimize away any reads of that value. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0376" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In <b>main(&#160;)</b>, two <b>SemaphoreTester</b> threads are created, and you&#146;ll see that in short order the invariant is violated. This happens because one thread might get a <b>true </b>result from calling <b>available(&#160;)</b>, but by the time that thread calls <b>acquire(&#160;)</b>, the other thread may have already called <b>acquire(&#160;)</b> and incremented the <b>semaphore</b> field. The <b>InvariantWatcher</b> may see the field with too high a value, or possibly see it after both threads have called <b>release(&#160;)</b> and decremented it to a negative value. Note that <b>InvariantWatcher</b> <b>join(&#160;)</b>s with the main thread to keep the program running until there is a failure. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0377" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>On my machine, I discovered that the inclusion of <a name="Index1560"></a><b>yield(&#160;)</b> caused failure to occur much faster, but this will vary with operating systems and JVM implementations. You should experiment with taking the <b>yield(&#160;)</b> statements out; the failure might take a very long time to occur, which demonstrates how difficult it can be to detect a flaw in your program when you&#146;re writing multithreaded code. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0378" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This class emphasizes the risk of concurrent programming: If a class this simple can produce problems, you can never trust any assumptions about concurrency. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0379" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775848"></a><a name="Heading17715"></a>Resolving shared resource
+contention</h3>
+<p>To solve the problem of thread collision, virtually all multithreading schemes <i>serialize access to shared resources</i>. This means that only one thread at a time is allowed to access the shared resource. This is ordinarily accomplished by putting a locked clause around a piece of code so that only one thread at a time may pass through that piece of code. Because this locked clause produces <a name="Index1561"></a><i>mutual exclusion</i>, a common name for such a mechanism is <a name="Index1562"></a><i>mutex</i>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0380" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Consider the bathroom in your house; multiple people (threads) may each want to have exclusive use of the bathroom (the shared resource). To access the bathroom, a person knocks on the door to see if it&#146;s available. If so, they enter and lock the door. Any other thread that wants to use the bathroom is &#147;blocked&#148; from using it, so that thread waits at the door until the bathroom is available. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0381" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The analogy breaks down a bit when the bathroom is released and it comes time to give access to another thread. There isn&#146;t actually a line of people and we don&#146;t know for sure who gets the bathroom next, because the thread scheduler isn&#146;t deterministic that way. Instead, it&#146;s as if there is a group of blocked threads milling about in front of the bathroom, and when the thread that has locked the bathroom unlocks it and emerges, the one that happens to be nearest the door at the moment goes in. As noted earlier, suggestions can be made to the thread scheduler via <b>yield(&#160;)</b> and <b>setPriority(&#160;)</b>, but these suggestions may not have much of an effect depending on your platform and JVM implementation. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0382" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Java has built-in support to prevent collisions over resources in the form of the <b>synchronized</b> keyword. This works much like the <b>Semaphore</b> class was supposed to: When a thread wishes to execute a piece of code guarded by the <b>synchronized</b> keyword, it checks to see if the semaphore is available, then acquires it, executes the code, and releases it. However, <b>synchronized</b> is built into the language, so it&#146;s guaranteed to always work, unlike the <b>Semaphore</b> class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0383" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The shared resource is typically just a piece of memory in the form of an object, but may also be a file, I/O port, or something like a printer. To control access to a shared resource, you first put it inside an object. Then any method that accesses that resource can be made <b>synchronized</b>. This means that if a thread is inside one of the <b>synchronized</b> methods, all other threads are blocked from entering any of the <b>synchronized</b> methods of the class until the first thread returns from its call. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0384" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Since you typically make the data elements of a class <a name="Index1563"></a><b>private</b> and access that memory only through methods, you can prevent collisions by making methods <a name="Index1564"></a><b>synchronized</b>. Here is how you declare <b>synchronized</b> methods: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0385" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>synchronized</font> <font color=#0000ff>void</font> f() { <font color=#009900>/* ... */</font> }
+<font color=#0000ff>synchronized</font> <font color=#0000ff>void</font> g(){ <font color=#009900>/* ... */</font> }</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Each object contains a single lock (also referred to as a <a name="Index1565"></a><a name="Index1566"></a><i>monitor</i>)<i> </i>that is automatically part of the object (you don&#146;t have to write any special code). When you call any <a name="Index1567"></a><b>synchronized</b> method, that object is locked and no other <b>synchronized</b> method of that object can be called until the first one finishes and releases the lock. In the preceding example, if <b>f(&#160;)</b> is called for an object, <b>g(&#160;)</b> cannot be called for the same object until <b>f(&#160;)</b> is completed and releases the lock. Thus, there is a single lock that is shared by all the <b>synchronized</b> methods of a particular object, and this lock prevents common memory from being written by more than one thread at a time. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2247" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>One thread may acquire an object&#146;s lock multiple times. This happens if one method calls a second method on the same object, which in turn calls another method on the same object, etc. The JVM keeps track of the number of times the object has been locked. If the object is unlocked, it has a count of zero. As a thread acquires the lock for the first time, the count goes to one. Each time the thread acquires a lock on the same object, the count is incremented. Naturally, multiple lock acquisition is only allowed for the thread that acquired the lock in the first place. Each time the thread leaves a <b>synchronized</b> method, the count is decremented, until the count goes to zero, releasing the lock entirely for use by other threads. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0193" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There&#146;s also a single lock per class (as part of the <a name="Index1568"></a><a name="Index1569"></a><b>Class</b> object for the class), so that <a name="Index1570"></a><a name="Index1571"></a><b>synchronized</b> <b>static</b> methods can lock each other out from simultaneous access of <b>static </b>data on a class-wide basis. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2248" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading17728"></a>Synchronizing the <b>EvenGenerator</b></h4>
+<p>By adding <b>synchronized </b>to <b>EvenGenerator.java</b>, we can prevent the undesirable thread access:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:SynchronizedEvenGenerator.java</font>
+<font color=#009900>// Using "synchronized" to prevent thread collisions</font>
+
+<font color=#0000ff>public</font>
+<font color=#0000ff>class</font> SynchronizedEvenGenerator <font color=#0000ff>implements</font> Invariant {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> i;
+  <font color=#0000ff>public</font> <font color=#0000ff>synchronized</font> <font color=#0000ff>void</font> next() { i++; i++; }
+  <font color=#0000ff>public</font> <font color=#0000ff>synchronized</font> <font color=#0000ff>int</font> getValue() { <font color=#0000ff>return</font> i; }
+  <font color=#009900>// Not synchronized so it can run at</font>
+  <font color=#009900>// any time and thus be a genuine test:</font>
+  <font color=#0000ff>public</font> InvariantState invariant() {
+    <font color=#0000ff>int</font> val = getValue();
+    <font color=#0000ff>if</font>(val % 2 == 0)
+      <font color=#0000ff>return</font> <font color=#0000ff>new</font> InvariantOK();
+    <font color=#0000ff>else</font>
+      <font color=#0000ff>return</font> <font color=#0000ff>new</font> InvariantFailure(<font color=#0000ff>new</font> Integer(val));
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    SynchronizedEvenGenerator gen =
+      <font color=#0000ff>new</font> SynchronizedEvenGenerator();
+    <font color=#0000ff>new</font> InvariantWatcher(gen, 4000); <font color=#009900>// 4-second timeout</font>
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>)
+      gen.next();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You&#146;ll notice that both <b>next(&#160;)</b> and <b>getValue(&#160;)</b> are <b>synchronized</b>. If you synchronize only one of the methods, then the other is free to ignore the object lock and can be called with impunity. This is an important point: Every method that accesses a critical shared resource must be <b>synchronized</b> or it won&#146;t work right. On the other hand, <b>InvariantState</b> is <i>not</i> <b>synchronized</b> because it is doing the testing, and we want it to be called at any time so that it produces a true test of the object. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2250" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading17757"></a>Atomic operations</h4>
+<p>A common piece of lore often repeated in Java threading discussions is that &#147;atomic operations do not need to be synchronized.&#148; An <a name="Index1572"></a><a name="Index1573"></a><i>atomic operation</i> is one that cannot be interrupted by the thread scheduler; if the operation begins, then it will run to completion before the possibility of a <i>context switch</i> (switching execution to another thread). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0386" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The atomic operations commonly mentioned in this lore include simple assignment and returning a value when the variable in question is a primitive type that is <i>not</i> a <a name="Index1574"></a><b>long</b> or a <a name="Index1575"></a><a name="Index1576"></a><b>double</b>. The latter types are excluded because they are larger than the rest of the types, and the JVM is thus not required to perform reads and assignments as single atomic operations (a JVM may choose to do so anyway, but there&#146;s no guarantee). However, you do get atomicity if you use the <a name="Index1577"></a><b>volatile</b> keyword with <b>long</b> or <b>double</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0387" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you were to blindly apply the idea of atomicity to <b>SynchronizedEvenGenerator.java</b>, you would notice that<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>  <font color=#0000ff>public</font> <font color=#0000ff>synchronized</font> <font color=#0000ff>int</font> getValue() { <font color=#0000ff>return</font> i; }</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>fits the description. But try removing <b>synchronized</b>, and the test will fail, because even though <b>return i</b> is indeed an atomic operation, removing <b>synchronized</b> allows the value to be read while the object is in an unstable intermediate state. You must genuinely understand what you&#146;re doing before you try to apply optimizations like this. There are no easily-applicable rules that work. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0388" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As a second example, consider something even simpler: a class that produces serial numbers.<sup><a name="fnB70" href="#fn70">[70]</a></sup> Each time <b>nextSerialNumber(&#160;)</b> is called, it must return a unique value to the caller:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:SerialNumberGenerator.java</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SerialNumberGenerator {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> <font color=#0000ff>volatile</font> <font color=#0000ff>int</font> serialNumber = 0;
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>int</font> nextSerialNumber() {
+    <font color=#0000ff>return</font> serialNumber++;
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><b>SerialNumberGenerator</b> is about as simple a class as you can imagine, and if you&#146;re coming from C++ or some other low-level background, you would expect the increment to be an atomic operation, because increment is usually implemented as a microprocessor instruction. However, in the JVM an increment is <i>not</i> atomic and involves both a read and a write, so there&#146;s room for threading problems even in such a simple operation. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0389" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The <b>serialNumber</b> field is <b>volatile</b> because it is possible for each thread to have a local stack and maintain copies of some variables there. If you define a variable as <b>volatile</b>, it tells the compiler not to do any optimizations that would remove reads and writes that keep the field in exact synchronization with the local data in the threads. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0390" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To test this, we need a set that doesn&#146;t run out of memory, in case it takes a long time to detect a problem. The <b>CircularSet</b> shown here reuses the memory used to store <b>int</b>s, with the assumption that by the time you wrap around, the possibility of a collision with the overwritten values is minimal. The <b>add(&#160;)</b> and <b>contains(&#160;)</b> methods are <b>synchronized</b> to prevent thread collisions: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0391" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:SerialNumberChecker.java</font>
+<font color=#009900>// Operations that may seem safe are not,</font>
+<font color=#009900>// when threads are present.</font>
+
+<font color=#009900>// Reuses storage so we don't run out of memory:</font>
+<font color=#0000ff>class</font> CircularSet {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font>[] array;
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> len;
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> index = 0;
+  <font color=#0000ff>public</font> CircularSet(<font color=#0000ff>int</font> size) {
+    array = <font color=#0000ff>new</font> <font color=#0000ff>int</font>[size];
+    len = size;
+    <font color=#009900>// Initialize to a value not produced</font>
+    <font color=#009900>// by the SerialNumberGenerator:</font>
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; size; i++)
+      array[i] = -1;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>synchronized</font> <font color=#0000ff>void</font> add(<font color=#0000ff>int</font> i) {
+    array[index] = i;
+    <font color=#009900>// Wrap index and write over old elements:</font>
+    index = ++index % len;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>synchronized</font> <font color=#0000ff>boolean</font> contains(<font color=#0000ff>int</font> val) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; len; i++)
+      <font color=#0000ff>if</font>(array[i] == val) <font color=#0000ff>return</font> <font color=#0000ff>true</font>;
+    <font color=#0000ff>return</font> <font color=#0000ff>false</font>;
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SerialNumberChecker {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> CircularSet serials =
+    <font color=#0000ff>new</font> CircularSet(1000);
+  <font color=#0000ff>static</font> <font color=#0000ff>class</font> SerialChecker <font color=#0000ff>extends</font> Thread {
+    SerialChecker() { start(); }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+      <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+        <font color=#0000ff>int</font> serial =
+          SerialNumberGenerator.nextSerialNumber();
+        <font color=#0000ff>if</font>(serials.contains(serial)) {
+          System.out.println(<font color=#004488>"Duplicate: "</font> + serial);
+          System.exit(0);
+        }
+        serials.add(serial);
+      }
+    }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 10; i++)
+      <font color=#0000ff>new</font> SerialChecker();
+    <font color=#009900>// Stop after 4 seconds:</font>
+    <font color=#0000ff>new</font> Timeout(4000, <font color=#004488>"No duplicates detected"</font>);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><b>SerialNumberChecker</b> contains a <b>static CircularSet</b> that contains all the serial numbers that have been extracted, and a nested <b>Thread</b> that gets serial numbers and ensures that they are unique. By creating multiple threads to contend over serial numbers, you&#146;ll discover that the threads get a duplicate serial number reasonably soon (note that this program may not indicate a collision on your machine, but it has successfully detected collisions on a multiprocessor machine). To solve the problem, add the <b>synchronized</b> keyword to <b>nextSerialNumber(&#160;)</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0392" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The atomic operations that are supposed to be safe are reading and assignment of primitives. However, as seen in <b>EvenGenerator.java</b>, it&#146;s still easily possible to use an atomic operation that accesses your object while it&#146;s in an unstable intermediate state, so you cannot make any assumptions. On top of this, the atomic operations are not guaranteed to work with <b>long</b> and <b>double</b> (although some JVM implementations do guarantee atomicity for <b>long</b> and <b>double</b> operations, you won&#146;t be writing portable code if you depend on this). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0393" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>It&#146;s safest to use the following guidelines:<br></p>
+<ol>
+<li>If you need to synchronize one method in a class, synchronize all of them.
+It&#146;s often difficult to tell for sure if a method will be negatively
+affected if you leave synchronization out. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0394" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>Be extremely careful when removing synchronization from methods. The typical
+reason to do this is for performance, but in JDK 1.3 and 1.4 the overhead of
+<b>synchronized</b> has been greatly reduced. In addition, you should only do
+this after using a profiler to determine that <b>synchronized</b> is indeed the
+bottleneck. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0395" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><h4>
+<a name="Heading17837"></a>Fixing <b>Semaphore</b></h4>
+<p>Now consider <b>Semaphore.java</b>. It would seem that we should be able to repair this by <b>synchronizing</b> the three class methods, like this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:SynchronizedSemaphore.java</font>
+<font color=#009900>// Colliding over shared resources</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SynchronizedSemaphore <font color=#0000ff>extends</font> Semaphore {
+  <font color=#0000ff>private</font> <font color=#0000ff>volatile</font> <font color=#0000ff>int</font> semaphore = 0;
+  <font color=#0000ff>public</font> <font color=#0000ff>synchronized</font> <font color=#0000ff>boolean</font> available() {
+    <font color=#0000ff>return</font> semaphore == 0;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>synchronized</font> <font color=#0000ff>void</font> acquire() { ++semaphore; }
+  <font color=#0000ff>public</font> <font color=#0000ff>synchronized</font> <font color=#0000ff>void</font> release() { --semaphore; }
+  <font color=#0000ff>public</font> InvariantState invariant() {
+    <font color=#0000ff>int</font> val = semaphore;
+    <font color=#0000ff>if</font>(val == 0 || val == 1)
+      <font color=#0000ff>return</font> <font color=#0000ff>new</font> InvariantOK();
+    <font color=#0000ff>else</font>
+      <font color=#0000ff>return</font> <font color=#0000ff>new</font> InvariantFailure(<font color=#0000ff>new</font> Integer(val));
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) <font color=#0000ff>throws</font> Exception {
+    SynchronizedSemaphore sem =<font color=#0000ff>new</font> SynchronizedSemaphore();
+    <font color=#0000ff>new</font> SemaphoreTester(sem);
+    <font color=#0000ff>new</font> SemaphoreTester(sem);
+    <font color=#0000ff>new</font> InvariantWatcher(sem).join();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This looks rather odd at first&#151;<b>SynchronizedSemaphore</b> is inherited from <b>Semaphore</b>, and yet all the overridden methods are <b>synchronized</b>, but the base-class versions aren&#146;t. Java doesn&#146;t allow you to change the method signature during overriding, and yet doesn&#146;t complain about this. That&#146;s because the <b>synchronized</b> keyword is not part of the method signature, so you can add it in and it doesn&#146;t limit overriding. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0396" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The reason for inheriting from <b>Semaphore</b> is to reuse the <b>SemaphoreTester</b> class. When you run the program you&#146;ll see that it still causes an <b>InvariantFailure</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0397" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Why does this fail? By the time a thread detects that the <b>Semaphore</b> is available because <b>available(&#160;)</b> returns <b>true</b>, it has released the lock on the object. Another thread can dash in and increment the <b>semaphore</b> value before the first thread does. The first thread still assumes the <b>Semaphore</b> object is available and so goes ahead and blindly enters the <b>acquire(&#160;)</b> method, putting the object into an unstable state. This is just one more lesson about rule zero of concurrent programming: Never make any assumptions. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0398" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The only solution to this problem is to make the test for availability and the acquisition a single atomic operation&#151;which is exactly what the <b>synchronized</b> keyword provides in conjunction with the lock on an object. That is, Java&#146;s lock and <b>synchronized</b> keyword is a built-in semaphore mechanism, so you don&#146;t need to create your own. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0399" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775849"></a><a name="Heading17868"></a>Critical sections</h3>
+<p>Sometimes, you only want to prevent multiple thread access to part of the code inside a method instead of the entire method. The section of code you want to isolate this way is called a <a name="Index1578"></a><a name="Index1579"></a><i>critical section</i> and is also created using the <b>synchronized</b> keyword. Here, <b>synchronized </b>is used to specify the object whose lock is being used to synchronize the enclosed code: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2252" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>synchronized</font>(syncObject) {
+  <font color=#009900>// This code can be accessed </font>
+  <font color=#009900>// by only one thread at a time</font>
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This is also called a <a name="Index1580"></a><i>synchronized block</i>; before it can be entered, the lock must be acquired on <b>syncObject</b>. If some other thread already has this lock, then the critical section cannot be entered until the lock is given up. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2253" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The following example compares both approaches to synchronization by showing how the time available for other threads to access an object is significantly increased by using a synchronized block instead of synchronizing an entire method. In addition, it shows how an unprotected class can be used in a multithreaded situation if it is controlled and protected by another class: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0400" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:CriticalSection.java</font>
+<font color=#009900>// Synchronizing blocks instead of entire methods. Also</font>
+<font color=#009900>// demonstrates protection of a non-thread-safe class</font>
+<font color=#009900>// with a thread-safe one.</font>
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>class</font> Pair { <font color=#009900>// Not thread-safe</font>
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> x, y;
+  <font color=#0000ff>public</font> Pair(<font color=#0000ff>int</font> x, <font color=#0000ff>int</font> y) {
+    <font color=#0000ff>this</font>.x = x;
+    <font color=#0000ff>this</font>.y = y;
+  }
+  <font color=#0000ff>public</font> Pair() { <font color=#0000ff>this</font>(0, 0); }
+  <font color=#0000ff>public</font> <font color=#0000ff>int</font> getX() { <font color=#0000ff>return</font> x; }
+  <font color=#0000ff>public</font> <font color=#0000ff>int</font> getY() { <font color=#0000ff>return</font> y; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> incrementX() { x++; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> incrementY() { y++; }
+  <font color=#0000ff>public</font> String toString() {
+    <font color=#0000ff>return</font> <font color=#004488>"x: "</font> + x + <font color=#004488>", y: "</font> + y;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>class</font> PairValuesNotEqualException
+  <font color=#0000ff>extends</font> RuntimeException {
+    <font color=#0000ff>public</font> PairValuesNotEqualException() {
+      <font color=#0000ff>super</font>(<font color=#004488>"Pair values not equal: "</font> + Pair.<font color=#0000ff>this</font>);
+    }
+  }
+  <font color=#009900>// Arbitrary invariant -- both variables must be equal:</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> checkState() {
+    <font color=#0000ff>if</font>(x != y)
+      <font color=#0000ff>throw</font> <font color=#0000ff>new</font> PairValuesNotEqualException();
+  }
+}
+
+<font color=#009900>// Protect a Pair inside a thread-safe class:</font>
+<font color=#0000ff>abstract</font> <font color=#0000ff>class</font> PairManager {
+  <font color=#0000ff>protected</font> Pair p = <font color=#0000ff>new</font> Pair();
+  <font color=#0000ff>private</font> List storage = <font color=#0000ff>new</font> ArrayList();
+  <font color=#0000ff>public</font> <font color=#0000ff>synchronized</font> Pair getPair() {
+    <font color=#009900>// Make a copy to keep the original safe:</font>
+    <font color=#0000ff>return</font> <font color=#0000ff>new</font> Pair(p.getX(), p.getY());
+  }
+  <font color=#0000ff>protected</font> <font color=#0000ff>void</font> store() { storage.add(getPair()); }
+  <font color=#009900>// A "template method":</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>abstract</font> <font color=#0000ff>void</font> doTask();
+}
+
+<font color=#009900>// Synchronize the entire method:</font>
+<font color=#0000ff>class</font> PairManager1 <font color=#0000ff>extends</font> PairManager {
+  <font color=#0000ff>public</font> <font color=#0000ff>synchronized</font> <font color=#0000ff>void</font> doTask() {
+    p.incrementX();
+    p.incrementY();
+    store();
+  }
+}
+
+<font color=#009900>// Use a critical section:</font>
+<font color=#0000ff>class</font> PairManager2 <font color=#0000ff>extends</font> PairManager {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> doTask() {
+    <font color=#0000ff>synchronized</font>(<font color=#0000ff>this</font>) {
+      p.incrementX();
+      p.incrementY();
+    }
+    store();
+  }
+}
+
+<font color=#0000ff>class</font> PairManipulator <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> PairManager pm;
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> checkCounter = 0;
+  <font color=#0000ff>private</font> <font color=#0000ff>class</font> PairChecker <font color=#0000ff>extends</font> Thread {
+    PairChecker() { start(); }
+    <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+      <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+        checkCounter++;
+        pm.getPair().checkState();
+      }
+    }
+  }
+  <font color=#0000ff>public</font> PairManipulator(PairManager pm) {
+    <font color=#0000ff>this</font>.pm = pm;
+    start();
+    <font color=#0000ff>new</font> PairChecker();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      pm.doTask();
+    }
+  }
+  <font color=#0000ff>public</font> String toString() {
+    <font color=#0000ff>return</font> <font color=#004488>"Pair: "</font> + pm.getPair() +
+      <font color=#004488>" checkCounter = "</font> + checkCounter;
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> CriticalSection {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#009900>// Test the two different approaches:</font>
+    <font color=#0000ff>final</font> PairManipulator
+      pm1 = <font color=#0000ff>new</font> PairManipulator(<font color=#0000ff>new</font> PairManager1()),
+      pm2 = <font color=#0000ff>new</font> PairManipulator(<font color=#0000ff>new</font> PairManager2());
+    <font color=#0000ff>new</font> Timer(<font color=#0000ff>true</font>).schedule(<font color=#0000ff>new</font> TimerTask() {
+      <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+        System.out.println(<font color=#004488>"pm1: "</font> + pm1);
+        System.out.println(<font color=#004488>"pm2: "</font> + pm2);
+        System.exit(0);
+      }
+    }, 500); <font color=#009900>// run() after 500 milliseconds</font>
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>As noted, <b>Pair</b> is not thread-safe because its invariant (admittedly arbitrary) requires that both variables maintain the same values. In addition, as seen earlier in this chapter, the increment operations are not thread-safe, and because none of the methods are <b>synchronized</b>, you can&#146;t trust a <b>Pair</b> object to stay uncorrupted in a threaded program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0401" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The <b>PairManager</b> class holds a <b>Pair</b> object and controls all access to it. Note that the only <b>public</b> methods are <b>getPair(&#160;)</b>, which is <b>synchronized</b>, and the <b>abstract doTask(&#160;)</b>. Synchronization for this method will be handled when it is implemented. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0402" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The structure of <b>PairManager</b>, where some of the functionality is implemented in the base class with one or more <b>abstract </b>methods defined in derived classes, is called a <a name="Index1581"></a><a name="Index1582"></a><i>Template Method</i> in <i>Design Patterns</i> parlance.<sup><a name="fnB71" href="#fn71">[71]</a></sup> Design patterns allow you to encapsulate change in your code; here, the part that is changing is the template method <b>doTask(&#160;)</b>. In <b>PairManager1</b> the entire <b>doTask(&#160;)</b> is <b>synchronized</b>, but in <b>PairManager2</b> only part of <b>doTask(&#160;)</b> is <b>synchronized</b> by using a <b>synchronized</b> block. Note that the <b>synchronized</b> keyword is not part of the method signature and thus may be added during overriding. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0403" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><b>PairManager2</b> is observing, in effect, that <b>store(&#160;)</b> is a <b>protected</b> method and thus is not available to the general client, but only to subclasses. Thus, it doesn&#146;t necessarily need to be guarded inside a <b>synchronized</b> method, and is instead placed outside of the <b>synchronized</b> block. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0404" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A <b>synchronized</b> block must be given an object to synchronize upon, and usually the most sensible object to use is just the current object that the method is being called for: <b>synchronized(this)</b>, which is the approach taken in <b>PairManager2</b>. That way, when the lock is acquired for the synchronized block, other synchronized methods in the object cannot be called. So the effect is that of simply reducing the scope of synchronization. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0405" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Sometimes this isn&#146;t what you want, in which case you can create a separate object and synchronize on that. The following example demonstrates that two threads can enter an object when the methods in that object synchronize on different locks: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0406" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:SyncObject.java</font>
+<font color=#009900>// Synchronizing on another object</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> DualSynch {
+  <font color=#0000ff>private</font> Object syncObject = <font color=#0000ff>new</font> Object();
+  <font color=#0000ff>public</font> <font color=#0000ff>synchronized</font> <font color=#0000ff>void</font> f() {
+    System.out.println(<font color=#004488>"Inside f()"</font>);
+    <font color=#009900>// Doesn't release lock:</font>
+    <font color=#0000ff>try</font> {
+      Thread.sleep(500);
+    } <font color=#0000ff>catch</font>(InterruptedException e) {
+      <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+    }
+    System.out.println(<font color=#004488>"Leaving f()"</font>);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> g() {
+    <font color=#0000ff>synchronized</font>(syncObject) {
+      System.out.println(<font color=#004488>"Inside g()"</font>);
+      <font color=#0000ff>try</font> {
+        Thread.sleep(500);
+      } <font color=#0000ff>catch</font>(InterruptedException e) {
+        <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+      }
+      System.out.println(<font color=#004488>"Leaving g()"</font>);
+    }
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> SyncObject {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>final</font> DualSynch ds = <font color=#0000ff>new</font> DualSynch();
+    <font color=#0000ff>new</font> Thread() {
+      <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+        ds.f();
+      }
+    }.start();
+    ds.g();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Inside g()"</font>,
+      <font color=#004488>"Inside f()"</font>,
+      <font color=#004488>"Leaving g()"</font>,
+      <font color=#004488>"Leaving f()"</font>
+    }, Test.WAIT + Test.IGNORE_ORDER);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>DualSync </b>method<b> f(&#160;)</b> synchronizes on <b>this</b> (by synchronizing the entire method) and <b>g(&#160;)</b> has a synchronized block that synchronizes on <b>syncObject</b>. Thus, the two synchronizations are independent. This is demonstrated in <b>main(&#160;)</b> by creating a <b>Thread</b> that calls <b>f(&#160;)</b>. The <b>main(&#160;)</b> thread is used to call <b>g(&#160;)</b>. You can see from the output that both methods are running at the same time, so neither one is blocked by the synchronization of the other. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0407" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Returning to <b>CriticalSection.java</b>, <b>PairManipulator</b> is created to test the two different types of <b>PairManager</b> by running <b>doTask(&#160;)</b> in one thread and an instance of the inner class <b>PairChecker</b> in the other. To trace how often it is able to run the test, <b>PairChecker</b> increments <b>checkCounter</b> every time it is successful. In <b>main(&#160;)</b>, two <b>PairManipulator</b> objects are created and allowed to run for awhile. When the <b>Timer</b> runs out, it executes its <b>run(&#160;)</b> method, that displays the results of each <b>PairManipulator</b> and exits. When you run the program, you should see something like this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0408" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>pm1: Pair: x: 58892, y: 58892 checkCounter = 44974
+pm2: Pair: x: 73153, y: 73153 checkCounter = 100535</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Although you will probably see a lot of variation from one run to the next, in general you will see that <b>PairManager1.doTask(&#160;)</b> does not allow the <b>PairChecker</b> nearly as much access as <b>PairManager2.doTask(&#160;)</b>, which has the synchronized block and thus provides more unlocked time. This is typically the reason that you want to use a synchronized block instead of synchronizing the whole method: to allow other threads more access (as long as it is safe to do so). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0409" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Of course, all synchronization depends on programmer diligence: Every piece of code that can access a shared resource must be wrapped in an appropriate synchronized block. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2255" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775850"></a><a name="Heading18049"></a>Thread states <br></h2>
+<p><a name="Index1583"></a><a name="Index1584"></a><a name="Index1585"></a><a name="Index1586"></a><a name="Index1587"></a><a name="Index1588"></a><a name="Index1589"></a><a name="Index1590"></a><a name="Index1591"></a>A thread can be in any one of four states: <br></p>
+<ol>
+<li><i>New</i>: The thread object has been created, but it hasn&#146;t been
+started yet, so it cannot run. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2265" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li><i>Runnable</i>: This means that a thread <i>can</i> be run when the
+time-slicing mechanism has CPU cycles available for the thread. Thus, the thread
+might or might not be running at any moment, but there&#146;s nothing to
+prevent it from being run if the scheduler can arrange it; it&#146;s not dead
+or blocked. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2266" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li><i>Dead</i>: The normal way for a thread to die is by returning from its
+<b>run(&#160;) </b>method. Before it was deprecated in Java 2, you could also
+call <b>stop(&#160;)</b>, but this could easily put your program into an
+unstable state. There&#146;s also a <b>destroy(&#160;)</b> method (which has
+never been implemented, and probably never will be, so it&#146;s effectively
+deprecated). You&#146;ll learn about an alternative way to code a
+<b>stop(&#160;)</b> equivalent later in the chapter. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2267" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li><i>Blocked</i>: The thread could be run, but there&#146;s something that
+prevents it. While a thread is in the blocked state, the scheduler will simply
+skip over it and not give it any CPU time. Until a thread reenters the runnable
+state, it won&#146;t perform any operations. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2268" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><h3>
+<a name="_Toc375545482"></a><a name="_Toc24775851"></a><a name="Heading18055"></a>Becoming
+blocked</h3>
+<p>When a thread is blocked, there&#146;s some reason that it cannot continue running. A thread can become blocked for the following reasons: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2269" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li><a name="Index1592"></a><a name="Index1593"></a><a name="Index1594"></a><a name="Index1595"></a><a name="Index1596"></a><a name="Index1597"></a><a name="Index1598"></a><a name="Index1599"></a><a name="Index1600"></a><a name="Index1601"></a><a name="Index1602"></a><a name="Index1603"></a><a name="Index1604"></a><a name="Index1605"></a><a name="Index1606"></a><a name="Index1607"></a><a name="Index1608"></a>You&#146;ve
+put the thread to sleep by calling <b>sleep(milliseconds),</b> in which case it
+will not be run for the specified time. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2270" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>You&#146;ve suspended the execution of the thread with <b>wait(&#160;)</b>.
+It will not become runnable again until the thread gets the
+<b>notify(&#160;)</b> or <b>notifyAll(&#160;)</b> message. We&#146;ll examine
+these in the next section. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2272" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>The thread is waiting for some I/O to complete. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2273" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>The thread is trying to call a <b>synchronized </b>method on another object,
+and that object&#146;s lock is not available. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2274" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><p>In old code, you may also see <b>suspend(&#160;)</b> and <b>resume(&#160;)</b> used to block and unblock threads, but these are deprecated in Java 2 (because they are deadlock-prone), and so will not be examined in this book. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2271" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545481"></a><a name="_Toc24775852"></a><a name="Heading18062"></a>Cooperation
+between threads</h2>
+<p>After understanding that threads can collide with each other, and how you keep them from colliding, the next step is to learn how to make threads cooperate with each other. The key to doing this is by handshaking between threads, which is safely implemented using the <b>Object</b> methods <b>wait(&#160;)</b> and <b>notify(&#160;)</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0410" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775853"></a><a name="Heading18064"></a>Wait and notify</h3>
+<p>It&#146;s important to understand that <b>sleep(&#160;)</b> <i>does not </i>release the lock when it is called. On the other hand, the method <a name="Index1609"></a><a name="Index1610"></a><b>wait(&#160;)</b> does release the lock, which means that other <a name="Index1611"></a><b>synchronized</b> methods in the thread object can be called during a <b>wait(&#160;)</b>. When a thread enters a call to <b>wait(&#160;)</b> inside a method, that thread&#146;s execution is suspended, and the lock on that object is released. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2285" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There are two forms of <b>wait(&#160;)</b>. The first takes an argument in milliseconds that has the same meaning as in <b>sleep(&#160;)</b>: &#147;Pause for this period of time.&#148; The difference is that in <b>wait(&#160;)</b>:<br></p>
+<ol>
+<li>The object lock is released during the <b>wait(&#160;)</b>.</li>
+<li>You can come out of the <b>wait(&#160;)</b> due to a <b>notify(&#160;)</b>
+or <b>notifyAll(&#160;)</b>,<b> </b>or by letting the clock run out. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2286"
+title="Send BackTalk
+Comment">Feedback</a></font></li></ol><p>The second form of <b>wait(&#160;)</b> takes no arguments; this version is more commonly used. This <b>wait(&#160;)</b> continues indefinitely until the thread receives a <b>notify(&#160;)</b> or <b>notifyAll(&#160;)</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2287" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index1612"></a>One fairly unique aspect of <b>wait(&#160;)</b>, <b>notify(&#160;)</b>, and <b>notifyAll(&#160;) </b>is that these methods are part of the base class <b>Object</b> and not part of <b>Thread</b>, as is <b>sleep(&#160;)</b>. Although this seems a bit strange at first&#151;to have something that&#146;s exclusively for threading as part of the universal base class&#151;it&#146;s essential because they manipulate the lock that&#146;s also part of every object. As a result, you can put a <b>wait(&#160;)</b> inside any <b>synchronized</b> method, regardless of whether that class extends <b>Thread</b> or implements <b>Runnable</b>. In fact, the <i>only</i> place you can call <b>wait(&#160;)</b>, <b>notify(&#160;)</b>, or <b>notifyAll(&#160;)</b> is within a <b>synchronized</b> method or block (<b>sleep(&#160;)</b> can be called within non-<b>synchronized</b> methods since it doesn&#146;t manipulate the lock). If you call any of these within a method that&#146;s not <b>synchronized,</b> the program will compile, but when you run it, you&#146;ll get an <b>IllegalMonitorStateException</b><a name="Index1613"></a> with the somewhat nonintuitive message &#147;current thread not owner.&#148; This message means that the thread calling <b>wait(&#160;)</b>, <b>notify(&#160;)</b>, or <b>notifyAll(&#160;)</b> must &#147;own&#148; (acquire) the lock for the object before it can call any of these methods. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2288" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can ask another object to perform an operation that manipulates its own lock. To do this, you must first capture that object&#146;s lock. For example, if you want to <b>notify(&#160;)</b> an object <b>x</b>, you must do so inside a <b>synchronized</b> block that acquires the lock for <b>x</b>: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2289" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>synchronized</font>(x) {
+  x.notify();
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Typically, <b>wait(&#160;)</b> is used when you&#146;re waiting for some condition that is under the control of forces outside of the current method to change (typically, this condition will be changed by another thread). You don&#146;t want to idly wait while testing the condition inside your thread; this is called a &#147;busy wait&#148; and it&#146;s a very bad use of CPU cycles. So <b>wait(&#160;)</b> allows you to put the thread to sleep while waiting for the world to change, and only when a <b>notify(&#160;)</b> or <b>notifyAll(&#160;) </b>occurs does the thread wake up and check for changes. Thus, <b>wait(&#160;)</b> provides a way to synchronize activities between threads. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2290" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As an example, consider a restaurant that has one chef and one waitperson. The waitperson must wait for the chef to prepare a meal. When the chef has a meal ready, the chef notifies the waitperson, who then gets the meal and goes back to waiting. This is an excellent example of thread cooperation: The chef represents the <a name="Index1614"></a><i>producer</i>, and the waitperson represents the <i>consumer</i>. Here is the story modeled in code: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0359" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:Restaurant.java</font>
+<font color=#009900>// The producer-consumer approach to thread cooperation.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Order {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> <font color=#0000ff>int</font> i = 0;
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> count = i++;
+  <font color=#0000ff>public</font> Order() {
+    <font color=#0000ff>if</font>(count == 10) {
+      System.out.println(<font color=#004488>"Out of food, closing"</font>);
+      System.exit(0);
+    }
+  }
+  <font color=#0000ff>public</font> String toString() { <font color=#0000ff>return</font> <font color=#004488>"Order "</font> + count; }
+}
+
+<font color=#0000ff>class</font> WaitPerson <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> Restaurant restaurant;
+  <font color=#0000ff>public</font> WaitPerson(Restaurant r) {
+    restaurant = r;
+    start();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      <font color=#0000ff>while</font>(restaurant.order == <font color=#0000ff>null</font>)
+        <font color=#0000ff>synchronized</font>(<font color=#0000ff>this</font>) {
+          <font color=#0000ff>try</font> {
+            wait();
+          } <font color=#0000ff>catch</font>(InterruptedException e) {
+            <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+          }
+        }
+      System.out.println(
+        <font color=#004488>"Waitperson got "</font> + restaurant.order);
+      restaurant.order = <font color=#0000ff>null</font>;
+    }
+  }
+}
+
+<font color=#0000ff>class</font> Chef <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> Restaurant restaurant;
+  <font color=#0000ff>private</font> WaitPerson waitPerson;
+  <font color=#0000ff>public</font> Chef(Restaurant r, WaitPerson w) {
+    restaurant = r;
+    waitPerson = w;
+    start();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      <font color=#0000ff>if</font>(restaurant.order == <font color=#0000ff>null</font>) {
+        restaurant.order = <font color=#0000ff>new</font> Order();
+        System.out.print(<font color=#004488>"Order up! "</font>);
+        <font color=#0000ff>synchronized</font>(waitPerson) {
+          waitPerson.notify();
+        }
+      }
+      <font color=#0000ff>try</font> {
+        sleep(100);
+      } <font color=#0000ff>catch</font>(InterruptedException e) {
+        <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+      }
+    }
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Restaurant {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  Order order; <font color=#009900>// Package access</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Restaurant restaurant = <font color=#0000ff>new</font> Restaurant();
+    WaitPerson waitPerson = <font color=#0000ff>new</font> WaitPerson(restaurant);
+    Chef chef = <font color=#0000ff>new</font> Chef(restaurant, waitPerson);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Order up! Waitperson got Order 0"</font>,
+      <font color=#004488>"Order up! Waitperson got Order 1"</font>,
+      <font color=#004488>"Order up! Waitperson got Order 2"</font>,
+      <font color=#004488>"Order up! Waitperson got Order 3"</font>,
+      <font color=#004488>"Order up! Waitperson got Order 4"</font>,
+      <font color=#004488>"Order up! Waitperson got Order 5"</font>,
+      <font color=#004488>"Order up! Waitperson got Order 6"</font>,
+      <font color=#004488>"Order up! Waitperson got Order 7"</font>,
+      <font color=#004488>"Order up! Waitperson got Order 8"</font>,
+      <font color=#004488>"Order up! Waitperson got Order 9"</font>,
+      <font color=#004488>"Out of food, closing"</font>
+    }, Test.WAIT);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><b>Order</b> is a simple self-counting class, but notice that it also includes a way to terminate the program; on order 10, <b>System.exit(&#160;)</b> is called. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0411" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A <b>WaitPerson</b> must know what <b>Restaurant</b> they are working for because they must fetch the order from the restaurant&#146;s &#147;order window,&#148; <b>restaurant.order</b>. In <b>run(&#160;)</b>, the <b>WaitPerson</b> goes into <b>wait(&#160;)</b> mode, stopping that thread until it is woken up with a <b>notify(&#160;)</b> from the <b>Chef</b>. Since this is a very simple program, we know that only one thread will be waiting on the <b>WaitPerson</b>&#146;s lock: the <b>WaitPerson</b> thread itself. For this reason it&#146;s safe to call <b>notify(&#160;)</b>. In more complex situations, multiple threads may be waiting on a particular object lock, so you don&#146;t know which thread should be awakened. The solutions is to call <b>notifyAll(&#160;)</b>, which wakes up all the threads waiting on that lock. Each thread must then decide whether the notification is relevant. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0412" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Notice that the <b>wait(&#160;)</b> is wrapped in a <b>while(&#160;)</b> statement that is testing for the same thing that is being waited for. This seems a bit strange at first&#151;if you&#146;re waiting for an order, once you wake up the order must be available, right? The problem is that in a multithreading application, some other thread might swoop in and grab the order while the <b>WaitPerson</b> is waking up. The only safe approach is to <i>always</i> use the following idiom for a <b>wait(&#160;)</b>: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0413" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><b>while(conditionIsNotMet)</b><br><b>    wait(&#160;);</b><br></p>
+<p>This guarantees that the condition will be met before you get out of the wait loop, and if you have either been notified of something that doesn&#146;t concern the condition (as can happen with <b>notifyAll(&#160;)</b>), or the condition changes before you get fully out of the wait loop, you are guaranteed to go back into waiting. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0414" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A <b>Chef</b> object must know what restaurant he or she is working for (so the <b>Order</b>s can be placed in <b>restaurant.order</b>)<b> </b>and the <b>WaitPerson</b> who is picking up the meals, so that <b>WaitPerson</b> can be notified when an order is ready. In this simplified example, the <b>Chef</b> is generating the <b>Order</b> objects, then notifying the <b>WaitPerson</b> that an order is ready. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0415" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Observe that the call to <b>notify(&#160;)</b> must first capture the lock on <b>waitPerson</b>. The call to <b>wait(&#160;)</b> in <b>WaitPerson.run(&#160;) </b>automatically releases the lock, so this is possible. Because the lock must be owned in order to call <b>notify(&#160;)</b>, it&#146;s guaranteed that two threads trying to call <b>notify(&#160;)</b> on one object won&#146;t step on each other&#146;s toes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0416" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The preceding example has only a single spot for one thread to store an object so that another thread can later use that object. However, in a typical producer-consumer implementation, you use a first-in, first-out queue in order to store the objects being produced and consumed. See the exercises at the end of the chapter to learn more about this. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0417" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775854"></a><a name="Heading18174"></a>Using Pipes for I/O
+between threads<br></h3>
+<p><a name="Index1615"></a><a name="Index1616"></a>It&#146;s often useful for threads to communicate with each other by using I/O. Threading libraries may provide support for inter-thread I/O in the form of <i>pipes</i>. These exist in the Java I/O library as the classes <a name="Index1617"></a><b>PipedWriter</b> (which allows a thread to write into a pipe) and <a name="Index1618"></a><b>PipedReader</b> (which allows a different thread to read from the same pipe). This can be thought of as a variation of the producer-consumer problem, where the pipe is the canned solution. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2291" title="Send BackTalk Comment">Feedback</a></font> <br></p>
+<p><a name="Index1619"></a><a name="Index1620"></a>Here&#146;s a simple example in which two threads use a pipe to communicate:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:PipedIO.java</font>
+<font color=#009900>// Using pipes for inter-thread I/O</font>
+<font color=#0000ff>import</font> java.io.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>class</font> Sender <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> Random rand = <font color=#0000ff>new</font> Random();
+  <font color=#0000ff>private</font> PipedWriter out = <font color=#0000ff>new</font> PipedWriter();
+  <font color=#0000ff>public</font> PipedWriter getPipedWriter() { <font color=#0000ff>return</font> out; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      <font color=#0000ff>for</font>(<font color=#0000ff>char</font> c = 'A'; c &lt;= 'z'; c++) {
+        <font color=#0000ff>try</font> {
+          out.write(c);
+          sleep(rand.nextInt(500));
+        } <font color=#0000ff>catch</font>(Exception e) {
+          <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+        }
+      }
+    }
+  }
+}
+
+<font color=#0000ff>class</font> Receiver <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> PipedReader in;
+  <font color=#0000ff>public</font> Receiver(Sender sender) <font color=#0000ff>throws</font> IOException {
+    in = <font color=#0000ff>new</font> PipedReader(sender.getPipedWriter());
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>try</font> {
+      <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+        <font color=#009900>// Blocks until characters are there:</font>
+        System.out.println(<font color=#004488>"Read: "</font> + (<font color=#0000ff>char</font>)in.read());
+      }
+    } <font color=#0000ff>catch</font>(IOException e) {
+      <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+    }
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> PipedIO {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) <font color=#0000ff>throws</font> Exception {
+    Sender sender = <font color=#0000ff>new</font> Sender();
+    Receiver receiver = <font color=#0000ff>new</font> Receiver(sender);
+    sender.start();
+    receiver.start();
+    <font color=#0000ff>new</font> Timeout(4000, <font color=#004488>"Terminated"</font>);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><b>Sender</b> and <b>Receiver</b> represent threads that are performing some tasks and need to communicate with each other. <b>Sender </b>creates a <b>PipedWriter</b>, which is a standalone object, but inside <b>Receiver</b> the creation of <b>PipedReader</b> must be associated with a <b>PipedWriter </b>in the constructor. The <b>Sender</b> puts data into the <b>Writer</b> and sleeps for a random amount of time. However, <b>Receiver</b> has no <b>sleep(&#160;)</b> or <b>wait(&#160;)</b>. But when it does a <b>read(&#160;)</b>, it automatically blocks when there is no more data. You get the effect of a producer-consumer, but no <b>wait(&#160;)</b> loop is necessary. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0360" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Notice that the <b>sender</b> and <b>receiver</b> are started in <b>main(&#160;)</b>, <i>after</i> the objects are completely constructed. If you don&#146;t start completely constructed objects, the pipe can produce inconsistent behavior on different platforms. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0444" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545483"></a><a name="_Toc24775855"></a><a name="Heading18229"></a>More
+sophisticated cooperation</h3>
+<p>Only the most basic cooperation approach (producer-consumer, usually implemented with <b>wait(&#160;)</b> and <b>notify(&#160;)</b>/<b>notifyAll(&#160;)</b>) has been introduced in this section. This will solve most kinds of thread cooperation problems, but there are numerous more sophisticated approaches that are described in more advanced texts (in particular, <i>Lea</i>, noted at the end of this chapter). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0418" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775856"></a><a name="Heading18231"></a>Deadlock<br></h2>
+<p><a name="Index1621"></a><a name="Index1622"></a>Because threads can become blocked <i>and</i> because objects can have <b>synchronized</b> methods that prevent threads from accessing that object until the synchronization lock is released, it&#146;s possible for one thread to get stuck waiting for another thread, which in turn waits for another thread, etc., until the chain leads back to a thread waiting on the first one. You get a continuous loop of threads waiting on each other, and no one can move. This is called <i>deadlock</i>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2297" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you try running a program and it deadlocks right away, you immediately know you have a problem and you can track it down. The real problem is when your program seems to be working fine but has the hidden potential to deadlock. In this case you may get no indication that deadlocking is a possibility, so it will be latent in your program until it unexpectedly happens to a customer (and you probably won&#146;t be able to easily reproduce it). Thus, preventing deadlock by careful program design is a critical part of developing concurrent programs. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0356" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Let&#146;s look at the classic demonstration of deadlock, invented by Dijkstra: the <a name="Index1623"></a><a name="Index1624"></a><i>dining philosophers</i> problem. The basic description specifies five philosophers (but the example shown here will allow any number). These philosophers spend part of their time thinking and part of their time eating. While they are thinking, they don&#146;t need any shared resources, but when they are eating, they sit at a table with a limited number of utensils. In the original problem description, the utensils are forks, and two forks are required to get spaghetti from a bowl in the middle of the table, but it seems to make more sense to say that the utensils are chopsticks; clearly, each philosopher will require two chopsticks in order to eat. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0357" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A difficulty is introduced into the problem: As philosophers, they have very little money, so they can only afford five chopsticks. These are spaced around the table between them. When a philosopher wants to eat, he or she must get the chopstick to the left and the one to the right. If the philosopher on either side is using the desired chopstick, then our philosopher must wait. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0358" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Note that the reason this problem is interesting is because it demonstrates that a program can appear to run correctly but actually be deadlock prone. To show this, the command-line arguments allow you to adjust the number of philosophers and a factor to affect the amount of time each philosopher spends thinking. If you have lots of philosophers and/or they spend a lot of time thinking, you may never see the deadlock even though it remains a possibility. The default command-line arguments tend to make it deadlock fairly quickly: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0419" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:DiningPhilosophers.java</font>
+<font color=#009900>// Demonstrates how deadlock can be hidden in a program.</font>
+<font color=#009900>// {Args: 5 0 deadlock 4}</font>
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>class</font> Chopstick {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> <font color=#0000ff>int</font> counter = 0;
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> number = counter++;
+  <font color=#0000ff>public</font> String toString() {
+    <font color=#0000ff>return</font> <font color=#004488>"Chopstick "</font> + number;
+  }
+}
+
+<font color=#0000ff>class</font> Philosopher <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Random rand = <font color=#0000ff>new</font> Random();
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> <font color=#0000ff>int</font> counter = 0;
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> number = counter++;
+  <font color=#0000ff>private</font> Chopstick leftChopstick;
+  <font color=#0000ff>private</font> Chopstick rightChopstick;
+  <font color=#0000ff>static</font> <font color=#0000ff>int</font> ponder = 0; <font color=#009900>// Package access</font>
+  <font color=#0000ff>public</font> Philosopher(Chopstick left, Chopstick right) {
+    leftChopstick = left;
+    rightChopstick = right;
+    start();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> think() {
+    System.out.println(<font color=#0000ff>this</font> + <font color=#004488>" thinking"</font>);
+    <font color=#0000ff>if</font>(ponder &gt; 0)
+      <font color=#0000ff>try</font> {
+        sleep(rand.nextInt(ponder));
+      } <font color=#0000ff>catch</font>(InterruptedException e) {
+        <font color=#0000ff>throw</font> <font color=#0000ff>new</font> RuntimeException(e);
+      }
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> eat() {
+    <font color=#0000ff>synchronized</font>(leftChopstick) {
+      System.out.println(<font color=#0000ff>this</font> + <font color=#004488>" has "</font>
+        + <font color=#0000ff>this</font>.leftChopstick + <font color=#004488>" Waiting for "</font>
+        + <font color=#0000ff>this</font>.rightChopstick);
+      <font color=#0000ff>synchronized</font>(rightChopstick) {
+        System.out.println(<font color=#0000ff>this</font> + <font color=#004488>" eating"</font>);
+      }
+    }
+  }
+  <font color=#0000ff>public</font> String toString() {
+    <font color=#0000ff>return</font> <font color=#004488>"Philosopher "</font> + number;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      think();
+      eat();
+    }
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> DiningPhilosophers {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>if</font>(args.length &lt; 3) {
+      System.err.println(<font color=#004488>"usage:\n"</font> +
+        <font color=#004488>"java DiningPhilosophers numberOfPhilosophers "</font> +
+        <font color=#004488>"ponderFactor deadlock timeout\n"</font> +
+        <font color=#004488>"A nonzero ponderFactor will generate a random "</font> +
+        <font color=#004488>"sleep time during think().\n"</font> +
+        <font color=#004488>"If deadlock is not the string "</font> +
+        <font color=#004488>"'deadlock', the program will not deadlock.\n"</font> +
+        <font color=#004488>"A nonzero timeout will stop the program after "</font> +
+        <font color=#004488>"that number of seconds."</font>);
+      System.exit(1);
+    }
+    Philosopher[] philosopher =
+      <font color=#0000ff>new</font> Philosopher[Integer.parseInt(args[0])];
+    Philosopher.ponder = Integer.parseInt(args[1]);
+    Chopstick
+      left = <font color=#0000ff>new</font> Chopstick(),
+      right = <font color=#0000ff>new</font> Chopstick(),
+      first = left;
+    <font color=#0000ff>int</font> i = 0;
+    <font color=#0000ff>while</font>(i &lt; philosopher.length - 1) {
+      philosopher[i++] =
+        <font color=#0000ff>new</font> Philosopher(left, right);
+      left = right;
+      right = <font color=#0000ff>new</font> Chopstick();
+    }
+    <font color=#0000ff>if</font>(args[2].equals(<font color=#004488>"deadlock"</font>))
+      philosopher[i] = <font color=#0000ff>new</font> Philosopher(left, first);
+    <font color=#0000ff>else</font> <font color=#009900>// Swapping values prevents deadlock:</font>
+      philosopher[i] = <font color=#0000ff>new</font> Philosopher(first, left);
+    <font color=#009900>// Optionally break out of program:</font>
+    <font color=#0000ff>if</font>(args.length &gt;= 4) {
+      <font color=#0000ff>int</font> delay = Integer.parseInt(args[3]);
+      <font color=#0000ff>if</font>(delay != 0)
+        <font color=#0000ff>new</font> Timeout(delay * 1000, <font color=#004488>"Timed out"</font>);
+    }
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Both <b>Chopstick</b> and <b>Philosopher</b> use an auto-incremented <b>static</b> <b>counter</b> to give each element an identification number. Each <b>Philosopher</b> is given a reference to a left and right <b>Chopstick</b> object; these are the utensils that must be picked up before that <b>Philosopher</b> can eat. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0420" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The <b>static</b> field <b>ponder</b> indicates whether the philosophers will spend any time thinking. If the value is nonzero, then it will be used to randomly generate a sleep time inside <b>think(&#160;)</b>. This way, you can show that if your threads (philosophers) are spending more time on other tasks (thinking) then they have a much lower probability of requiring the shared resources (chopsticks) and thus you can convince yourself that the program is deadlock free, even though it isn&#146;t. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0421" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Inside <b>eat(&#160;)</b>, a <b>Philosopher</b> acquires the left chopstick by synchronizing on it. If the chopstick is unavailable, then the philosopher blocks while waiting. When the left chopstick is acquired, the right one is acquired the same way. After eating, the right chopstick is released, then the left. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0422" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In <b>run(&#160;)</b>, each <b>Philosopher</b> just thinks and eats continuously. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0423" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The <b>main(&#160;)</b> method requires at least three arguments and prints a usage message if these are not present. The third argument can be the string &#147;deadlock,&#148; in which case the deadlocking version of the program is used. Any other string will cause the non-deadlocking version to be used. The last (optional) argument is a timeout factor, which will abort the program after that number of seconds (whether it&#146;s deadlocked or not). The timeout is necessary for the program to be run automatically as part of the book code testing process. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0424" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>After the array of <b>Philosopher</b> is created and the ponder value is set, two <b>Chopstick</b> objects are created, and the first one is also stored in the <b>first</b> variable for use later. Every reference in the array except the last one is initialized by creating a new <b>Philosopher</b> object and handing it the <b>left</b> and <b>right</b> chopsticks. After each initialization, the left chopstick is moved to the right and the right is given a new <b>Chopstick</b> object to be used for the next <b>Philosopher</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0425" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In the deadlocking version, the last <b>Philosopher</b> is given the left chopstick and the <b>first</b> chopstick that was stored earlier. That&#146;s because the last <b>Philosopher</b> is sitting right next to the very first one, and they both share that first chopstick. With this arrangement, it&#146;s possible at some point for all the philosophers to be trying to eat and waiting on the philosopher next to them to put down their chopstick, and the program will deadlock. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0426" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Try experimenting with different command-line values to see how the program behaves, and in particular to see all the ways that the program can appear to be executing without deadlock. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0427" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To repair the problem, you must understand that deadlock can occur if four conditions are simultaneously met: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0428" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li><a name="Index1625"></a>Mutual exclusion: At least one resource used by the
+threads must not be shareable. In this case, a chopstick can be used by only one
+philosopher at a time. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0429" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>At least one process must be holding a resource and waiting to acquire a
+resource currently held by another process. That is, for deadlock to occur, a
+philosopher must be holding one chopstick and waiting for the other one. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0430" title="Send
+BackTalk Comment">Feedback</a></font></li>
+<li>A resource cannot be preemptively taken away from a process. All processes
+must only release resources as a normal event. Our philosophers are polite and
+they don&#146;t grab chopsticks from other philosophers. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0431" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>A circular wait must happen, whereby a process waits on a resource held by
+another process, which in turn is waiting on a resource held by another process,
+and so on, until one of the processes is waiting on a resource held by the first
+process, thus gridlocking everything. In this example, the circular wait happens
+because each philosopher tries to get the left chopstick first and then the
+right. In the preceding example, the deadlock is broken by swapping the
+initialization order in the constructor for the last philosopher, causing that
+last philosopher to actually get the right chopstick first, then the left. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0432" title="Send
+BackTalk
+Comment">Feedback</a></font></li></ol><p>Because all of these conditions must be met in order to cause deadlock, you only need to stop one of them from occurring in order to prevent deadlock. In this program, the easiest way to prevent deadlock is to break condition four. This condition happens because each philosopher is trying to pick up their chopsticks in a particular sequence: first left, then right. Because of that, it&#146;s possible to get into a situation where each of them is holding their left chopstick and waiting to get the right one, causing the circular wait condition. However, if the last philosopher is initialized to try to get the right chopstick first and then the left, then that philosopher will never prevent the philosopher on the immediate left from picking up his or her right chopstick, so the circular wait is prevented. This is only one solution to the problem, but you could also solve it by preventing one of the other conditions (see more advanced threading books for more details). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0433" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There is no Java language support to help prevent deadlock; it&#146;s up to you to avoid it by careful design. These are not comforting words to the person who&#146;s trying to debug a deadlocking program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2298" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775857"></a><a name="Heading18348"></a>The proper way to
+stop<br></h2>
+<p><a name="Index1626"></a><a name="Index1627"></a><a name="Index1628"></a><a name="Index1629"></a><a name="Index1630"></a><a name="Index1631"></a>One change that was introduced in Java 2 to reduce the possibility of deadlock is the deprecation of the <b>Thread</b> class&#146;s <b>stop(&#160;)</b>, <b>suspend(&#160;)</b>, and <b>resume(&#160;)</b> methods. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2299" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index1632"></a><a name="Index1633"></a>The reason that the <b>stop(&#160;)</b> method is deprecated is because it doesn&#146;t release the locks that the thread has acquired, and if the objects are in an inconsistent state (&#147;damaged&#148;), other threads can view and modify them in that state. The resulting problems can be subtle and difficult to detect. Instead of using <b>stop(&#160;)</b>, you should use a flag to tell the thread when to terminate itself by exiting its <b>run(&#160;)</b> method. Here&#146;s a simple example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2300" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:Stopping.java</font>
+<font color=#009900>// The safe way to stop a thread.</font>
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>class</font> CanStop <font color=#0000ff>extends</font> Thread {
+  <font color=#009900>// Must be volatile:</font>
+  <font color=#0000ff>private</font> <font color=#0000ff>volatile</font> <font color=#0000ff>boolean</font> stop = <font color=#0000ff>false</font>;
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> counter = 0;
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>while</font>(!stop &amp;&amp; counter &lt; 10000) {
+      System.out.println(counter++);
+    }
+    <font color=#0000ff>if</font>(stop)
+      System.out.println(<font color=#004488>"Detected stop"</font>);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> requestStop() { stop = <font color=#0000ff>true</font>; }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Stopping {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>final</font> CanStop stoppable = <font color=#0000ff>new</font> CanStop();
+    stoppable.start();
+    <font color=#0000ff>new</font> Timer(<font color=#0000ff>true</font>).schedule(<font color=#0000ff>new</font> TimerTask() {
+      <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+        System.out.println(<font color=#004488>"Requesting stop"</font>);
+        stoppable.requestStop();
+      }
+    }, 500); <font color=#009900>// run() after 500 milliseconds</font>
+  }
+} <font color=#009900>///:~            </font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The flag <b>stop</b> must be <b>volatile</b> so that the <b>run(&#160;)</b> method is sure to see it (otherwise the value may be cached locally). The &#147;job&#148; of this thread is to print out 10,000 numbers, so it is finished whenever <b>counter &gt;= 10000</b> <i>or</i> someone requests a stop. Note that <b>requestStop(&#160;)</b> is not <b>synchronized</b> because <b>stop</b> is both <b>boolean</b> (changing it to <b>true </b>is an atomic operation) and <b>volatile</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0434" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In <b>main(&#160;)</b>, a <b>CanStop</b> object is started, then a <b>Timer</b> is set up to call <b>requestStop(&#160;)</b> after one half second. The constructor for <b>Timer</b> is passed the argument <b>true</b> to make it a daemon thread so that it doesn&#146;t prevent the program from terminating. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0435" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775858"></a><a name="Heading18384"></a>Interrupting a blocked
+thread</h2>
+<p>There are times when a thread blocks&#151;such as when it is waiting for input&#151;and it cannot poll a flag as it does in the previous example. In these cases, you can use the <b>Thread</b>.<a name="Index1634"></a><a name="Index1635"></a><b>interrupt(&#160;)</b> method to break out of the blocked code: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0436" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c13:Interrupt.java</font>
+<font color=#009900>// Using interrupt() to break out of a blocked thread.</font>
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>class</font> Blocked <font color=#0000ff>extends</font> Thread {
+  <font color=#0000ff>public</font> Blocked() {
+    System.out.println(<font color=#004488>"Starting Blocked"</font>);
+    start();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+    <font color=#0000ff>try</font> {
+      <font color=#0000ff>synchronized</font>(<font color=#0000ff>this</font>) {
+        wait(); <font color=#009900>// Blocks</font>
+      }
+    } <font color=#0000ff>catch</font>(InterruptedException e) {
+      System.out.println(<font color=#004488>"Interrupted"</font>);
+    }
+    System.out.println(<font color=#004488>"Exiting run()"</font>);
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Interrupt {
+  <font color=#0000ff>static</font> Blocked blocked = <font color=#0000ff>new</font> Blocked();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>new</font> Timer(<font color=#0000ff>true</font>).schedule(<font color=#0000ff>new</font> TimerTask() {
+      <font color=#0000ff>public</font> <font color=#0000ff>void</font> run() {
+        System.out.println(<font color=#004488>"Preparing to interrupt"</font>);
+        blocked.interrupt();
+        blocked = <font color=#0000ff>null</font>; <font color=#009900>// to release it</font>
+      }
+    }, 2000); <font color=#009900>// run() after 2000 milliseconds</font>
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>wait(&#160;)</b> inside <b>Blocked.run(&#160;)</b> produces the blocked thread. When the <b>Timer</b> runs out, the object&#146;s <b>interrupt(&#160;)</b> method is called. Then the <b>blocked</b> reference is set to <b>null</b> so the garbage collector will clean it up (not necessary here, but important in a long-running program). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2301" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545485"></a><a name="_Toc24775859"></a><a name="Heading18421"></a>Thread
+groups</h2>
+<p>A <a name="Index1636"></a><a name="Index1637"></a><i>thread group</i> holds a collection of threads. The value of thread groups can be summed up by a quote from Joshua Bloch,<sup><a name="fnB72" href="#fn72">[72]</a></sup> the software architect at Sun who fixed and greatly improved the Java collections library in JDK 1.2: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0075" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><i>&#147;Thread groups are best viewed as an unsuccessful experiment, and you may simply ignore their existence.&#148;</i><br></p>
+<p>If you&#146;ve spent time and energy trying to figure out the value of thread groups (as I have), you may wonder why there was not some more official announcement from Sun on the topic, sooner than this (the same question could be asked about any number of other changes that have happened to Java over the years). The Nobel Laureate economist Joseph Stiglitz has a philosophy of life that would seem to apply here.<sup><a name="fnB73" href="#fn73">[73]</a></sup> It&#146;s called <i>The </i><a name="Index1638"></a><a name="Index1639"></a><a name="Index1640"></a><i>Theory of Escalating Commitment</i>: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0076" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><i>"The cost of continuing mistakes is borne by others, while the cost of admitting mistakes is borne by yourself."</i><br></p>
+<p>There is one tiny remaining use for thread groups. If a thread in the group throws an uncaught exception, <b>ThreadGroup.uncaughtException(&#160;)</b> is invoked, which prints a stack trace to the standard error stream. If you want to modify this behavior, you must override this method. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0077" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545489"></a><a name="_Toc24775860"></a><a name="Heading18429"></a>Summary</h2>
+<p>It is vital to learn when to use concurrency and when to avoid it. The main reasons to use it are: to manage a number of tasks whose intermingling will make more efficient use of the computer (including the ability to transparently distribute the tasks across multiple CPUs), allow better code organization, or be more convenient for the user. The classic example of resource balancing is to use the CPU during I/O waits. The classic example of user convenience is to monitor a &#147;stop&#148; button during long downloads. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2346" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index1641"></a><a name="Index1642"></a>An additional advantage to threads is that they provide &#147;light&#148; execution context switches (on the order of 100 instructions) rather than &#147;heavy&#148; process context switches (thousands of instructions). Since all threads in a given process share the same memory space, a light context switch changes only program execution and local variables. A process change &#150;the heavy context switch&#151;must exchange the full memory space. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2347" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The main drawbacks to multithreading are: <br></p>
+<ol>
+<li><a name="Index1643"></a><a name="Index1644"></a>Slowdown occurs while
+waiting for shared resources.</li>
+<li>Additional CPU overhead is required to manage threads.</li>
+<li>Unrewarded complexity arises from poor design decisions.</li>
+<li>Opportunities are created for pathologies such as starving, racing,
+deadlock, and livelock.</li>
+<li>Inconsistenciesoccur across platforms. For instance, while developing some
+of the examples for this book, I discovered race conditions that quickly
+appeared on some computers but that wouldn&#146;t appear on others. If you
+developed a program on the latter, you might get badly surprised when you
+distribute
+it.</li></ol><p>One of the biggest difficulties with threads occurs because more than one thread might be sharing a resource&#151;such as the memory in an object&#151;and you must make sure that multiple threads don&#146;t try to read and change that resource at the same time. This requires judicious use of the <b>synchronized</b> keyword, which is an essential tool, but must be understood thoroughly because it can quietly introduce deadlock situations. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2349" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In addition, there&#146;s a certain art to the application of threads. Java is designed to allow you to create as many objects as you need to solve your problem&#151;at least in theory. (Creating millions of objects for an engineering finite-element analysis, for example, might not be practical in Java.) However, it seems that there is an upper bound to the number of threads you&#146;ll want to create, because at some number, threads seem to become balky. This critical point can be hard to detect, and will often depend on the OS and JVM; it could be less than a hundred or in the thousands. As you often create only a handful of threads to solve a problem, this is typically not much of a limit; yet in a more general design it becomes a constraint. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2350" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A significant nonintuitive issue in threading is that, because of thread scheduling, you can typically make your applications run <i>faster</i> by inserting calls to <b>yield(&#160;) </b>or even <b>sleep(&#160;)</b> inside <b>run(&#160;)</b>&#146;s main loop. This definitely makes it feel like an art, in particular when the longer delays seem to speed up performance. The reason this happens is that shorter delays can cause the end-of-<b>sleep(&#160;)</b> scheduler interrupt to happen before the running thread is ready to go to sleep, forcing the scheduler to stop it and restart it later so it can finish what it was doing and then go to sleep. The extra context switches can end up slowing things down, and the use of <b>yield(&#160;)</b> or <b>sleep(&#160;)</b> may prevent the extra switches. It takes extra thought to realize how messy things can get. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2351" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>For more advanced discussions of threading, see <i>Concurrent Programming in Java</i>, 2<sup>nd</sup> Edition, by Doug Lea, Addison-Wesley, 2000. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2352" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545490"></a><a name="_Toc24775861"></a><a name="Heading18442"></a>Exercises</h2>
+<p>Solutions to selected exercises can be found in the electronic document <i>The Thinking in Java Annotated Solution Guide</i>, available for a small fee from <i>www.BruceEckel.com</i>.<br></p>
+<ol>
+<li>	Inherit a class from <b>Thread</b> and override the <b>run(&#160;)</b>
+method. Inside <b>run(&#160;)</b>, print a message, and then call
+<b>sleep(&#160;)</b>. Repeat this three times, then return from
+<b>run(&#160;)</b>. Put a start-up message in the constructor and override
+<b>finalize(&#160;)</b> to print a shut-down message. Make a separate thread
+class that calls <b>System.gc(&#160;)</b> and <b>System.runFinalization(&#160;)
+</b>inside <b>run(&#160;)</b>, printing a message as it does so. Make several
+thread objects of both types and run them to see what happens. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2353"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Experiment with different sleep times in <b>Daemons.java</b> to see what
+happens. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2358" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	In Chapter 8, locate the <b>GreenhouseController.java</b> example, which
+consists of four files. In <b>Event.java</b>, the class <b>Event</b> is based on
+watching the time. Change <b>Event</b> so that it is a <b>Thread</b>, and change
+the rest of the design so that it works with this new <b>Thread</b>-based
+<b>Event</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2359" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify the previous exercise so that the <b>java.util.Timer</b> class is
+used to run the system. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2360" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify <b>SimpleThread.java</b> so that all the threads are daemon threads
+and verify that the program ends as soon as <b>main(&#160;)</b> is able to exit.
+<font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2364"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Demonstrate that <b>java.util.Timer</b> scales to large numbers by creating
+a program that generates many <b>Timer</b> objects that perform some simple task
+when the timeout completes (if you want to get fancy, you can jump forward to
+the &#147;Windows and Applets&#148; chapter and use the <b>Timer</b> objects
+to draw pixels on the screen, but printing to the console is sufficient).</li>
+<li>	Demonstrate that a <b>synchronized</b> method in a class can call a second
+<b>synchronized</b> method in the same class, which can then call a third
+<b>synchronized</b> method in the same class. Create a separate <b>Thread</b>
+object that invokes the first <b>synchronized</b> method.</li>
+<li>	Create two <b>Thread</b> subclasses, one with a <b>run(&#160;)</b> that
+starts up and then calls <b>wait(&#160;)</b>. The other class&#146;s
+<b>run(&#160;)</b> should capture the reference of the first <b>Thread
+</b>object. Its <b>run(&#160;) </b>should call <b>notifyAll(&#160;)</b> for the
+first thread after some number of seconds have passed so that first thread can
+print a message. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap14_2355" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create an example of a &#147;busy wait.&#148; One thread sleeps for
+awhile and then sets a flag to <b>true</b>. The second thread watches that flag
+inside a while loop (this is the &#147;busy wait&#148;) and when the flag
+becomes <b>true</b>, sets it back to false and reports the change to the
+console. Note how much wasted time the program spends inside the &#147;busy
+wait&#148; and create a second version of the program that uses
+<b>wait(&#160;)</b> instead of the &#147;busy wait.&#148;</li>
+<li>	Modify <b>Restaurant.java</b> to use <b>notifyAll(&#160;)</b> and observe
+any difference in behavior.</li>
+<li>	Modify <b>Restaurant.java</b> so that there are multiple
+<b>WaitPerson</b>s, and indicate which one gets each <b>Order</b>.</li>
+<li>	Modify <b>Restaurant.java</b> so that multiple <b>WaitPerson</b>s generate
+order requests to multiple <b>Chef</b>s, who produce orders and notify the
+<b>WaitPerson</b> who generated the request. You&#146;ll need to use queues for
+both incoming order requests and outgoing orders.</li>
+<li>	Modify the previous exercise to add <b>Customer</b> objects that are also
+threads. The <b>Customer</b>s will place order requests with <b>WaitPerson</b>s,
+who give the requests to the <b>Chef</b>s, who fulfill the orders and notify the
+appropriate <b>WaitPerson</b>, who gives it to the appropriate
+<b>Customer</b>.</li>
+<li>	Modify <b>PipedIO.java</b> so that <b>Sender</b> reads and sends lines from
+a text file.</li>
+<li>	Change <b>DiningPhilosophers.java</b> so that the philosophers just pick
+the next available chopstick (when a philosopher is done with their chopsticks,
+they drop them into a bin. When a philosopher wants to eat, they take the next
+two available chopsticks from the bin). Does this eliminate the possibility of
+deadlock? Can you re-introduce deadlock by simply reducing the number of
+available chopsticks?</li>
+<li>	Inherit a class from <b>java.util.Timer</b> and implement the
+<b>requestStop(&#160;)</b> method as in <b>Stopping.java</b>.</li>
+<li>	Modify <b>SimpleThread.java</b> so that all threads receive an
+<b>interrupt(&#160;)</b> before they are completed.</li>
+<li>	Solve a single producer, single consumer problem using <b>wait(&#160;)</b>
+and <b>notify(&#160;)</b>. The producer must not overflow the receiver's buffer,
+which can happen if the producer is faster than the consumer. If the consumer is
+faster than the producer, then it must not read the same data more than once. Do
+not assume anything about the relative speeds of the producer or
+consumer.</li></ol><hr><p class="footnote text"><sup><a name="fn68" href="#fnB68">[68]</a></sup> <b>Runnable</b> was in Java 1.0, while inner classes were not introduced until Java 1.1, which may partially account for the existence of <b>Runnable</b>. Also, traditional multithreading architectures focused on a function to be run rather than an object. My preference is always to inherit from <b>Thread</b> if I can; it seems cleaner and more flexible to me.<br></p>
+<p class="footnote text"><sup><a name="fn69" href="#fnB69">[69]</a></sup> Some examples were developed on a dual-processor Win2K machine that would immediately show collisions. However, the same example run on single-processor machines might run for extended periods without demonstrating a collision&#151;this is the kind of scary behavior that makes multithreading difficult. You can imagine developing on a single-processor machine and thinking that your code is thread safe, then discovering breakages as soon as it&#146;s moved to a multiprocessor machine.<br></p>
+<p class="footnote text"><sup><a name="fn70" href="#fnB70">[70]</a></sup> Inspired by Joshua Bloch&#146;s <i>Effective Java</i>, Addison-Wesley 2001, page 190.<br></p>
+<p class="footnote text"><sup><a name="fn71" href="#fnB71">[71]</a></sup> See <i>Design Patterns</i>, by Gamma et. al., Addison-Wesley 1995.<br></p>
+<p class="footnote text"><sup><a name="fn72" href="#fnB72">[72]</a></sup> <i>Effective Java</i>, by Joshua Bloch, Addison-Wesley 2001, page 211.<br></p>
+<p class="footnote text"><sup><a name="fn73" href="#fnB73">[73]</a></sup> And in a number of other places throughout the experience of Java. Well, why stop there?&#151;I&#146;ve consulted on more than a few projects where this has applied.<br></p>
+
+<!-- <hr><b>Placeholder</b> -->
+
+<hr>
+
+<div align="CENTER"><a href="TIJ314.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ316.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+
+</font></body>
+
+</html>

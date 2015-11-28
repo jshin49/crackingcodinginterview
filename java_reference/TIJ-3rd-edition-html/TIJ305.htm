@@ -1,0 +1,1822 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<!--
+This document was converted from RTF source: 
+By r2net 5.8 r2netcmd Windows 
+See http://www.logictran.com
+-->
+<head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Thinking in Java, 3rd ed. Revision 4.0: 3: Controlling Program Flow</title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css"></head>
+
+<body >
+   <CENTER>     <a href="http://www.MindView.net">     <img src="mindview.gif" alt="MindView Inc." BORDER = "0"></a>     <Font FACE="Verdana, Tahoma, Arial, Helvetica, Sans">     <h2>Thinking in Java, 3<sup>rd</sup> ed. Revision 4.0</h2>     <FONT size = "-1"><br>     [ <a href="README.txt">Viewing Hints</a> ]     [ <a href="http://www.mindview.net/Books/TIJ/">Book Home Page</a> ]     [ <a href="http://www.mindview.net/Etc/MailingList.html">Free Newsletter</a> ] <br>     [ <a href="http://www.mindview.net/Seminars">Seminars</a> ]     [ <a href="http://www.mindview.net/CDs">Seminars on CD ROM</a> ]     [ <a href="http://www.mindview.net/Services">Consulting</a> ] <br><br>     </FONT></FONT>   </CENTER> 
+<font face="Georgia"><div align="CENTER"><a href="TIJ304.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ306.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+<hr>
+
+<h1>
+<a name="_Toc24272642"></a><a name="_Toc24775570"></a><a name="Heading1718"></a>3:
+Controlling Program Flow</h1>
+<p class="Intro">Like a sentient creature, a program must manipulate its world and make choices during execution. <br></p>
+<p>In Java you manipulate data using operators, and you make choices with execution control statements. Java was inherited from C++, so most of these statements and operators will be familiar to C and C++ programmers. Java has also added some improvements and simplifications. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_497" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you find yourself floundering a bit in this chapter, make sure you go through the multimedia CD ROM bound into this book: <i>Foundations for Java</i>. It contains audio lectures, slides, exercises, and solutions specifically designed to bring you up to speed with the fundamentals necessary to learn Java. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_498" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545247"></a><a name="_Toc24775571"></a><a name="Heading1722"></a>Using
+Java operators<br></h2>
+<p><a name="Index144"></a><a name="Index145"></a>An operator takes one or more arguments and produces a new value. The arguments are in a different form than ordinary method calls, but the effect is the same. Addition (<b>+</b>), subtraction and unary minus (<b>-</b>), multiplication (<b>*</b>), division (<b>/</b>), and assignment (<b>=</b>) all work much the same in any programming language. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_499" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>All operators produce a value from their operands. In addition, an operator can change the value of an operand. This is called a <i>side effect</i>. The most common use for operators that modify their operands is to generate the side effect, but you should keep in mind that the value produced is available for your use, just as in operators without side effects. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_500" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index146"></a>Almost all operators work only with primitives. The exceptions are <b>&#145;=</b>&#146;, &#145;<b>==</b>&#146; and &#145;<b>!=</b>&#146;, which work with all objects (and are a point of confusion for objects). In addition, the <b>String </b>class supports &#145;<b>+</b>&#146; and &#145;<b>+=</b>&#146;. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_501" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545248"></a><a name="_Toc24775572"></a><a name="Heading1726"></a>Precedence<br></h3>
+<p><a name="Index147"></a>Operator precedence defines how an expression evaluates when several operators are present. Java has specific rules that determine the order of evaluation. The easiest one to remember is that multiplication and division happen before addition and subtraction. Programmers often forget the other precedence rules, so you should use parentheses to make the order of evaluation explicit. For example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_502" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>a = x + y - 2/2 + z;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>has a very different meaning from the same statement with a particular grouping of parentheses: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_503" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>a = x + (y - 2)/(2 + z);</PRE></FONT></BLOCKQUOTE><p><br></p>
+<h3>
+<a name="_Toc375545249"></a><a name="_Toc24775573"></a><a name="Heading1733"></a>Assignment</h3>
+<p><a name="Index148"></a>Assignment is performed with the operator =. It means &#147;take the value of the right-hand side (often called the <i>rvalue</i><a name="Index149"></a>) and copy it into the left-hand side (often called the <i>lvalue</i><a name="Index150"></a>).&#148; An rvalue is any constant, variable, or expression that can produce a value, but an lvalue must be a distinct, named variable. (That is, there must be a physical space to store the value.) For instance, you can assign a constant value to a variable:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>a = 4;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>but you cannot assign anything to constant value&#151;it cannot be an lvalue. (You can&#146;t say <b>4 = a;</b>.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_504" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Assignment of primitives is quite straightforward. Since the primitive holds the actual value and not a reference to an object, when you assign primitives, you copy the contents from one place to another. For example, if you say <b>a = b</b> for primitives, then the contents of <b>b</b> are copied into <b>a</b>. If you then go on to modify <b>a</b>, <b>b</b> is naturally unaffected by this modification. As a programmer, this is what you&#146;ve come to expect for most situations. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_505" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When you assign objects, however, things change. Whenever you manipulate an object, what you&#146;re manipulating is the reference, so when you assign &#147;from one object to another,&#148; you&#146;re actually copying a reference from one place to another. This means that if you say <a name="Index151"></a><a name="Index152"></a><a name="Index153"></a><b>c = d</b> for objects, you end up with both <b>c</b> and <b>d</b> pointing to the object that, originally, only <b>d</b> pointed to. Here&#146;s an example that demonstrates this behavior: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_506" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:Assignment.java</font>
+<font color=#009900>// Assignment with objects is a bit tricky.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Number {
+  <font color=#0000ff>int</font> i;
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Assignment {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Number n1 = <font color=#0000ff>new</font> Number();
+    Number n2 = <font color=#0000ff>new</font> Number();
+    n1.i = 9;
+    n2.i = 47;
+    System.out.println(<font color=#004488>"1: n1.i: "</font> + n1.i +
+      <font color=#004488>", n2.i: "</font> + n2.i);
+    n1 = n2;
+    System.out.println(<font color=#004488>"2: n1.i: "</font> + n1.i +
+      <font color=#004488>", n2.i: "</font> + n2.i);
+    n1.i = 27;
+    System.out.println(<font color=#004488>"3: n1.i: "</font> + n1.i +
+      <font color=#004488>", n2.i: "</font> + n2.i);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"1: n1.i: 9, n2.i: 47"</font>,
+      <font color=#004488>"2: n1.i: 47, n2.i: 47"</font>,
+      <font color=#004488>"3: n1.i: 27, n2.i: 27"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>First, notice that something new has been added. The line:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>import</font> com.bruceeckel.simpletest.*;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>imports the &#147;<b>simpletest</b>&#148; library that has been created to test the code in this book, and is explained in Chapter 15. At the beginning of the <b>Assignment</b> class, you see the line:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This creates an instance of the <b>simpletest</b> class <b>Test</b>, called <b>monitor</b>. Finally, at the end of <b>main(&#160;)</b>, you see the statement:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"1: n1.i: 9, n2.i: 47"</font>,
+      <font color=#004488>"2: n1.i: 47, n2.i: 47"</font>,
+      <font color=#004488>"3: n1.i: 27, n2.i: 27"</font>
+    });</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This is the expected output of the program, expressed as an array of <b>String</b> objects. When the program is run, it not only prints out the output, but it compares it to this array to verify that the array is correct. Thus, when you see a program in this book that uses <b>simpletest</b>, you will also see an <b>expect(&#160;)</b> call that will show you what the output of the program is. This way, you see validated output from the program.<br></p>
+<p>The <b>Number</b> class is simple, and two instances of it (<b>n1</b> and <b>n2</b>) are created within <b>main(&#160;)</b>. The <b>i</b> value within each <b>Number</b> is given a different value, and then <b>n2</b> is assigned to <b>n1</b>, and <b>n1</b> is changed. In many programming languages you would expect <b>n1</b> and <b>n2</b> to be independent at all times, but because you&#146;ve assigned a reference, you&#146;ll see the output in the <b>expect(&#160;)</b> statement. Changing the <b>n1</b> object appears to change the <b>n2</b> object as well! This is because both <b>n1</b> and <b>n2</b> contain the same reference, which is pointing to the same object. (The original reference that was in <b>n1</b>, that pointed to the object holding a value of 9, was overwritten during the assignment and effectively lost; its object will be cleaned up by the garbage collector.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_508" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This phenomenon is often called <a name="Index154"></a><a name="Index155"></a><i>aliasing</i>, and it&#146;s a fundamental way that Java works with objects. But what if you don&#146;t want aliasing to occur in this case? You could forego the assignment and say: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_509" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>n1.i = n2.i;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This retains the two separate objects instead of tossing one and tying <b>n1 </b>and <b>n2</b> to the same object, but you&#146;ll soon realize that manipulating the fields within objects is messy and goes against good object-oriented design principles. This is a nontrivial topic, so it is left for Appendix A, which is devoted to aliasing. In the meantime, you should keep in mind that assignment for objects can add surprises. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_510" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1790"></a>Aliasing during method calls<br></h4>
+<p><a name="Index156"></a>Aliasing will also occur when you pass an object into a method:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:PassObject.java</font>
+<font color=#009900>// Passing objects to methods may not be what</font>
+<font color=#009900>// you're used to.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Letter {
+  <font color=#0000ff>char</font> c;
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> PassObject {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> f(Letter y) {
+    y.c = 'z';
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Letter x = <font color=#0000ff>new</font> Letter();
+    x.c = 'a';
+    System.out.println(<font color=#004488>"1: x.c: "</font> + x.c);
+    f(x);
+    System.out.println(<font color=#004488>"2: x.c: "</font> + x.c);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"1: x.c: a"</font>,
+      <font color=#004488>"2: x.c: z"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In many programming languages, the method <b>f(&#160;)</b> would appear to be making a copy of its argument <b>Letter y</b> inside the scope of the method. But once again a reference is being passed, so the line <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_511" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>y.c = 'z';</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>is actually changing the object outside of <b>f(&#160;)</b>. The output in the <b>expect(&#160;) </b>statement shows this. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_512" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Aliasing and its solution is a complex issue and, although you must wait until Appendix A for all the answers, you should be aware of it at this point so you can watch for pitfalls. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_513" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545250"></a><a name="_Toc24775574"></a><a name="Heading1824"></a>Mathematical
+operators</h3>
+<p><a name="Index157"></a>The basic mathematical operators are the same as the ones available in most programming languages: addition (<a name="Index158"></a><b>+</b>), subtraction (<a name="Index159"></a><b>-</b>), division (<a name="Index160"></a><b>/</b>), multiplication (<a name="Index161"></a><b>*</b>) and modulus (<a name="Index162"></a><b>%</b>, which produces the remainder from integer division). Integer division truncates, rather than rounds, the result. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_514" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Java also uses a shorthand notation to perform an operation and an assignment at the same time. This is denoted by an operator followed by an equal sign, and is consistent with all the operators in the language (whenever it makes sense). For example, to add 4 to the variable <b>x</b> and assign the result<b> </b>to <b>x</b>, use: <b>x += 4</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_515" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This example shows the use of the mathematical operators:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:MathOps.java</font>
+<font color=#009900>// Demonstrates the mathematical operators.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> MathOps {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#009900>// Shorthand to print a string and an int:</font>
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> printInt(String s, <font color=#0000ff>int</font> i) {
+    System.out.println(s + <font color=#004488>" = "</font> + i);
+  }
+  <font color=#009900>// Shorthand to print a string and a float:</font>
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> printFloat(String s, <font color=#0000ff>float</font> f) {
+    System.out.println(s + <font color=#004488>" = "</font> + f);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#009900>// Create a random number generator,</font>
+    <font color=#009900>// seeds with current time by default:</font>
+    Random rand = <font color=#0000ff>new</font> Random();
+    <font color=#0000ff>int</font> i, j, k;
+    <font color=#009900>// Choose value from 1 to 100:</font>
+    j = rand.nextInt(100) + 1;
+    k = rand.nextInt(100) + 1;
+    printInt(<font color=#004488>"j"</font>, j);  printInt(<font color=#004488>"k"</font>, k);
+    i = j + k; printInt(<font color=#004488>"j + k"</font>, i);
+    i = j - k; printInt(<font color=#004488>"j - k"</font>, i);
+    i = k / j; printInt(<font color=#004488>"k </font><font color=#004488>/ j"</font>, i);
+    i = k * j; printInt(<font color=#004488>"k * j"</font>, i);
+    i = k % j; printInt(<font color=#004488>"k % j"</font>, i);
+    j %= k; printInt(<font color=#004488>"j %= k"</font>, j);
+    <font color=#009900>// Floating-point number tests:</font>
+    <font color=#0000ff>float</font> u,v,w;  <font color=#009900>// applies to doubles, too</font>
+    v = rand.nextFloat();
+    w = rand.nextFloat();
+    printFloat(<font color=#004488>"v"</font>, v); printFloat(<font color=#004488>"w"</font>, w);
+    u = v + w; printFloat(<font color=#004488>"v + w"</font>, u);
+    u = v - w; printFloat(<font color=#004488>"v - w"</font>, u);
+    u = v * w; printFloat(<font color=#004488>"v * w"</font>, u);
+    u = v / w; printFloat(<font color=#004488>"v </font><font color=#004488>/ w"</font>, u);
+    <font color=#009900>// the following also works for</font>
+    <font color=#009900>// char, byte, short, int, long,</font>
+    <font color=#009900>// and double:</font>
+    u += v; printFloat(<font color=#004488>"u += v"</font>, u);
+    u -= v; printFloat(<font color=#004488>"u -= v"</font>, u);
+    u *= v; printFloat(<font color=#004488>"u *= v"</font>, u);
+    u /= v; printFloat(<font color=#004488>"u </font><font color=#004488>/= v"</font>, u);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"%% j = -?\\d+"</font>,
+      <font color=#004488>"%% k = -?\\d+"</font>,
+      <font color=#004488>"%% j \\+ k = -?\\d+"</font>,
+      <font color=#004488>"%% j - k = -?\\d+"</font>,
+      <font color=#004488>"%% k </font><font color=#004488>/ j = -?\\d+"</font>,
+      <font color=#004488>"%% k \\* j = -?\\d+"</font>,
+      <font color=#004488>"%% k % j = -?\\d+"</font>,
+      <font color=#004488>"%% j %= k = -?\\d+"</font>,
+      <font color=#004488>"%% v = -?\\d+\\.\\d+(E-?\\d)?"</font>,
+      <font color=#004488>"%% w = -?\\d+\\.\\d+(E-?\\d)?"</font>,
+      <font color=#004488>"%% v \\+ w = -?\\d+\\.\\d+(E-?\\d)??"</font>,
+      <font color=#004488>"%% v - w = -?\\d+\\.\\d+(E-?\\d)??"</font>,
+      <font color=#004488>"%% v \\* w = -?\\d+\\.\\d+(E-?\\d)??"</font>,
+      <font color=#004488>"%% v </font><font color=#004488>/ w = -?\\d+\\.\\d+(E-?\\d)??"</font>,
+      <font color=#004488>"%% u \\+= v = -?\\d+\\.\\d+(E-?\\d)??"</font>,
+      <font color=#004488>"%% u -= v = -?\\d+\\.\\d+(E-?\\d)??"</font>,
+      <font color=#004488>"%% u \\*= v = -?\\d+\\.\\d+(E-?\\d)??"</font>,
+      <font color=#004488>"%% u </font><font color=#004488>/= v = -?\\d+\\.\\d+(E-?\\d)??"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The first thing you will see are some shorthand methods for printing: the <b>printInt(&#160;)</b> prints a <b>String</b> followed by an <b>int</b> and the <b>printFloat(&#160;)</b> prints a <b>String</b> followed by a <b>float</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_516" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To generate numbers, the program first creates a <b>Random</b> object. Because no arguments are passed during creation, Java uses the current time as a seed for the random number generator. The program generates a number of different types of random numbers with the <b>Random</b> object simply by calling the methods: <b>nextInt(&#160;)</b> and<b> nextFloat(&#160;)</b> (you can also call <b>nextLong(&#160;) </b>or<b> nextDouble(&#160;)</b>). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_517" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The modulus operator, when used with the result of the random number generator, limits the result to an upper bound of the operand minus 1 (99 in this case). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_518" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1900"></a>Regular expressions</h4>
+<p>Since random numbers are used to generate the output for this program, the <b>expect(&#160;)</b> statement can&#146;t just show literal output as it did before, since the output will vary from one run to the next. To solve this problem, <i>regular expressions</i>, a new feature introduced in Java JDK 1.4 (but an old feature in languages like Perl and Python) will be used inside the <b>expect(&#160;)</b> statement. Although coverage of this intensely powerful tool doesn&#146;t occur until Chapter 12, to understand these statements you&#146;ll need an introduction to regular expressions. Here, you&#146;ll learn just enough to read the <b>expect(&#160;)</b> statements, but if you want a full description, look up <b>java.util.regex.Pattern</b> in the downloadable JDK documentation. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0450" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A regular expression is a way to describe strings in general terms, so that you can say: &#147;If a string has these things in it, then it matches what I&#146;m looking for.&#148; For example, to say that a number might or might not be preceded by a minus sign, you put in the minus sign followed by a question mark, like this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0451" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>-?</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>To describe an integer, you say that it&#146;s one or more digits. In regular expressions, a digit is &#145;<b>\d</b>&#146;, but in a Java <b>String</b> you have to &#147;escape&#148; the backslash by putting in a second backslash: &#145;<b>\\d</b>&#146;. To indicate &#147;one or more of the preceding expression&#148; in regular expressions, you use the &#145;<b>+</b>&#146;. So to say &#147;possibly a minus sign, followed by one or more digits,&#148; you write: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0452" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>-?\\d+</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Which you can see in the first lines of the <b>expect(&#160;)</b> statement in the preceding code.<br></p>
+<p>One thing that is <i>not</i> part of the regular expression syntax is the &#145;<b>%%</b>&#146; (note the space included for readability) at the beginning of the lines in the <b>expect(&#160;)</b> statement. This is a flag used by <b>simpletest</b> to indicate that the rest of the line is a regular expression. So you won&#146;t see it in normal regular expressions, only in <b>simpletest expect(&#160;)</b> statements. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0453" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Any other characters that are not special characters to regular expression searches are treated as exact matches. So in the first line:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>%% j = -?\\d+</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The &#145;j = &#146; is matched exactly. However, in the third line, the &#145;+&#146; in &#145;j + k&#146; must be escaped because it is a special regular expression character, as is &#145;*&#146;. The rest of the lines should be understandable from this introduction. Later in the book, when additional features of regular expressions are used inside <b>expect(&#160;)</b> statements, they will be explained. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0454" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1914"></a>Unary minus and plus operators<br></h4>
+<p><a name="Index163"></a><a name="Index164"></a>The unary minus (-)and unary plus (+) are the same operators as binary minus and plus. The compiler figures out which use is intended by the way you write the expression. For instance, the statement <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_519" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>x = -a;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>has an obvious meaning. The compiler is able to figure out: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_520" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>x = a * -b;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>but the reader might get confused, so it is clearer to say: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_521" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>x = a * (-b);</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Unary minus inverts the sign on the data. Unary plus provides symmetry with unary minus, although it doesn&#146;t have any effect. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_522" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545251"></a><a name="_Toc24775575"></a><a name="Heading1925"></a>Auto
+increment and decrement</h3>
+<p>Java, like C, is full of shortcuts. Shortcuts can make code much easier to type, and either easier or harder to read. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_523" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Two of the nicer shortcuts are the increment and decrement operators (often referred to as the auto-increment and auto-decrement operators). The decrement operator is <a name="Index168"></a><a name="Index169"></a><a name="Index170"></a><a name="Index171"></a><b>--</b> and means &#147;decrease by one unit.&#148; The increment operator is <b>++</b> and means &#147;increase by one unit.&#148; If <b>a</b> is an <b>int</b>, for example, the expression <b>++a</b> is equivalent to (<b>a = a + 1</b>). Increment and decrement operators not only modify the variable, but also produce the value of the variable as a result. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_524" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There are two versions of each type of operator, often called the <i>prefix</i> and <i>postfix</i> versions. <i>Pre-increment</i> means the <b>++ </b>operator appears before the variable or expression, and <i>post-increment</i> means the <b>++</b> operator appears after the variable or expression. Similarly, <i>pre-decrement</i> means the <b>-- </b>operator appears before the variable or expression, and <i>post-decrement</i> means the <b>--</b> operator appears after the variable or expression. For pre-increment and pre-decrement, (i.e., <b>++a</b> or <b>--a</b>), the operation is performed and the value is produced. For post-increment and post-decrement (i.e. <b>a++ </b>or <b>a--</b>), the value is produced, then the operation is performed. As an example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_525" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:AutoInc.java</font>
+<font color=#009900>// Demonstrates the ++ and -- operators.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> AutoInc {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>int</font> i = 1;
+    System.out.println(<font color=#004488>"i : "</font> + i);
+    System.out.println(<font color=#004488>"++i : "</font> + ++i); <font color=#009900>// Pre-increment</font>
+    System.out.println(<font color=#004488>"i++ : "</font> + i++); <font color=#009900>// Post-increment</font>
+    System.out.println(<font color=#004488>"i : "</font> + i);
+    System.out.println(<font color=#004488>"--i : "</font> + --i); <font color=#009900>// Pre-decrement</font>
+    System.out.println(<font color=#004488>"i-- : "</font> + i--); <font color=#009900>// Post-decrement</font>
+    System.out.println(<font color=#004488>"i : "</font> + i);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"i : 1"</font>,
+      <font color=#004488>"++i : 2"</font>,
+      <font color=#004488>"i++ : 2"</font>,
+      <font color=#004488>"i : 3"</font>,
+      <font color=#004488>"--i : 2"</font>,
+      <font color=#004488>"i-- : 2"</font>,
+      <font color=#004488>"i : 1"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that for the prefix form, you get the value after the operation has been performed, but with the postfix form, you get the value before the operation is performed. These are the only operators (other than those involving assignment) that have side effects. (That is, they change the operand rather than using just its value.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_527" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index172"></a>The increment operator is one explanation for the name C++, implying &#147;one step beyond C.&#148; In an early Java speech, Bill Joy (one of the Java creators), said that &#147;Java=C++--&#148; (C plus plus minus minus), suggesting that Java is C++ with the unnecessary hard parts removed, and therefore a much simpler language. As you progress in this book, you&#146;ll see that many parts are simpler, and yet Java isn&#146;t <a name="Index173"></a><i>that </i>much easier than C++. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_528" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="Index174"></a><a name="_Toc375545252"></a><a name="_Toc24775576"></a><a name="Heading1958"></a>Relational
+operators<br></h3>
+<p><a name="Index175"></a><a name="Index176"></a>Relational operators generate a <b>boolean</b> result. They evaluate the relationship between the values of the operands. A relational expression produces <b>true</b> if the relationship is true, and <b>false</b> if the relationship is untrue. The relational operators are less than (&lt;)<a name="Index177"></a>, greater than (&gt;), less than or equal to (&lt;=), greater than or equal to (&gt;=), equivalent (==) and not equivalent (!=). Equivalence and nonequivalence work with all built-in data types, but the other comparisons won&#146;t work with type <a name="Index178"></a><a name="Index179"></a><a name="Index180"></a><a name="Index181"></a><a name="Index182"></a><a name="Index183"></a><a name="Index184"></a><a name="Index185"></a><a name="Index186"></a><a name="Index187"></a><a name="Index188"></a><b>boolean</b><a name="Index189"></a>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_529" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading1960"></a>Testing object equivalence<br></h4>
+<p><a name="Index190"></a><a name="Index191"></a>The relational operators <b>==</b> and <b>!=</b> also work with all objects, but their meaning often confuses the first-time Java programmer. Here&#146;s an example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_530" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:Equivalence.java</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Equivalence {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Integer n1 = <font color=#0000ff>new</font> Integer(47);
+    Integer n2 = <font color=#0000ff>new</font> Integer(47);
+    System.out.println(n1 == n2);
+    System.out.println(n1 != n2);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"false"</font>,
+      <font color=#004488>"true"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The expression <b>System.out.println(n1 == n2)</b> will print the result of the <b>boolean</b> comparison within it. Surely the output should be <b>true</b> and then <b>false</b>,<b> </b>since both <b>Integer</b> objects are the same. But while the <i>contents</i> of the objects are the same, the references are not the same and the operators <a name="Index192"></a><a name="Index193"></a><b>==</b> and <b>!= </b>compare object references. So the output is actually <b>false</b> and then <b>true</b>. Naturally, this surprises people at first. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_531" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>What if you want to compare the actual contents of an object for equivalence? You must use the special method <a name="Index194"></a><a name="Index195"></a><b>equals(&#160;)</b> that exists for all objects (not primitives, which work fine with <a name="Index196"></a><b>==</b> and <b>!=</b>). Here&#146;s how it&#146;s used: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_532" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:EqualsMethod.java</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> EqualsMethod {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Integer n1 = <font color=#0000ff>new</font> Integer(47);
+    Integer n2 = <font color=#0000ff>new</font> Integer(47);
+    System.out.println(n1.equals(n2));
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"true"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The result will be <b>true</b>, as you would expect. Ah, but it&#146;s not as simple as that. If you create your own class, like this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_533" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:EqualsMethod2.java</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Value {
+  <font color=#0000ff>int</font> i;
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> EqualsMethod2 {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Value v1 = <font color=#0000ff>new</font> Value();
+    Value v2 = <font color=#0000ff>new</font> Value();
+    v1.i = v2.i = 100;
+    System.out.println(v1.equals(v2));
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"false"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>you&#146;re back to square one: the result is <b>false</b>. This is because the default behavior of <b>equals(&#160;)</b> is to compare references. So unless you <i>override</i> <b>equals(&#160;)</b> in your new class you won&#146;t get the desired behavior. Unfortunately, you won&#146;t learn about overriding until Chapter 7 and about the proper way to define <b>equals(&#160;)</b> until Chapter 11, but being aware of the way <b>equals(&#160;)</b> behaves might save you some grief in the meantime. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_534" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Most of the Java library classes implement <b>equals(&#160;)</b> so that it compares the contents of objects instead of their references. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_535" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545253"></a><a name="_Toc24775577"></a><a name="Heading2019"></a>Logical
+operators</h3>
+<p><a name="Index197"></a><a name="Index198"></a>Each of the logical operators AND (&amp;&amp;), OR (||) and NOT (!) produces a <a name="Index199"></a><a name="Index200"></a><a name="Index201"></a><a name="Index202"></a><a name="Index203"></a><a name="Index204"></a><b>boolean</b> value of <b>true</b> or <b>false</b> based on the logical relationship of its arguments. This example uses the relational and logical operators: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_536" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:Bool.java</font>
+<font color=#009900>// Relational and logical operators.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Bool {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Random rand = <font color=#0000ff>new</font> Random();
+    <font color=#0000ff>int</font> i = rand.nextInt(100);
+    <font color=#0000ff>int</font> j = rand.nextInt(100);
+    System.out.println(<font color=#004488>"i = "</font> + i);
+    System.out.println(<font color=#004488>"j = "</font> + j);
+    System.out.println(<font color=#004488>"i &gt; j is "</font> + (i &gt; j));
+    System.out.println(<font color=#004488>"i &lt; j is "</font> + (i &lt; j));
+    System.out.println(<font color=#004488>"i &gt;= j is "</font> + (i &gt;= j));
+    System.out.println(<font color=#004488>"i &lt;= j is "</font> + (i &lt;= j));
+    System.out.println(<font color=#004488>"i == j is "</font> + (i == j));
+    System.out.println(<font color=#004488>"i != j is "</font> + (i != j));
+    <font color=#009900>// Treating an int as a boolean is not legal Java:</font>
+<font color=#009900>//! System.out.println("i &amp;&amp; j is " + (i &amp;&amp; j));</font>
+<font color=#009900>//! System.out.println("i || j is " + (i || j));</font>
+<font color=#009900>//! System.out.println("!i is " + !i);</font>
+    System.out.println(<font color=#004488>"(i &lt; 10) &amp;&amp; (j &lt; 10) is "</font>
+       + ((i &lt; 10) &amp;&amp; (j &lt; 10)) );
+    System.out.println(<font color=#004488>"(i &lt; 10) || (j &lt; 10) is "</font>
+       + ((i &lt; 10) || (j &lt; 10)) );
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"%% i = -?\\d+"</font>,
+      <font color=#004488>"%% j = -?\\d+"</font>,
+      <font color=#004488>"%% i &gt; j is (true|false)"</font>,
+      <font color=#004488>"%% i &lt; j is (true|false)"</font>,
+      <font color=#004488>"%% i &gt;= j is (true|false)"</font>,
+      <font color=#004488>"%% i &lt;= j is (true|false)"</font>,
+      <font color=#004488>"%% i == j is (true|false)"</font>,
+      <font color=#004488>"%% i != j is (true|false)"</font>,
+      <font color=#004488>"%% \\(i &lt; 10\\) &amp;&amp; \\(j &lt; 10\\) is (true|false)"</font>,
+      <font color=#004488>"%% \\(i &lt; 10\\) \\|\\| \\(j &lt; 10\\) is (true|false)"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In the regular expressions in the <b>expect(&#160;)</b> statement, parentheses have the effect of grouping an expression, and the vertical bar &#145;<b>|</b>&#146; means OR. So:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>(<font color=#0000ff>true</font>|<font color=#0000ff>false</font>)</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Means that this part of the string may be either &#145;true&#146; or &#145;false&#146;. Because these characters are special in regular expressions, they must be escaped with a &#145;<b>\\</b>&#146; if you want them to appear as ordinary characters in the expression. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0455" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can apply AND, OR, or NOT to <b>boolean</b> values only. You can&#146;t use a non-<b>boolean</b> as if it were a <a name="Index207"></a><b>boolean</b> in a logical expression as you can in C and C++. You can see the failed attempts at doing this commented out with a <b>//!</b> comment marker. The subsequent expressions, however, produce <b>boolean</b> values using relational comparisons, then use logical operations on the results. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_537" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Note that a <b>boolean</b> value is automatically converted to an appropriate text form if it&#146;s used where a <b>String</b> is expected. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_538" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can replace the definition for <b>int</b> in the preceding program with any other primitive data type except <b>boolean</b>. Be aware, however, that the comparison of floating-point numbers is very strict. A number that is the tiniest fraction different from another number is still &#147;not equal.&#148; A number that is the tiniest bit above zero is still nonzero. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_539" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Index208"></a><a name="Heading2070"></a>Short-circuiting</h4>
+<p>When dealing with logical operators, you run into a phenomenon called &#147;short circuiting.&#148; This means that the expression will be evaluated only <a name="Index209"></a><a name="Index210"></a><a name="Index211"></a><i>until</i> the truth or falsehood of the entire expression can be unambiguously determined. As a result, the latter parts of a logical expression might not be evaluated. Here&#146;s an example that demonstrates short-circuiting:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:ShortCircuit.java</font>
+<font color=#009900>// Demonstrates short-circuiting behavior.</font>
+<font color=#009900>// with logical operators.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ShortCircuit {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>static</font> <font color=#0000ff>boolean</font> test1(<font color=#0000ff>int</font> val) {
+    System.out.println(<font color=#004488>"test1("</font> + val + <font color=#004488>")"</font>);
+    System.out.println(<font color=#004488>"result: "</font> + (val &lt; 1));
+    <font color=#0000ff>return</font> val &lt; 1;
+  }
+  <font color=#0000ff>static</font> <font color=#0000ff>boolean</font> test2(<font color=#0000ff>int</font> val) {
+    System.out.println(<font color=#004488>"test2("</font> + val + <font color=#004488>")"</font>);
+    System.out.println(<font color=#004488>"result: "</font> + (val &lt; 2));
+    <font color=#0000ff>return</font> val &lt; 2;
+  }
+  <font color=#0000ff>static</font> <font color=#0000ff>boolean</font> test3(<font color=#0000ff>int</font> val) {
+    System.out.println(<font color=#004488>"test3("</font> + val + <font color=#004488>")"</font>);
+    System.out.println(<font color=#004488>"result: "</font> + (val &lt; 3));
+    <font color=#0000ff>return</font> val &lt; 3;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>if</font>(test1(0) &amp;&amp; test2(2) &amp;&amp; test3(2))
+      System.out.println(<font color=#004488>"expression is true"</font>);
+    <font color=#0000ff>else</font>
+      System.out.println(<font color=#004488>"expression is false"</font>);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"test1(0)"</font>,
+      <font color=#004488>"result: true"</font>,
+      <font color=#004488>"test2(2)"</font>,
+      <font color=#004488>"result: false"</font>,
+      <font color=#004488>"expression is false"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Each test performs a comparison against the argument and returns true or false. It also prints information to show you that it&#146;s being called. The tests are used in the expression: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_540" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>if</font>(test1(0) &amp;&amp; test2(2) &amp;&amp; test3(2))</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You might naturally think that all three tests would be executed, but the output shows otherwise. The first test produced a <b>true</b> result, so the expression evaluation continues. However, the second test produced a <b>false</b> result. Since this means that the whole expression must be <b>false</b>, why continue evaluating the rest of the expression? It could be expensive. The reason for short-circuiting, in fact, is that you can get a potential performance increase if all the parts of a logical expression do not need to be evaluated. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_542" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545254"></a><a name="_Toc24775578"></a><a name="Heading2113"></a>Bitwise
+operators</h3>
+<p><a name="Index212"></a><a name="Index213"></a>The bitwise operators allow you to manipulate individual bits in an integral primitive data type. Bitwise operators perform Boolean algebra on the corresponding bits in the two arguments to produce the result. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_543" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index214"></a>The bitwise operators come from C&#146;s low-level orientation, where you often manipulate hardware directly and must set the bits in hardware registers. Java was originally designed to be embedded in TV set-top boxes, so this low-level orientation still made sense. However, you probably won&#146;t use the bitwise operators much. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_544" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index215"></a>The bitwise AND operator (<b>&amp;</b>)<a name="Index216"></a><a name="Index217"></a> produces a one in the output bit if both input bits are one, otherwise it produces a zero. The bitwise OR operator (<b>|</b>)<a name="Index218"></a><a name="Index219"></a> produces a one in the output bit if either input bit is a one and produces a zero only if both input bits are zero. The bitwise EXCLUSIVE OR, or XOR (<b>^</b>),<a name="Index220"></a><a name="Index221"></a><a name="Index222"></a> produces a one in the output bit if one or the other input bit is a one, but not both. The bitwise NOT (<a name="Index223"></a><b>~</b>, also called the <i>ones complement </i>operator) is a unary operator; it takes only one argument. (All other bitwise operators are binary operators.) Bitwise NOT produces the opposite of the input bit&#151;a one if the input bit is zero, a zero if the input bit is one. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_545" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index224"></a><a name="Index225"></a><a name="Index226"></a><a name="Index227"></a><a name="Index228"></a><a name="Index229"></a>The bitwise operators and logical operators use the same characters, so it is helpful to have a mnemonic device to help you remember the meanings: because bits are &#147;small,&#148; there is only one character in the bitwise operators. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_546" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Bitwise operators can be combined with the <b>=</b> sign to unite the operation and assignment: <b>&amp;=</b>, <a name="Index230"></a><b>|=</b><a name="Index231"></a> and <b>^=</b><a name="Index232"></a> are all legitimate. (Since <b>~</b> is a unary operator, it cannot be combined with the <b>=</b> sign.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_547" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The <b>boolean</b> type is treated as a one-bit value, so it is somewhat different. You can perform a bitwise AND, OR, and XOR, but you can&#146;t perform a bitwise NOT (presumably to prevent confusion with the logical NOT). For <b>boolean</b>s, the bitwise operators have the same effect as the logical operators except that they do not short circuit. Also, bitwise operations on <b>boolean</b>s include an XOR logical operator that is not included under the list of &#147;logical&#148; operators. You&#146;re prevented from using <b>boolean</b>s in shift expressions, which are described next. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_548" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545255"></a><a name="_Toc24775579"></a><a name="Heading2120"></a>Shift
+operators</h3>
+<p><a name="Index233"></a><a name="Index234"></a>The shift operators also manipulate bits. They can be used solely with primitive, integral types. The left-shift operator (<b>&lt;&lt;</b>)<a name="Index235"></a><a name="Index236"></a> produces the operand to the left of the operator shifted to the left by the number of bits specified after the operator (inserting zeroes at the lower-order bits). The signed right-shift operator (<b>&gt;&gt;</b>)<a name="Index237"></a><a name="Index238"></a> produces the operand to the left of the operator shifted to the right by the number of bits specified after the operator. The signed right shift <b>&gt;&gt; </b>uses <i>sign extension</i><a name="Index239"></a><a name="Index240"></a>: if the value is positive, zeroes are inserted at the higher-order bits; if the value is negative, ones are inserted at the higher-order bits. Java has also added the unsigned right shift <b>&gt;&gt;&gt;, </b>which<b> </b>uses <i>zero extension</i><a name="Index241"></a><a name="Index242"></a>: regardless of the sign, zeroes are inserted at the higher-order bits.<i> </i>This operator does not exist in C or C++. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_549" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you shift a <b>char</b>, <b>byte,</b> or <b>short</b>, it will be promoted to <b>int</b> before the shift takes place, and the result will be an <b>int</b>. Only the five low-order bits of the right-hand side will be used. This prevents you from shifting more than the number of bits in an <b>int</b>. If you&#146;re operating on a <b>long</b>, you&#146;ll get a <b>long</b> result. Only the six low-order bits of the right-hand side will be used, so you can&#146;t shift more than the number of bits in a <b>long</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_550" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Shifts can be combined with the equal sign (<b>&lt;&lt;=</b> or <b>&gt;&gt;=</b> or <b>&gt;&gt;&gt;=</b>). The lvalue is replaced by the lvalue shifted by the rvalue. There is a problem, however, with the unsigned right shift combined with assignment. If you use it with <a name="Index243"></a><a name="Index244"></a><b>byte</b> or <b>short</b>, you don&#146;t get the correct results. Instead, these are promoted to <b>int</b> and right shifted, but then truncated as they are assigned back into their variables, so you get <b>-1</b> in those cases. The following example demonstrates this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_551" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:URShift.java</font>
+<font color=#009900>// Test of unsigned right shift.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> URShift {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>int</font> i = -1;
+    System.out.println(i &gt;&gt;&gt;= 10);
+    <font color=#0000ff>long</font> l = -1;
+    System.out.println(l &gt;&gt;&gt;= 10);
+    <font color=#0000ff>short</font> s = -1;
+    System.out.println(s &gt;&gt;&gt;= 10);
+    <font color=#0000ff>byte</font> b = -1;
+    System.out.println(b &gt;&gt;&gt;= 10);
+    b = -1;
+    System.out.println(b&gt;&gt;&gt;10);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"4194303"</font>,
+      <font color=#004488>"18014398509481983"</font>,
+      <font color=#004488>"-1"</font>,
+      <font color=#004488>"-1"</font>,
+      <font color=#004488>"4194303"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In the last shift, the resulting value is not assigned back into <b>b</b>, but is printed directly, so the correct behavior occurs. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_552" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Here&#146;s an example that demonstrates the use of all the operators involving bits:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:BitManipulation.java</font>
+<font color=#009900>// Using the bitwise operators.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> BitManipulation {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Random rand = <font color=#0000ff>new</font> Random();
+    <font color=#0000ff>int</font> i = rand.nextInt();
+    <font color=#0000ff>int</font> j = rand.nextInt();
+    printBinaryInt(<font color=#004488>"-1"</font>, -1);
+    printBinaryInt(<font color=#004488>"+1"</font>, +1);
+    <font color=#0000ff>int</font> maxpos = 2147483647;
+    printBinaryInt(<font color=#004488>"maxpos"</font>, maxpos);
+    <font color=#0000ff>int</font> maxneg = -2147483648;
+    printBinaryInt(<font color=#004488>"maxneg"</font>, maxneg);
+    printBinaryInt(<font color=#004488>"i"</font>, i);
+    printBinaryInt(<font color=#004488>"~i"</font>, ~i);
+    printBinaryInt(<font color=#004488>"-i"</font>, -i);
+    printBinaryInt(<font color=#004488>"j"</font>, j);
+    printBinaryInt(<font color=#004488>"i &amp; j"</font>, i &amp; j);
+    printBinaryInt(<font color=#004488>"i | j"</font>, i | j);
+    printBinaryInt(<font color=#004488>"i ^ j"</font>, i ^ j);
+    printBinaryInt(<font color=#004488>"i &lt;&lt; 5"</font>, i &lt;&lt; 5);
+    printBinaryInt(<font color=#004488>"i &gt;&gt; 5"</font>, i &gt;&gt; 5);
+    printBinaryInt(<font color=#004488>"(~i) &gt;&gt; 5"</font>, (~i) &gt;&gt; 5);
+    printBinaryInt(<font color=#004488>"i &gt;&gt;&gt; 5"</font>, i &gt;&gt;&gt; 5);
+    printBinaryInt(<font color=#004488>"(~i) &gt;&gt;&gt; 5"</font>, (~i) &gt;&gt;&gt; 5);
+
+    <font color=#0000ff>long</font> l = rand.nextLong();
+    <font color=#0000ff>long</font> m = rand.nextLong();
+    printBinaryLong(<font color=#004488>"-1L"</font>, -1L);
+    printBinaryLong(<font color=#004488>"+1L"</font>, +1L);
+    <font color=#0000ff>long</font> ll = 9223372036854775807L;
+    printBinaryLong(<font color=#004488>"maxpos"</font>, ll);
+    <font color=#0000ff>long</font> lln = -9223372036854775808L;
+    printBinaryLong(<font color=#004488>"maxneg"</font>, lln);
+    printBinaryLong(<font color=#004488>"l"</font>, l);
+    printBinaryLong(<font color=#004488>"~l"</font>, ~l);
+    printBinaryLong(<font color=#004488>"-l"</font>, -l);
+    printBinaryLong(<font color=#004488>"m"</font>, m);
+    printBinaryLong(<font color=#004488>"l &amp; m"</font>, l &amp; m);
+    printBinaryLong(<font color=#004488>"l | m"</font>, l | m);
+    printBinaryLong(<font color=#004488>"l ^ m"</font>, l ^ m);
+    printBinaryLong(<font color=#004488>"l &lt;&lt; 5"</font>, l &lt;&lt; 5);
+    printBinaryLong(<font color=#004488>"l &gt;&gt; 5"</font>, l &gt;&gt; 5);
+    printBinaryLong(<font color=#004488>"(~l) &gt;&gt; 5"</font>, (~l) &gt;&gt; 5);
+    printBinaryLong(<font color=#004488>"l &gt;&gt;&gt; 5"</font>, l &gt;&gt;&gt; 5);
+    printBinaryLong(<font color=#004488>"(~l) &gt;&gt;&gt; 5"</font>, (~l) &gt;&gt;&gt; 5);
+    monitor.expect(<font color=#004488>"BitManipulation.out"</font>);
+  }
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> printBinaryInt(String s, <font color=#0000ff>int</font> i) {
+    System.out.println(
+      s + <font color=#004488>", int: "</font> + i + <font color=#004488>", binary: "</font>);
+    System.out.print(<font color=#004488>"   "</font>);
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> j = 31; j &gt;= 0; j--)
+      <font color=#0000ff>if</font>(((1 &lt;&lt; j) &amp;  i) != 0)
+        System.out.print(<font color=#004488>"1"</font>);
+      <font color=#0000ff>else</font>
+        System.out.print(<font color=#004488>"0"</font>);
+    System.out.println();
+  }
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> printBinaryLong(String s, <font color=#0000ff>long</font> l) {
+    System.out.println(
+      s + <font color=#004488>", long: "</font> + l + <font color=#004488>", binary: "</font>);
+    System.out.print(<font color=#004488>"   "</font>);
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 63; i &gt;= 0; i--)
+      <font color=#0000ff>if</font>(((1L &lt;&lt; i) &amp; l) != 0)
+        System.out.print(<font color=#004488>"1"</font>);
+      <font color=#0000ff>else</font>
+        System.out.print(<font color=#004488>"0"</font>);
+    System.out.println();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><a name="Index245"></a>The two methods at the end, <b>printBinaryInt(&#160;)</b> and <b>printBinaryLong(&#160;)</b>, take an <b>int</b> or a <b>long</b>, respectively, and print it out in binary format along with a descriptive string. You can ignore the implementation of these for now. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_553" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You&#146;ll note the use of <b>System.out.print(&#160;)</b> instead of <b>System.out.println(&#160;)</b>. The <b>print(&#160;)</b> method does not emit a newline, so it allows you to output a line in pieces. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_554" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In this case, the <b>expect(&#160;)</b> statement takes a file name, from which it reads the expected lines (which may or may not include regular expressions). This is useful in situations where the output is too long or inappropriate to include in the book. The files ending with &#147;.out&#148; are part of the code distribution, available for download from <i>www.BruceEckel.com</i>, so you can open the file and look at it to see what the output should be (or simply run the program yourself). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0457" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As well as demonstrating the effect of all the bitwise operators for <b>int</b> and <b>long</b>, this example also shows the minimum, maximum, +1, and -1 values for <b>int</b> and <b>long</b> so you can see what they look like. Note that the high bit represents the sign: 0 means positive and 1 means negative. The output for the <b>int</b> portion looks like this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>-1, <font color=#0000ff>int</font>: -1, binary: 
+   11111111111111111111111111111111
++1, <font color=#0000ff>int</font>: 1, binary: 
+   00000000000000000000000000000001
+maxpos, <font color=#0000ff>int</font>: 2147483647, binary: 
+   01111111111111111111111111111111
+maxneg, <font color=#0000ff>int</font>: -2147483648, binary: 
+   10000000000000000000000000000000
+i, <font color=#0000ff>int</font>: 59081716, binary: 
+   00000011100001011000001111110100
+~i, <font color=#0000ff>int</font>: -59081717, binary: 
+   11111100011110100111110000001011
+-i, <font color=#0000ff>int</font>: -59081716, binary: 
+   11111100011110100111110000001100
+j, <font color=#0000ff>int</font>: 198850956, binary: 
+   00001011110110100011100110001100
+i &amp; j, <font color=#0000ff>int</font>: 58720644, binary: 
+   00000011100000000000000110000100
+i | j, <font color=#0000ff>int</font>: 199212028, binary: 
+   00001011110111111011101111111100
+i ^ j, <font color=#0000ff>int</font>: 140491384, binary: 
+   00001000010111111011101001111000
+i &lt;&lt; 5, <font color=#0000ff>int</font>: 1890614912, binary: 
+   01110000101100000111111010000000
+i &gt;&gt; 5, <font color=#0000ff>int</font>: 1846303, binary: 
+   00000000000111000010110000011111
+(~i) &gt;&gt; 5, <font color=#0000ff>int</font>: -1846304, binary: 
+   11111111111000111101001111100000
+i &gt;&gt;&gt; 5, <font color=#0000ff>int</font>: 1846303, binary: 
+   00000000000111000010110000011111
+(~i) &gt;&gt;&gt; 5, <font color=#0000ff>int</font>: 132371424, binary: 
+   00000111111000111101001111100000</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The binary representation of the numbers is referred to as <a name="Index246"></a><a name="Index247"></a><i>signed two&#146;s complement</i>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_555" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545256"></a><a name="_Toc24775580"></a><a name="Heading2267"></a>Ternary
+if-else operator</h3>
+<p><a name="Index248"></a><a name="Index249"></a><a name="Index250"></a>This operator is unusual because it has three operands. It is truly an operator because it produces a value, unlike the ordinary if-else statement that you&#146;ll see in the next section of this chapter. The expression is of the form: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_556" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>boolean</font>-exp ? value0 : value1</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>If <i>boolean-exp</i> evaluates to <b>true</b>, <i>value0</i> is evaluated, and its result becomes the value produced by the operator. If <i>boolean-exp</i> is <b>false</b>, <i>value1</i> is evaluated and its result becomes the value produced by the operator. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_557" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Of course, you could use an ordinary <b>if-else </b>statement (described later), but the ternary operator is much terser. Although C (where this operator originated) prides itself on being a terse language, and the ternary operator might have been introduced partly for efficiency, you should be somewhat wary of using it on an everyday basis&#151;it&#146;s easy to produce unreadable code. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_558" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The conditional operator can be used for its side effects or for the value it produces, but in general you want the value, since that&#146;s what makes the operator distinct from the <b>if-else</b>. Here&#146;s an example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_559" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>static</font> <font color=#0000ff>int</font> ternary(<font color=#0000ff>int</font> i) {
+  <font color=#0000ff>return</font> i &lt; 10 ? i * 100 : i * 10;
+} </PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that this code is more compact than what you&#146;d need to write without the ternary operator: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_560" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>static</font> <font color=#0000ff>int</font> alternative(<font color=#0000ff>int</font> i) {
+  <font color=#0000ff>if</font> (i &lt; 10)
+    <font color=#0000ff>return</font> i * 100;
+  <font color=#0000ff>else</font>
+    <font color=#0000ff>return</font> i * 10;
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The second form is easier to understand, and doesn&#146;t require a lot more typing. So be sure to ponder your reasons when choosing the ternary operator&#151;it&#146;s generally warranted when you&#146;re setting a variable to one of two values. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_561" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545257"></a><a name="_Toc24775581"></a><a name="Heading2287"></a>The
+comma operator<br></h3>
+<p><a name="Index252"></a><a name="Index253"></a>The comma is used in C and C++ not only as a separator in function argument lists, but also as an operator for sequential evaluation. The sole place that the comma <i>operator</i> is used in Java is in <b>for</b> loops, which will be described later in this chapter. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_562" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545258"></a><a name="_Toc24775582"></a><a name="Heading2289"></a><b>String</b>
+operator +<br></h3>
+<p><a name="Index254"></a>There&#146;s one special usage of an operator in Java: the <b>+</b> operator can be used to <a name="Index255"></a>concatenate strings, as you&#146;ve already seen. It seems a natural use of the <b>+</b> even though it doesn&#146;t fit with the traditional way that <b>+</b> is used. This capability seemed like a good idea in C++, so <a name="Index256"></a><a name="Index257"></a><i>operator overloading</i> was added to C++ to allow the C++ programmer to add meanings to almost any operator. Unfortunately, operator overloading combined with some of the other restrictions in C++ turns out to be a fairly complicated feature for programmers to design into their classes. Although operator overloading would have been much simpler to implement in Java than it was in C++, this feature was still considered too complex, so Java programmers cannot implement their own overloaded operators like C++ programmers can. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_563" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The use of the <b>String +</b> has some interesting behavior. If an expression begins with a <b>String</b>, then all operands that follow must be <b>String</b>s (remember that the compiler will turn a quoted sequence of characters into a <b>String</b>): <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_564" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>int</font> x = 0, y = 1, z = 2;
+String sString = <font color=#004488>"x, y, z "</font>;
+System.out.println(sString + x + y + z);</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Here, the Java compiler will convert <b>x</b>, <b>y</b>, and <b>z</b> into their <b>String</b> representations instead of adding them together first. And if you say:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>System.out.println(x + sString);</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Java will turn <b>x </b>into a <b>String</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_565" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545259"></a><a name="_Toc24775583"></a><a name="Heading2300"></a>Common
+pitfalls when using operators</h3>
+<p><a name="Index258"></a><a name="Index259"></a>One of the pitfalls when using operators is attempting to leave out the parentheses when you are even the least bit uncertain about how an expression will evaluate. This is still true in Java. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_566" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>An extremely common error in C and C++ looks like this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>while</font>(x = y) {
+  <font color=#009900>// ....</font>
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The programmer was clearly trying to test for equivalence (<b>==</b>) rather than do an assignment. In C and C++ the result of this assignment will always be <b>true</b> if <b>y </b>is nonzero, and you&#146;ll probably get an infinite loop. In Java, the result of this expression is not a <b>boolean,</b> but the compiler expects a <b>boolean</b> and won&#146;t convert from an <b>int</b>, so it will conveniently give you a compile-time error and catch the problem before you ever try to run the program. So the pitfall never happens in Java. (The only time you won&#146;t get a compile-time error is when <a name="Index260"></a><b>x</b> and <b>y</b> are <b>boolean</b>, in which case <b>x = y</b> is a legal expression, and in the preceding example, probably an error.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_567" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A similar problem in C and C++ is using bitwise AND and OR instead of the logical versions. Bitwise AND and OR use one of the characters (<b>&amp;</b> or <b>|</b>) while logical AND and OR use two (<b>&amp;&amp;</b> and <b>||</b>). Just as with <b>=</b> and <b>==</b>, it&#146;s easy to type just one character instead of two. In Java, the compiler again prevents this, because it won&#146;t let you cavalierly use one type where it doesn&#146;t belong. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_568" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="Index261"></a><a name="Index262"></a><a name="Index263"></a><a name="Index264"></a><a name="Index265"></a><a name="Index266"></a><a name="_Toc375545260"></a><a name="_Toc24775584"></a><a name="Heading2309"></a>Casting
+operators</h3>
+<p><a name="Index267"></a><a name="Index268"></a>The word <i>cast</i> is used in the sense of &#147;casting into a mold.&#148; Java will automatically change one type of data into another when appropriate. For instance, if you assign an integral value to a floating-point variable, the compiler will automatically convert the <b>int</b> to a <b>float</b>. Casting allows you to make this type conversion explicit, or to force it when it wouldn&#146;t normally happen. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_569" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To perform a cast, put the desired data type (including all modifiers) inside parentheses to the left of any value. Here&#146;s an example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>void</font> casts() {
+  <font color=#0000ff>int</font> i = 200;
+  <font color=#0000ff>long</font> l = (<font color=#0000ff>long</font>)i;
+  <font color=#0000ff>long</font> l2 = (<font color=#0000ff>long</font>)200;
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>As you can see, it&#146;s possible to perform a cast on a numeric value as well as on a variable. In both casts shown here, however, the cast is superfluous, since the compiler will automatically promote an <b>int</b> value to a <b>long</b> when necessary. However, you are allowed to use superfluous casts to make a point or to make your code more clear. In other situations, a cast may be essential just to get the code to compile. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_570" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In C and C++, casting can cause some headaches. In Java, casting is safe, with the exception that when you perform a so-called <a name="Index269"></a><a name="Index270"></a><i>narrowing conversion</i> (that is, when you go from a data type that can hold more information to one that doesn&#146;t hold as much), you run the risk of losing information.<i> </i>Here the compiler forces you to do a cast, in effect saying &#147;this can be a dangerous thing to do&#151;if you want me to do it anyway you must make the cast explicit.&#148; With a <a name="Index271"></a><a name="Index272"></a><i>widening conversion</i> an explicit cast is not needed, because the new type will more than hold the information from the old type so that no information is ever lost. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_571" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Java allows you to cast any primitive type to any other primitive type, except for <a name="Index273"></a><b>boolean,</b> which doesn&#146;t allow any casting at all. Class types do not allow casting. To convert one to the other, there must be special methods. (<b>String</b> is a special case, and you&#146;ll find out later in this book that objects can be cast within a <i>family</i> of types; an <b>Oak</b> can be cast to a <b>Tree</b> and vice-versa, but not to a foreign type such as a <b>Rock</b>.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_572" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading2321"></a>Literals<br></h4>
+<p><a name="Index274"></a>Ordinarily, when you insert a literal value into a program, the compiler knows exactly what type to make it. Sometimes, however, the type is ambiguous. When this happens, you must guide the compiler by adding some extra information in the form of characters associated with the literal value. The following code shows these characters: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_573" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:Literals.java</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Literals {
+  <font color=#0000ff>char</font> c = 0xffff; <font color=#009900>// max char hex value</font>
+  <font color=#0000ff>byte</font> b = 0x7f; <font color=#009900>// max byte hex value</font>
+  <font color=#0000ff>short</font> s = 0x7fff; <font color=#009900>// max short hex value</font>
+  <font color=#0000ff>int</font> i1 = 0x2f; <font color=#009900>// Hexadecimal (lowercase)</font>
+  <font color=#0000ff>int</font> i2 = 0X2F; <font color=#009900>// Hexadecimal (uppercase)</font>
+  <font color=#0000ff>int</font> i3 = 0177; <font color=#009900>// Octal (leading zero)</font>
+  <font color=#009900>// Hex and Oct also work with long.</font>
+  <font color=#0000ff>long</font> n1 = 200L; <font color=#009900>// long suffix</font>
+  <font color=#0000ff>long</font> n2 = 200l; <font color=#009900>// long suffix (but can be confusing)</font>
+  <font color=#0000ff>long</font> n3 = 200;
+  <font color=#009900>//! long l6(200); // not allowed</font>
+  <font color=#0000ff>float</font> f1 = 1;
+  <font color=#0000ff>float</font> f2 = 1F; <font color=#009900>// float suffix</font>
+  <font color=#0000ff>float</font> f3 = 1f; <font color=#009900>// float suffix</font>
+  <font color=#0000ff>float</font> f4 = 1e-45f; <font color=#009900>// 10 to the power</font>
+  <font color=#0000ff>float</font> f5 = 1e+9f; <font color=#009900>// float suffix</font>
+  <font color=#0000ff>double</font> d1 = 1d; <font color=#009900>// double suffix</font>
+  <font color=#0000ff>double</font> d2 = 1D; <font color=#009900>// double suffix</font>
+  <font color=#0000ff>double</font> d3 = 47e47d; <font color=#009900>// 10 to the power</font>
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><a name="Index275"></a>Hexadecimal (base 16), which works with all the integral data types, is denoted by a leading <a name="Index276"></a><b>0x</b> or <b>0X</b> followed by <b>0-9</b> or <b>a-f</b> either in uppercase or lowercase. If you try to initialize a variable with a value bigger than it can hold (regardless of the numerical form of the value), the compiler will give you an error message. Notice in the preceding code the maximum possible hexadecimal values for <b>char</b>, <b>byte,</b> and <b>short</b>. If you exceed these, the compiler will automatically make the value an <b>int</b> and tell you that you need a narrowing cast for the assignment. You&#146;ll know you&#146;ve stepped over the line. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_574" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index277"></a>Octal (base 8) is denoted by a leading zero in the number and digits from 0-7. There is no literal representation for binary numbers in C, C++, or Java. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_575" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index278"></a><a name="Index279"></a><a name="Index280"></a>A trailing character after a literal value establishes its type. Uppercase or lowercase <b>L </b>means <b>long</b><a name="Index281"></a><a name="Index282"></a>, upper or lowercase <b>F</b> means <b>float</b><a name="Index283"></a><a name="Index284"></a> and uppercase or lowercase <b>D</b> means <b>double</b><a name="Index285"></a><a name="Index286"></a>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_576" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index287"></a>Exponents use a notation that I&#146;ve always found rather dismaying: <b>1.39 e-47f</b>. In science and engineering, &#145;e&#146; refers to the base of <a name="Index288"></a><a name="Index289"></a>natural logarithms, approximately 2.718. (A more precise <b>double </b>value is available in Java as <b>Math.E</b>.) This is used in exponentiation expressions such as 1.39 x e<sup>-47</sup>, which means 1.39 x 2.718<sup>-47</sup>. However, when <a name="Index290"></a>FORTRAN was invented, they decided that <b>e</b> would naturally mean &#147;ten to the power,&#148; which is an odd decision because FORTRAN was designed for science and engineering, and one would think its designers would be sensitive about introducing such an ambiguity.<sup><a name="fnB17" href="#fn17">[17]</a></sup> At any rate, this custom was followed in C, C++ and now Java. So if you&#146;re used to thinking in terms of <b>e</b> as the base of natural logarithms, you must do a mental translation when you see an expression such as <b>1.39 e-47f</b> in Java; it means 1.39 x 10<sup>-47</sup>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_577" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Note that you don&#146;t need to use the trailing character when the compiler can figure out the appropriate type. With <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_578" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>long</font> n3 = 200;</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>there&#146;s no ambiguity, so an <b>L</b> after the 200 would be superfluous. However, with <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_579" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>float</font> f4 = 1e-47f; <font color=#009900>// 10 to the power</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>the compiler normally takes exponential numbers as doubles, so without the trailing <b>f</b>, it will give you an error telling you that you must use a cast to convert <b>double</b> to <b>float</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_580" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading2359"></a>Promotion</h4>
+<p>You&#146;ll discover that if you perform any mathematical or bitwise operations on primitive data types that are smaller than an <b>int</b> (that is, <b>char</b>, <b>byte,</b> or <b>short</b>), those values will be promoted to <a name="Index291"></a><b>int</b> before performing the operations, and the resulting value will be of type <b>int</b>. So if you want to assign back into the smaller type, you must use a cast. (And, since you&#146;re assigning back into a smaller type, you might be losing information.) In general, the largest data type in an expression is the one that determines the size of the result of that expression; if you multiply a <b>float</b> and a <b>double</b>, the result will be <b>double</b>; if you add an <b>int</b> and a <b>long</b>, the result will be <b>long</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_581" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545261"></a><a name="_Toc24775585"></a><a name="Heading2361"></a>Java
+has no &#147;sizeof&#148; </h3>
+<p>In C and C++, the <a name="Index292"></a><b>sizeof(&#160;)</b> operator satisfies a specific need: it tells you the number of bytes allocated for data items. The most compelling need for <b>sizeof(&#160;)</b> in C and C++ is portability. Different data types might be different sizes on different machines, so the programmer must find out how big those types are when performing operations that are sensitive to size. For example, one computer might store integers in 32 bits, whereas another might store integers as 16 bits. Programs could store larger values in integers on the first machine. As you might imagine, portability is a huge headache for C and C++ programmers. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_582" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index293"></a>Java does not need a <b>sizeof(&#160;)</b> operator for this purpose, because all the data types are the same size on all machines. You do not need to think about portability on this level&#151;it is designed into the language. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_583" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545262"></a><a name="_Toc24775586"></a><a name="Heading2364"></a>Precedence
+revisited</h3>
+<p>Upon hearing me complain about the complexity of remembering operator precedence during one of my seminars, a student suggested a mnemonic that is simultaneously a commentary: &#147;Ulcer Addicts Really Like C A lot.&#148;<br></p>
+<div align="center" style="position:relative; left: 0"><table border="1">
+<tr valign="top">
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table"><a name="Index294"></a><a name="Index295"></a><b>Mnemonic</b><br></p>
+</td>
+<td width="170.666624" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Operator type</b><br></p>
+</td>
+<td width="173.333290" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>Operators</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table">Ulcer<br></p>
+</td>
+<td width="170.666624" colspan="1" rowspan="1" valign="top">
+<p class="Table">Unary<br></p>
+</td>
+<td width="173.333290" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>+ - ++--</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table">Addicts<br></p>
+</td>
+<td width="170.666624" colspan="1" rowspan="1" valign="top">
+<p class="Table">Arithmetic (and shift)<br></p>
+</td>
+<td width="173.333290" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>* / % + -  &lt;&lt; &gt;&gt;</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table">Really<br></p>
+</td>
+<td width="170.666624" colspan="1" rowspan="1" valign="top">
+<p class="Table">Relational<br></p>
+</td>
+<td width="173.333290" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>&gt; &lt; &gt;= &lt;= == !=</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table">Like<br></p>
+</td>
+<td width="170.666624" colspan="1" rowspan="1" valign="top">
+<p class="Table">Logical (and bitwise)<br></p>
+</td>
+<td width="173.333290" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>&amp;&amp; ||  &amp;  |  ^ </b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table">C<br></p>
+</td>
+<td width="170.666624" colspan="1" rowspan="1" valign="top">
+<p class="Table">Conditional (ternary)<br></p>
+</td>
+<td width="173.333290" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>A &gt; B ? X : Y</b><br></p>
+</td>
+</tr>
+<tr valign="top">
+<td width="103.999974" colspan="1" rowspan="1" valign="top">
+<p class="Table">A Lot<br></p>
+</td>
+<td width="170.666624" colspan="1" rowspan="1" valign="top">
+<p class="Table">Assignment<br></p>
+</td>
+<td width="173.333290" colspan="1" rowspan="1" valign="top">
+<p class="Table"><b>= </b>(and compound assignment like<b> *=</b>)<br></p>
+</td>
+</tr>
+</table></div>
+<p class="TableFollower">Of course, with the shift and bitwise operators distributed around the table it is not a perfect mnemonic, but for non-bit operations it works.<br></p>
+<h3>
+<a name="_Toc375545263"></a><a name="_Toc24775587"></a><a name="Heading2388"></a>A
+compendium of operators</h3>
+<p>The following example shows which primitive data types can be used with particular operators. Basically, it is the same example repeated over and over, but using different primitive data types. The file will compile without error because the lines that would cause errors are commented out with a <a name="Index296"></a><a name="Index297"></a><a name="Index298"></a><b>//!</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_584" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:AllOps.java</font>
+<font color=#009900>// Tests all the operators on all the primitive data types</font>
+<font color=#009900>// to show which ones are accepted by the Java compiler.</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> AllOps {
+  <font color=#009900>// To accept the results of a boolean test:</font>
+  <font color=#0000ff>void</font> f(<font color=#0000ff>boolean</font> b) {}
+  <font color=#0000ff>void</font> boolTest(<font color=#0000ff>boolean</font> x, <font color=#0000ff>boolean</font> y) {
+    <font color=#009900>// Arithmetic operators:</font>
+    <font color=#009900>//! x = x * y;</font>
+    <font color=#009900>//! x = x / y;</font>
+    <font color=#009900>//! x = x % y;</font>
+    <font color=#009900>//! x = x + y;</font>
+    <font color=#009900>//! x = x - y;</font>
+    <font color=#009900>//! x++;</font>
+    <font color=#009900>//! x--;</font>
+    <font color=#009900>//! x = +y;</font>
+    <font color=#009900>//! x = -y;</font>
+    <font color=#009900>// Relational and logical:</font>
+    <font color=#009900>//! f(x &gt; y);</font>
+    <font color=#009900>//! f(x &gt;= y);</font>
+    <font color=#009900>//! f(x &lt; y);</font>
+    <font color=#009900>//! f(x &lt;= y);</font>
+    f(x == y);
+    f(x != y);
+    f(!y);
+    x = x &amp;&amp; y;
+    x = x || y;
+    <font color=#009900>// Bitwise operators:</font>
+    <font color=#009900>//! x = ~y;</font>
+    x = x &amp; y;
+    x = x | y;
+    x = x ^ y;
+    <font color=#009900>//! x = x &lt;&lt; 1;</font>
+    <font color=#009900>//! x = x &gt;&gt; 1;</font>
+    <font color=#009900>//! x = x &gt;&gt;&gt; 1;</font>
+    <font color=#009900>// Compound assignment:</font>
+    <font color=#009900>//! x += y;</font>
+    <font color=#009900>//! x -= y;</font>
+    <font color=#009900>//! x *= y;</font>
+    <font color=#009900>//! x /= y;</font>
+    <font color=#009900>//! x %= y;</font>
+    <font color=#009900>//! x &lt;&lt;= 1;</font>
+    <font color=#009900>//! x &gt;&gt;= 1;</font>
+    <font color=#009900>//! x &gt;&gt;&gt;= 1;</font>
+    x &amp;= y;
+    x ^= y;
+    x |= y;
+    <font color=#009900>// Casting:</font>
+    <font color=#009900>//! char c = (char)x;</font>
+    <font color=#009900>//! byte B = (byte)x;</font>
+    <font color=#009900>//! short s = (short)x;</font>
+    <font color=#009900>//! int i = (int)x;</font>
+    <font color=#009900>//! long l = (long)x;</font>
+    <font color=#009900>//! float f = (float)x;</font>
+    <font color=#009900>//! double d = (double)x;</font>
+  }
+  <font color=#0000ff>void</font> charTest(<font color=#0000ff>char</font> x, <font color=#0000ff>char</font> y) {
+    <font color=#009900>// Arithmetic operators:</font>
+    x = (<font color=#0000ff>char</font>)(x * y);
+    x = (<font color=#0000ff>char</font>)(x / y);
+    x = (<font color=#0000ff>char</font>)(x % y);
+    x = (<font color=#0000ff>char</font>)(x + y);
+    x = (<font color=#0000ff>char</font>)(x - y);
+    x++;
+    x--;
+    x = (<font color=#0000ff>char</font>)+y;
+    x = (<font color=#0000ff>char</font>)-y;
+    <font color=#009900>// Relational and logical:</font>
+    f(x &gt; y);
+    f(x &gt;= y);
+    f(x &lt; y);
+    f(x &lt;= y);
+    f(x == y);
+    f(x != y);
+    <font color=#009900>//! f(!x);</font>
+    <font color=#009900>//! f(x &amp;&amp; y);</font>
+    <font color=#009900>//! f(x || y);</font>
+    <font color=#009900>// Bitwise operators:</font>
+    x= (<font color=#0000ff>char</font>)~y;
+    x = (<font color=#0000ff>char</font>)(x &amp; y);
+    x  = (<font color=#0000ff>char</font>)(x | y);
+    x = (<font color=#0000ff>char</font>)(x ^ y);
+    x = (<font color=#0000ff>char</font>)(x &lt;&lt; 1);
+    x = (<font color=#0000ff>char</font>)(x &gt;&gt; 1);
+    x = (<font color=#0000ff>char</font>)(x &gt;&gt;&gt; 1);
+    <font color=#009900>// Compound assignment:</font>
+    x += y;
+    x -= y;
+    x *= y;
+    x /= y;
+    x %= y;
+    x &lt;&lt;= 1;
+    x &gt;&gt;= 1;
+    x &gt;&gt;&gt;= 1;
+    x &amp;= y;
+    x ^= y;
+    x |= y;
+    <font color=#009900>// Casting:</font>
+    <font color=#009900>//! boolean b = (boolean)x;</font>
+    <font color=#0000ff>byte</font> B = (<font color=#0000ff>byte</font>)x;
+    <font color=#0000ff>short</font> s = (<font color=#0000ff>short</font>)x;
+    <font color=#0000ff>int</font> i = (<font color=#0000ff>int</font>)x;
+    <font color=#0000ff>long</font> l = (<font color=#0000ff>long</font>)x;
+    <font color=#0000ff>float</font> f = (<font color=#0000ff>float</font>)x;
+    <font color=#0000ff>double</font> d = (<font color=#0000ff>double</font>)x;
+  }
+  <font color=#0000ff>void</font> byteTest(<font color=#0000ff>byte</font> x, <font color=#0000ff>byte</font> y) {
+    <font color=#009900>// Arithmetic operators:</font>
+    x = (<font color=#0000ff>byte</font>)(x* y);
+    x = (<font color=#0000ff>byte</font>)(x / y);
+    x = (<font color=#0000ff>byte</font>)(x % y);
+    x = (<font color=#0000ff>byte</font>)(x + y);
+    x = (<font color=#0000ff>byte</font>)(x - y);
+    x++;
+    x--;
+    x = (<font color=#0000ff>byte</font>)+ y;
+    x = (<font color=#0000ff>byte</font>)- y;
+    <font color=#009900>// Relational and logical:</font>
+    f(x &gt; y);
+    f(x &gt;= y);
+    f(x &lt; y);
+    f(x &lt;= y);
+    f(x == y);
+    f(x != y);
+    <font color=#009900>//! f(!x);</font>
+    <font color=#009900>//! f(x &amp;&amp; y);</font>
+    <font color=#009900>//! f(x || y);</font>
+    <font color=#009900>// Bitwise operators:</font>
+    x = (<font color=#0000ff>byte</font>)~y;
+    x = (<font color=#0000ff>byte</font>)(x &amp; y);
+    x = (<font color=#0000ff>byte</font>)(x | y);
+    x = (<font color=#0000ff>byte</font>)(x ^ y);
+    x = (<font color=#0000ff>byte</font>)(x &lt;&lt; 1);
+    x = (<font color=#0000ff>byte</font>)(x &gt;&gt; 1);
+    x = (<font color=#0000ff>byte</font>)(x &gt;&gt;&gt; 1);
+    <font color=#009900>// Compound assignment:</font>
+    x += y;
+    x -= y;
+    x *= y;
+    x /= y;
+    x %= y;
+    x &lt;&lt;= 1;
+    x &gt;&gt;= 1;
+    x &gt;&gt;&gt;= 1;
+    x &amp;= y;
+    x ^= y;
+    x |= y;
+    <font color=#009900>// Casting:</font>
+    <font color=#009900>//! boolean b = (boolean)x;</font>
+    <font color=#0000ff>char</font> c = (<font color=#0000ff>char</font>)x;
+    <font color=#0000ff>short</font> s = (<font color=#0000ff>short</font>)x;
+    <font color=#0000ff>int</font> i = (<font color=#0000ff>int</font>)x;
+    <font color=#0000ff>long</font> l = (<font color=#0000ff>long</font>)x;
+    <font color=#0000ff>float</font> f = (<font color=#0000ff>float</font>)x;
+    <font color=#0000ff>double</font> d = (<font color=#0000ff>double</font>)x;
+  }
+  <font color=#0000ff>void</font> shortTest(<font color=#0000ff>short</font> x, <font color=#0000ff>short</font> y) {
+    <font color=#009900>// Arithmetic operators:</font>
+    x = (<font color=#0000ff>short</font>)(x * y);
+    x = (<font color=#0000ff>short</font>)(x / y);
+    x = (<font color=#0000ff>short</font>)(x % y);
+    x = (<font color=#0000ff>short</font>)(x + y);
+    x = (<font color=#0000ff>short</font>)(x - y);
+    x++;
+    x--;
+    x = (<font color=#0000ff>short</font>)+y;
+    x = (<font color=#0000ff>short</font>)-y;
+    <font color=#009900>// Relational and logical:</font>
+    f(x &gt; y);
+    f(x &gt;= y);
+    f(x &lt; y);
+    f(x &lt;= y);
+    f(x == y);
+    f(x != y);
+    <font color=#009900>//! f(!x);</font>
+    <font color=#009900>//! f(x &amp;&amp; y);</font>
+    <font color=#009900>//! f(x || y);</font>
+    <font color=#009900>// Bitwise operators:</font>
+    x = (<font color=#0000ff>short</font>)~y;
+    x = (<font color=#0000ff>short</font>)(x &amp; y);
+    x = (<font color=#0000ff>short</font>)(x | y);
+    x = (<font color=#0000ff>short</font>)(x ^ y);
+    x = (<font color=#0000ff>short</font>)(x &lt;&lt; 1);
+    x = (<font color=#0000ff>short</font>)(x &gt;&gt; 1);
+    x = (<font color=#0000ff>short</font>)(x &gt;&gt;&gt; 1);
+    <font color=#009900>// Compound assignment:</font>
+    x += y;
+    x -= y;
+    x *= y;
+    x /= y;
+    x %= y;
+    x &lt;&lt;= 1;
+    x &gt;&gt;= 1;
+    x &gt;&gt;&gt;= 1;
+    x &amp;= y;
+    x ^= y;
+    x |= y;
+    <font color=#009900>// Casting:</font>
+    <font color=#009900>//! boolean b = (boolean)x;</font>
+    <font color=#0000ff>char</font> c = (<font color=#0000ff>char</font>)x;
+    <font color=#0000ff>byte</font> B = (<font color=#0000ff>byte</font>)x;
+    <font color=#0000ff>int</font> i = (<font color=#0000ff>int</font>)x;
+    <font color=#0000ff>long</font> l = (<font color=#0000ff>long</font>)x;
+    <font color=#0000ff>float</font> f = (<font color=#0000ff>float</font>)x;
+    <font color=#0000ff>double</font> d = (<font color=#0000ff>double</font>)x;
+  }
+  <font color=#0000ff>void</font> intTest(<font color=#0000ff>int</font> x, <font color=#0000ff>int</font> y) {
+    <font color=#009900>// Arithmetic operators:</font>
+    x = x * y;
+    x = x / y;
+    x = x % y;
+    x = x + y;
+    x = x - y;
+    x++;
+    x--;
+    x = +y;
+    x = -y;
+    <font color=#009900>// Relational and logical:</font>
+    f(x &gt; y);
+    f(x &gt;= y);
+    f(x &lt; y);
+    f(x &lt;= y);
+    f(x == y);
+    f(x != y);
+    <font color=#009900>//! f(!x);</font>
+    <font color=#009900>//! f(x &amp;&amp; y);</font>
+    <font color=#009900>//! f(x || y);</font>
+    <font color=#009900>// Bitwise operators:</font>
+    x = ~y;
+    x = x &amp; y;
+    x = x | y;
+    x = x ^ y;
+    x = x &lt;&lt; 1;
+    x = x &gt;&gt; 1;
+    x = x &gt;&gt;&gt; 1;
+    <font color=#009900>// Compound assignment:</font>
+    x += y;
+    x -= y;
+    x *= y;
+    x /= y;
+    x %= y;
+    x &lt;&lt;= 1;
+    x &gt;&gt;= 1;
+    x &gt;&gt;&gt;= 1;
+    x &amp;= y;
+    x ^= y;
+    x |= y;
+    <font color=#009900>// Casting:</font>
+    <font color=#009900>//! boolean b = (boolean)x;</font>
+    <font color=#0000ff>char</font> c = (<font color=#0000ff>char</font>)x;
+    <font color=#0000ff>byte</font> B = (<font color=#0000ff>byte</font>)x;
+    <font color=#0000ff>short</font> s = (<font color=#0000ff>short</font>)x;
+    <font color=#0000ff>long</font> l = (<font color=#0000ff>long</font>)x;
+    <font color=#0000ff>float</font> f = (<font color=#0000ff>float</font>)x;
+    <font color=#0000ff>double</font> d = (<font color=#0000ff>double</font>)x;
+  }
+  <font color=#0000ff>void</font> longTest(<font color=#0000ff>long</font> x, <font color=#0000ff>long</font> y) {
+    <font color=#009900>// Arithmetic operators:</font>
+    x = x * y;
+    x = x / y;
+    x = x % y;
+    x = x + y;
+    x = x - y;
+    x++;
+    x--;
+    x = +y;
+    x = -y;
+    <font color=#009900>// Relational and logical:</font>
+    f(x &gt; y);
+    f(x &gt;= y);
+    f(x &lt; y);
+    f(x &lt;= y);
+    f(x == y);
+    f(x != y);
+    <font color=#009900>//! f(!x);</font>
+    <font color=#009900>//! f(x &amp;&amp; y);</font>
+    <font color=#009900>//! f(x || y);</font>
+    <font color=#009900>// Bitwise operators:</font>
+    x = ~y;
+    x = x &amp; y;
+    x = x | y;
+    x = x ^ y;
+    x = x &lt;&lt; 1;
+    x = x &gt;&gt; 1;
+    x = x &gt;&gt;&gt; 1;
+    <font color=#009900>// Compound assignment:</font>
+    x += y;
+    x -= y;
+    x *= y;
+    x /= y;
+    x %= y;
+    x &lt;&lt;= 1;
+    x &gt;&gt;= 1;
+    x &gt;&gt;&gt;= 1;
+    x &amp;= y;
+    x ^= y;
+    x |= y;
+    <font color=#009900>// Casting:</font>
+    <font color=#009900>//! boolean b = (boolean)x;</font>
+    <font color=#0000ff>char</font> c = (<font color=#0000ff>char</font>)x;
+    <font color=#0000ff>byte</font> B = (<font color=#0000ff>byte</font>)x;
+    <font color=#0000ff>short</font> s = (<font color=#0000ff>short</font>)x;
+    <font color=#0000ff>int</font> i = (<font color=#0000ff>int</font>)x;
+    <font color=#0000ff>float</font> f = (<font color=#0000ff>float</font>)x;
+    <font color=#0000ff>double</font> d = (<font color=#0000ff>double</font>)x;
+  }
+  <font color=#0000ff>void</font> floatTest(<font color=#0000ff>float</font> x, <font color=#0000ff>float</font> y) {
+    <font color=#009900>// Arithmetic operators:</font>
+    x = x * y;
+    x = x / y;
+    x = x % y;
+    x = x + y;
+    x = x - y;
+    x++;
+    x--;
+    x = +y;
+    x = -y;
+    <font color=#009900>// Relational and logical:</font>
+    f(x &gt; y);
+    f(x &gt;= y);
+    f(x &lt; y);
+    f(x &lt;= y);
+    f(x == y);
+    f(x != y);
+    <font color=#009900>//! f(!x);</font>
+    <font color=#009900>//! f(x &amp;&amp; y);</font>
+    <font color=#009900>//! f(x || y);</font>
+    <font color=#009900>// Bitwise operators:</font>
+    <font color=#009900>//! x = ~y;</font>
+    <font color=#009900>//! x = x &amp; y;</font>
+    <font color=#009900>//! x = x | y;</font>
+    <font color=#009900>//! x = x ^ y;</font>
+    <font color=#009900>//! x = x &lt;&lt; 1;</font>
+    <font color=#009900>//! x = x &gt;&gt; 1;</font>
+    <font color=#009900>//! x = x &gt;&gt;&gt; 1;</font>
+    <font color=#009900>// Compound assignment:</font>
+    x += y;
+    x -= y;
+    x *= y;
+    x /= y;
+    x %= y;
+    <font color=#009900>//! x &lt;&lt;= 1;</font>
+    <font color=#009900>//! x &gt;&gt;= 1;</font>
+    <font color=#009900>//! x &gt;&gt;&gt;= 1;</font>
+    <font color=#009900>//! x &amp;= y;</font>
+    <font color=#009900>//! x ^= y;</font>
+    <font color=#009900>//! x |= y;</font>
+    <font color=#009900>// Casting:</font>
+    <font color=#009900>//! boolean b = (boolean)x;</font>
+    <font color=#0000ff>char</font> c = (<font color=#0000ff>char</font>)x;
+    <font color=#0000ff>byte</font> B = (<font color=#0000ff>byte</font>)x;
+    <font color=#0000ff>short</font> s = (<font color=#0000ff>short</font>)x;
+    <font color=#0000ff>int</font> i = (<font color=#0000ff>int</font>)x;
+    <font color=#0000ff>long</font> l = (<font color=#0000ff>long</font>)x;
+    <font color=#0000ff>double</font> d = (<font color=#0000ff>double</font>)x;
+  }
+  <font color=#0000ff>void</font> doubleTest(<font color=#0000ff>double</font> x, <font color=#0000ff>double</font> y) {
+    <font color=#009900>// Arithmetic operators:</font>
+    x = x * y;
+    x = x / y;
+    x = x % y;
+    x = x + y;
+    x = x - y;
+    x++;
+    x--;
+    x = +y;
+    x = -y;
+    <font color=#009900>// Relational and logical:</font>
+    f(x &gt; y);
+    f(x &gt;= y);
+    f(x &lt; y);
+    f(x &lt;= y);
+    f(x == y);
+    f(x != y);
+    <font color=#009900>//! f(!x);</font>
+    <font color=#009900>//! f(x &amp;&amp; y);</font>
+    <font color=#009900>//! f(x || y);</font>
+    <font color=#009900>// Bitwise operators:</font>
+    <font color=#009900>//! x = ~y;</font>
+    <font color=#009900>//! x = x &amp; y;</font>
+    <font color=#009900>//! x = x | y;</font>
+    <font color=#009900>//! x = x ^ y;</font>
+    <font color=#009900>//! x = x &lt;&lt; 1;</font>
+    <font color=#009900>//! x = x &gt;&gt; 1;</font>
+    <font color=#009900>//! x = x &gt;&gt;&gt; 1;</font>
+    <font color=#009900>// Compound assignment:</font>
+    x += y;
+    x -= y;
+    x *= y;
+    x /= y;
+    x %= y;
+    <font color=#009900>//! x &lt;&lt;= 1;</font>
+    <font color=#009900>//! x &gt;&gt;= 1;</font>
+    <font color=#009900>//! x &gt;&gt;&gt;= 1;</font>
+    <font color=#009900>//! x &amp;= y;</font>
+    <font color=#009900>//! x ^= y;</font>
+    <font color=#009900>//! x |= y;</font>
+    <font color=#009900>// Casting:</font>
+    <font color=#009900>//! boolean b = (boolean)x;</font>
+    <font color=#0000ff>char</font> c = (<font color=#0000ff>char</font>)x;
+    <font color=#0000ff>byte</font> B = (<font color=#0000ff>byte</font>)x;
+    <font color=#0000ff>short</font> s = (<font color=#0000ff>short</font>)x;
+    <font color=#0000ff>int</font> i = (<font color=#0000ff>int</font>)x;
+    <font color=#0000ff>long</font> l = (<font color=#0000ff>long</font>)x;
+    <font color=#0000ff>float</font> f = (<font color=#0000ff>float</font>)x;
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Note that <a name="Index299"></a><b>boolean</b> is quite limited. You can assign to it the values <b>true</b> and <b>false</b>, and you can test it for truth or falsehood, but you cannot add booleans or perform any other type of operation on them. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_585" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In <b>char</b>, <b>byte</b>, and <b>short</b>, you can see the effect of promotion with the arithmetic operators. Each arithmetic operation on any of those types produces an <a name="Index300"></a><b>int</b> result, which must be explicitly cast back to the original type (a narrowing conversion that might lose information) to assign back to that type. With <b>int</b> values, however, you do not need to cast, because everything is already an <b>int</b>. Don&#146;t be lulled into thinking everything is safe, though. If you multiply two <b>int</b>s that are big enough, you&#146;ll overflow the result. The following example demonstrates this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_586" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:Overflow.java</font>
+<font color=#009900>// Surprise! Java lets you overflow.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Overflow {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>int</font> big = 0x7fffffff; <font color=#009900>// max int value</font>
+    System.out.println(<font color=#004488>"big = "</font> + big);
+    <font color=#0000ff>int</font> bigger = big * 4;
+    System.out.println(<font color=#004488>"bigger = "</font> + bigger);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"big = 2147483647"</font>,
+      <font color=#004488>"bigger = -4"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You get no errors or warnings from the compiler, and no exceptions at run time. Java is good, but it&#146;s not <i>that</i> good. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_587" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Compound assignments do <i>not</i> require casts for <b>char</b>, <b>byte,</b> or <b>short</b>, even though they are performing promotions that have the same results as the direct arithmetic operations. On the other hand, the lack of the cast certainly simplifies the code. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_588" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can see that, with the exception of <b>boolean</b>, any primitive type can be cast to any other primitive type. Again, you must be aware of the effect of a narrowing conversion  when casting to a smaller type, otherwise you might unknowingly lose information during the cast. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_589" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="Index302"></a><a name="Index303"></a><a name="_Toc375545264"></a><a name="_Toc24775588"></a><a name="Heading2822"></a>Execution
+control</h2>
+<p>Java uses all of C&#146;s execution control statements, so if you&#146;ve programmed with C or C++, then most of what you see will be familiar. Most procedural programming languages have some kind of control statements, and there is often overlap among languages. In Java, the keywords include <b>if-else</b>, <b>while</b>, <b>do-while</b>, <b>for</b>, and a selection statement called <b>switch</b>. Java does not, however, support the much-maligned <b>goto</b> (which can still be the most expedient way to solve certain types of problems). You can still do a goto-like jump, but it is much more constrained than a typical <b>goto</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_590" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545265"></a><a name="_Toc24775589"></a><a name="Heading2824"></a>true
+and false</h3>
+<p>All conditional statements use the truth or falsehood of a conditional expression to determine the execution path. An example of a conditional expression is <b>A == B</b>. This uses the conditional operator <b>==</b> to see if the value of <b>A</b> is equivalent to the value of <b>B</b>. The expression returns <b>true</b> or <b>false</b>. Any of the relational operators you&#146;ve seen earlier in this chapter can be used to produce a conditional statement. Note that Java doesn&#146;t allow you to use a number as a <b>boolean</b>, even though it&#146;s allowed in C and C++ (where truth is nonzero and falsehood is zero). If you want to use a non-<b>boolean</b> in a <b>boolean</b> test, such as <b>if(a)</b>, you must first convert it to a <b>boolean</b> value by using a conditional expression, such as <b>if(a != 0)</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_591" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545266"></a><a name="_Toc24775590"></a><a name="Heading2826"></a>if-else<br></h3>
+<p><a name="Index304"></a><a name="Index305"></a>The <b>if-else</b> statement is probably the most basic way to control program flow. The <b>else</b> is optional, so you can use <b>if</b> in two forms:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>if</font>(Boolean-expression)
+  statement</PRE></FONT></BLOCKQUOTE><p><br></p>
+or
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>if</font>(Boolean-expression)
+  statement
+<font color=#0000ff>else</font>
+  statement</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The conditional must produce a <b>boolean</b> result. The <i>statement</i> is either a simple statement terminated by a semicolon, or a compound statement, which is a group of simple statements enclosed in braces. Any time the word &#147;<i>statement</i>&#148; is used, it always implies that the statement can be simple or compound. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_592" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As an example of <b>if-else</b>, here is a<b> test(&#160;) </b>method that will tell you whether a guess is above, below, or equivalent to a target number:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:IfElse.java</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> IfElse {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>static</font> <font color=#0000ff>int</font> test(<font color=#0000ff>int</font> testval, <font color=#0000ff>int</font> target) {
+    <font color=#0000ff>int</font> result = 0;
+    <font color=#0000ff>if</font>(testval &gt; target)
+      result = +1;
+    <font color=#0000ff>else</font> <font color=#0000ff>if</font>(testval &lt; target)
+      result = -1;
+    <font color=#0000ff>else</font>
+      result = 0; <font color=#009900>// Match</font>
+    <font color=#0000ff>return</font> result;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    System.out.println(test(10, 5));
+    System.out.println(test(5, 10));
+    System.out.println(test(5, 5));
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"1"</font>,
+      <font color=#004488>"-1"</font>,
+      <font color=#004488>"0"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>It is conventional to indent the body of a control flow statement so the reader can easily determine where it begins and ends.<br></p>
+<h3>
+<a name="_Toc24775591"></a><a name="Heading2867"></a>return</h3>
+<p>The <b>return</b> keyword has two purposes: It specifies what value a method will return (if it doesn&#146;t have a <b>void</b> return value) and it causes that value to be returned immediately. The preceding <b>test(&#160;)</b> method can be rewritten to take advantage of this: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_593" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:IfElse2.java</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> IfElse2 {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>static</font> <font color=#0000ff>int</font> test(<font color=#0000ff>int</font> testval, <font color=#0000ff>int</font> target) {
+    <font color=#0000ff>if</font>(testval &gt; target)
+      <font color=#0000ff>return</font> +1;
+    <font color=#0000ff>else</font> <font color=#0000ff>if</font>(testval &lt; target)
+      <font color=#0000ff>return</font> -1;
+    <font color=#0000ff>else</font>
+      <font color=#0000ff>return</font> 0; <font color=#009900>// Match</font>
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    System.out.println(test(10, 5));
+    System.out.println(test(5, 10));
+    System.out.println(test(5, 5));
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"1"</font>,
+      <font color=#004488>"-1"</font>,
+      <font color=#004488>"0"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>There&#146;s no need for <b>else</b>, because the method will not continue after executing a <b>return</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_594" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545267"></a><a name="_Toc24775592"></a><a name="Heading2895"></a>Iteration
+</h3>
+<p><a name="Index306"></a>Looping is controlled by <b>while</b>, <b>do-while</b> and <b>for</b>, which are sometimes classified as <i>iteration statements</i>. A <i>statement</i> repeats until the controlling <i>Boolean</i>-<i>expression</i> evaluates to false. The form for a <b>while</b> loop is<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>while</font>(Boolean-expression)
+  statement</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <i>Boolean-expression</i> is evaluated once at the beginning of the loop and again before each further iteration of the <i>statement</i>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_595" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Here&#146;s a simple example that generates random numbers until a particular condition is met:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:WhileTest.java</font>
+<font color=#009900>// Demonstrates the while loop.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> WhileTest {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>double</font> r = 0;
+    <font color=#0000ff>while</font>(r &lt; 0.99d) {
+      r = Math.random();
+      System.out.println(r);
+      monitor.expect(<font color=#0000ff>new</font> String[] {
+        <font color=#004488>"%% \\d\\.\\d+E?-?\\d*"</font>
+      }, Test.AT_LEAST);
+    }
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This uses the <b>static</b> method <b>random(&#160;)</b> in the <b>Math</b> library, which generates a <b>double </b>value between 0 and 1. (It includes 0, but not 1.) The conditional expression for the <b>while</b> says &#147;keep doing this loop until the number is 0.99 or greater.&#148; Each time you run this program, you&#146;ll get a different-sized list of numbers. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_596" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In the <b>expect(&#160;)</b> statement, you see the <b>Test.AT_LEAST</b> flag following the expected list of strings. The <b>expect(&#160;)</b> statement can include several different flags to modify its behavior; this one says that <b>expect(&#160;)</b> should see at least the lines shown, but others may also appear (which it ignores). Here, it says &#147;you should see at least one double value.&#148; <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0456" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545268"></a><a name="_Toc24775593"></a><a name="Heading2922"></a>do-while</h3>
+<p><a name="Index307"></a>The form for <b>do-while</b> is<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>do</font>
+  statement
+<font color=#0000ff>while</font>(Boolean-expression);</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The sole difference between <b>while</b> and <b>do-while</b> is that the statement of the <b>do-while</b> always executes at least once, even if the expression evaluates to false the first time. In a <b>while</b>, if the conditional is false the first time the statement never executes. In practice, <b>do-while</b> is less common than <b>while</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_597" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545269"></a><a name="_Toc24775594"></a><a name="Heading2929"></a>for<br></h3>
+<p><a name="Index308"></a>A <b>for</b> loop performs initialization before the first iteration. Then it performs conditional testing and, at the end of each iteration, some form of &#147;stepping.&#148; The form of the <b>for</b> loop is:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>for</font>(initialization;&#160;Boolean-expression;&#160;step)
+  statement</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Any of the expressions <i>initialization</i>, <i>Boolean-expression</i> or <i>step</i> can be empty. The expression is tested before each iteration, and as soon as it evaluates to <b>false</b>, execution will continue at the line following the <b>for</b> statement. At the end of each loop, the <i>step</i> executes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_598" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><b>for</b> loops are usually used for &#147;counting&#148; tasks:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:ListCharacters.java</font>
+<font color=#009900>// Demonstrates "for" loop by listing</font>
+<font color=#009900>// all the lowercase ASCII letters.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> ListCharacters {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 128; i++)
+      <font color=#0000ff>if</font>(Character.isLowerCase((<font color=#0000ff>char</font>)i))
+        System.out.println(<font color=#004488>"value: "</font> + i +
+          <font color=#004488>" character: "</font> + (<font color=#0000ff>char</font>)i);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"value: 97 character: a"</font>,
+      <font color=#004488>"value: 98 character: b"</font>,
+      <font color=#004488>"value: 99 character: c"</font>,
+      <font color=#004488>"value: 100 character: d"</font>,
+      <font color=#004488>"value: 101 character: e"</font>,
+      <font color=#004488>"value: 102 character: f"</font>,
+      <font color=#004488>"value: 103 character: g"</font>,
+      <font color=#004488>"value: 104 character: h"</font>,
+      <font color=#004488>"value: 105 character: i"</font>,
+      <font color=#004488>"value: 106 character: j"</font>,
+      <font color=#004488>"value: 107 character: k"</font>,
+      <font color=#004488>"value: 108 character: l"</font>,
+      <font color=#004488>"value: 109 character: m"</font>,
+      <font color=#004488>"value: 110 character: n"</font>,
+      <font color=#004488>"value: 111 character: o"</font>,
+      <font color=#004488>"value: 112 character: p"</font>,
+      <font color=#004488>"value: 113 character: q"</font>,
+      <font color=#004488>"value: 114 character: r"</font>,
+      <font color=#004488>"value: 115 character: s"</font>,
+      <font color=#004488>"value: 116 character: t"</font>,
+      <font color=#004488>"value: 117 character: u"</font>,
+      <font color=#004488>"value: 118 character: v"</font>,
+      <font color=#004488>"value: 119 character: w"</font>,
+      <font color=#004488>"value: 120 character: x"</font>,
+      <font color=#004488>"value: 121 character: y"</font>,
+      <font color=#004488>"value: 122 character: z"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Note that the variable <b>i</b> is defined at the point where it is used, inside the control expression of the <b>for</b> loop, rather than at the beginning of the block denoted by the open curly brace. The scope of <b>i </b>is the expression controlled by the <b>for</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_599" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This program also uses the <b>java.lang.Character</b> &#147;wrapper&#148; class, which not only wraps the primitive <b>char</b> type in an object, but also provides other utilities. Here, the <b>static</b> <b>isLowerCase(&#160;)</b> method is used to detect whether the character in question is a lower-case letter. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0458" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Traditional procedural languages like C require that all variables be defined at the beginning of a block so that when the compiler creates a block, it can allocate space for those variables. In Java and C++, you can spread your variable declarations throughout the block, defining them at the point that you need them. This allows a more natural coding style and makes code easier to understand. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_600" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index309"></a>You can define multiple variables within a <b>for</b> statement, but they must be of the same type:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0, j = 1; i &lt; 10 &amp;&amp; j != 11; i++, j++)
+  <font color=#009900>// body of for loop</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <b>int </b>definition in the <b>for </b>statement covers both <b>i </b>and <b>j</b>.<b> </b>The ability to define variables in the control expression is limited to the <b>for</b> loop. You cannot use this approach with any of the other selection or iteration statements. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_601" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="_Toc375545270"></a><a name="Heading2987"></a>The comma operator</h4>
+<p>Earlier in this chapter I stated that the comma <a name="Index310"></a><a name="Index311"></a><i>operator</i> (not the comma <i>separator</i>, which is used to separate definitions and method arguments) has only one use in Java: in the control expression of a <b>for</b> loop. In both the initialization and step portions of the control expression, you can have a number of statements separated by commas, and those statements will be evaluated sequentially. The previous bit of code uses this ability. Here&#146;s another example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:CommaOperator.java</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> CommaOperator {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 1, j = i + 10; i &lt; 5;
+        i++, j = i * 2) {
+      System.out.println(<font color=#004488>"i= "</font> + i + <font color=#004488>" j= "</font> + j);
+    }
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"i= 1 j= 11"</font>,
+      <font color=#004488>"i= 2 j= 4"</font>,
+      <font color=#004488>"i= 3 j= 6"</font>,
+      <font color=#004488>"i= 4 j= 8"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that in both the initialization and step portions, the statements are evaluated in sequential order. Also, the initialization portion can have any number of definitions <i>of one type</i>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_603" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775595"></a><a name="Heading3009"></a>break and continue</h3>
+<p>You can also control the flow of the loop inside the body of any of the iteration statements by using <a name="Index312"></a><a name="Index313"></a><b>break</b> and <b>continue</b>. <b>break</b> quits the loop without executing the rest of the statements in the loop. <b>continue</b> stops the execution of the current iteration and goes back to the beginning of the loop to begin the next iteration. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_604" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This program shows examples of <b>break</b> and <b>continue</b> within <b>for </b>and <b>while</b> loops:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:BreakAndContinue.java</font>
+<font color=#009900>// Demonstrates break and continue keywords.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> BreakAndContinue {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 100; i++) {
+      <font color=#0000ff>if</font>(i == 74) <font color=#0000ff>break</font>; <font color=#009900>// Out of for loop</font>
+      <font color=#0000ff>if</font>(i % 9 != 0) <font color=#0000ff>continue</font>; <font color=#009900>// Next iteration</font>
+      System.out.println(i);
+    }
+    <font color=#0000ff>int</font> i = 0;
+    <font color=#009900>// An "infinite loop":</font>
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      i++;
+      <font color=#0000ff>int</font> j = i * 27;
+      <font color=#0000ff>if</font>(j == 1269) <font color=#0000ff>break</font>; <font color=#009900>// Out of loop</font>
+      <font color=#0000ff>if</font>(i % 10 != 0) <font color=#0000ff>continue</font>; <font color=#009900>// Top of loop</font>
+      System.out.println(i);
+    }
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"0"</font>,
+      <font color=#004488>"9"</font>,
+      <font color=#004488>"18"</font>,
+      <font color=#004488>"27"</font>,
+      <font color=#004488>"36"</font>,
+      <font color=#004488>"45"</font>,
+      <font color=#004488>"54"</font>,
+      <font color=#004488>"63"</font>,
+      <font color=#004488>"72"</font>,
+      <font color=#004488>"10"</font>,
+      <font color=#004488>"20"</font>,
+      <font color=#004488>"30"</font>,
+      <font color=#004488>"40"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In the <b>for</b> loop, the value of <b>i</b> never gets to 100 because the <b>break</b> statement breaks out of the loop when <b>i</b> is 74. Normally, you&#146;d use a <b>break</b> like this only if you didn&#146;t know when the terminating condition was going to occur. The <b>continue</b> statement causes execution to go back to the top of the iteration loop (thus incrementing <b>i</b>) whenever <b>i</b> is not evenly divisible by 9. When it is, the value is printed. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_605" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The second portion shows an &#147;infinite loop&#148; that would, in theory, continue forever. However, inside the loop there is a <b>break</b> statement that will break out of the loop. In addition, you&#146;ll see that the <b>continue</b> moves back to the top of the loop without completing the remainder. (Thus printing happens in the second loop only when the value of <b>i</b> is divisible by 10.) In the output, The value 0 is printed, because 0 % 9 produces 0. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_606" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A second form of the infinite loop is <b>for(;;)</b>. The compiler treats both <b>while(true)</b> and <b>for(;;)</b> in the same way, so whichever one you use is a matter of programming taste. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_607" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading3054"></a>The infamous &#147;goto&#148;</h4>
+<p>The <a name="Index314"></a><b>goto </b>keyword has been present in programming languages from the beginning. Indeed, <b>goto</b> was the genesis of program control in assembly language: &#147;If condition A, then jump here, otherwise jump there.&#148; If you read the assembly code that is ultimately generated by virtually any compiler, you&#146;ll see that program control contains many jumps (the Java compiler produces its own &#147;assembly code,&#148; but this code is run by the Java Virtual Machine rather than directly on a hardware CPU). <br></p>
+<p>A <b>goto </b>is a jump at the source-code level, and that&#146;s what brought it into disrepute. If a program will always jump from one point to another, isn&#146;t there some way to reorganize the code so the flow of control is not so jumpy? <b>goto </b>fell into true disfavor with the publication of the famous &#147;Goto considered harmful&#148; paper by Edsger Dijkstra, and since then goto-bashing has been a popular sport, with advocates of the cast-out keyword scurrying for cover. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_608" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As is typical in situations like this, the middle ground is the most fruitful. The problem is not the use of <b>goto</b>, but the overuse of <b>goto</b>; in rare situations <b>goto</b> is actually the best way to structure control flow. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_609" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Although <b>goto </b>is a reserved word in Java, it is not used in the language; Java has no <b>goto</b>. However, it does have something that looks a bit like a jump tied in with the <b>break</b> and <b>continue</b> keywords. It&#146;s not a jump but rather a way to break out of an iteration statement. The reason it&#146;s often thrown in with discussions of <b>goto</b> is because it uses the same mechanism: a label. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_610" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A label is an identifier followed by a colon, like this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>label1:</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The <i>only</i> place a label is useful in Java is right before an iteration statement. And that means <i>right</i> before&#151;it does no good to put any other statement between the label and the iteration. And the sole reason to put a label before an iteration is if you&#146;re going to nest another iteration or a switch inside it. That&#146;s because the <a name="Index316"></a><b>break</b> and <a name="Index317"></a><b>continue</b> keywords will normally interrupt only the current loop, but when used with a label, they&#146;ll interrupt the loops up to where the label exists: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_611" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>label1: 
+outer-iteration {
+  inner-iteration {
+    <font color=#009900>//...</font>
+    <font color=#0000ff>break</font>; <font color=#009900>// 1</font>
+    <font color=#009900>//...</font>
+    <font color=#0000ff>continue</font>;  <font color=#009900>// 2</font>
+    <font color=#009900>//...</font>
+    <font color=#0000ff>continue</font> label1; <font color=#009900>// 3</font>
+    <font color=#009900>//...</font>
+    <font color=#0000ff>break</font> label1;  <font color=#009900>// 4</font>
+  }
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In case 1, the <b>break</b> breaks out of the inner iteration and you end up in the outer iteration. In case 2, the <b>continue</b> moves back to the beginning of the inner iteration. But in case 3, the <b>continue label1</b> breaks out of the inner iteration <i>and</i> the outer iteration, all the way back to <b>label1</b>. Then it does in fact continue the iteration, but starting at the outer iteration. In case 4, the <b>break label1</b> also breaks all the way out to <b>label1</b>, but it does not reenter the iteration. It actually does break out of both iterations. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_612" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Here is an example using <b>for</b> loops:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:LabeledFor.java</font>
+<font color=#009900>// Java's "labeled for" loop.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> LabeledFor {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>int</font> i = 0;
+    outer: <font color=#009900>// Can't have statements here</font>
+    <font color=#0000ff>for</font>(; <font color=#0000ff>true</font> ;) { <font color=#009900>// infinite loop</font>
+      inner: <font color=#009900>// Can't have statements here</font>
+      <font color=#0000ff>for</font>(; i &lt; 10; i++) {
+        System.out.println(<font color=#004488>"i = "</font> + i);
+        <font color=#0000ff>if</font>(i == 2) {
+          System.out.println(<font color=#004488>"continue"</font>);
+          <font color=#0000ff>continue</font>;
+        }
+        <font color=#0000ff>if</font>(i == 3) {
+          System.out.println(<font color=#004488>"break"</font>);
+          i++; <font color=#009900>// Otherwise i never</font>
+               <font color=#009900>// gets incremented.</font>
+          <font color=#0000ff>break</font>;
+        }
+        <font color=#0000ff>if</font>(i == 7) {
+          System.out.println(<font color=#004488>"continue outer"</font>);
+          i++; <font color=#009900>// Otherwise i never</font>
+               <font color=#009900>// gets incremented.</font>
+          <font color=#0000ff>continue</font> outer;
+        }
+        <font color=#0000ff>if</font>(i == 8) {
+          System.out.println(<font color=#004488>"break outer"</font>);
+          <font color=#0000ff>break</font> outer;
+        }
+        <font color=#0000ff>for</font>(<font color=#0000ff>int</font> k = 0; k &lt; 5; k++) {
+          <font color=#0000ff>if</font>(k == 3) {
+            System.out.println(<font color=#004488>"continue inner"</font>);
+            <font color=#0000ff>continue</font> inner;
+          }
+        }
+      }
+    }
+    <font color=#009900>// Can't break or continue to labels here</font>
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"i = 0"</font>,
+      <font color=#004488>"continue inner"</font>,
+      <font color=#004488>"i = 1"</font>,
+      <font color=#004488>"continue inner"</font>,
+      <font color=#004488>"i = 2"</font>,
+      <font color=#004488>"continue"</font>,
+      <font color=#004488>"i = 3"</font>,
+      <font color=#004488>"break"</font>,
+      <font color=#004488>"i = 4"</font>,
+      <font color=#004488>"continue inner"</font>,
+      <font color=#004488>"i = 5"</font>,
+      <font color=#004488>"continue inner"</font>,
+      <font color=#004488>"i = 6"</font>,
+      <font color=#004488>"continue inner"</font>,
+      <font color=#004488>"i = 7"</font>,
+      <font color=#004488>"continue outer"</font>,
+      <font color=#004488>"i = 8"</font>,
+      <font color=#004488>"break outer"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Note that <b>break</b> breaks out of the <b>for</b> loop, and that the increment-expression doesn&#146;t occur until the end of the pass through the <b>for</b> loop. Since <b>break</b> skips the increment expression, the increment is performed directly in the case of <b>i == 3</b>. The <b>continue outer</b> statement in the case of <b>i == 7 </b>also goes to the top of the loop and also skips the increment, so it too is incremented directly. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_614" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If not for the <b>break outer</b> statement, there would be no way to get out of the outer loop from within an inner loop, since <b>break</b> by itself can break out of only the innermost loop. (The same is true for <b>continue</b>.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_615" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Of course, in the cases where breaking out of a loop will also exit the method, you can simply use a <b>return</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_616" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Here is a demonstration of labeled <b>break</b> and <b>continue</b> statements with <b>while</b> loops:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:LabeledWhile.java</font>
+<font color=#009900>// Java's "labeled while" loop.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> LabeledWhile {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>int</font> i = 0;
+    outer:
+    <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+      System.out.println(<font color=#004488>"Outer while loop"</font>);
+      <font color=#0000ff>while</font>(<font color=#0000ff>true</font>) {
+        i++;
+        System.out.println(<font color=#004488>"i = "</font> + i);
+        <font color=#0000ff>if</font>(i == 1) {
+          System.out.println(<font color=#004488>"continue"</font>);
+          <font color=#0000ff>continue</font>;
+        }
+        <font color=#0000ff>if</font>(i == 3) {
+          System.out.println(<font color=#004488>"continue outer"</font>);
+          <font color=#0000ff>continue</font> outer;
+        }
+        <font color=#0000ff>if</font>(i == 5) {
+          System.out.println(<font color=#004488>"break"</font>);
+          <font color=#0000ff>break</font>;
+        }
+        <font color=#0000ff>if</font>(i == 7) {
+          System.out.println(<font color=#004488>"break outer"</font>);
+          <font color=#0000ff>break</font> outer;
+        }
+      }
+    }
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Outer while loop"</font>,
+      <font color=#004488>"i = 1"</font>,
+      <font color=#004488>"continue"</font>,
+      <font color=#004488>"i = 2"</font>,
+      <font color=#004488>"i = 3"</font>,
+      <font color=#004488>"continue outer"</font>,
+      <font color=#004488>"Outer while loop"</font>,
+      <font color=#004488>"i = 4"</font>,
+      <font color=#004488>"i = 5"</font>,
+      <font color=#004488>"break"</font>,
+      <font color=#004488>"Outer while loop"</font>,
+      <font color=#004488>"i = 6"</font>,
+      <font color=#004488>"i = 7"</font>,
+      <font color=#004488>"break outer"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The same rules hold true for <b>while</b>: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_617" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li>A plain <b>continue</b> goes to the top of the innermost loop and
+continues.</li>
+<li>A labeled <b>continue</b> goes to the label and reenters the loop right
+after that label.</li>
+<li>A <b>break</b> &#147;drops out of the bottom&#148; of the loop.</li>
+<li>A labeled <b>break</b> drops out of the bottom of the end of the loop
+denoted by the label.
+</li></ol><p>It&#146;s important to remember that the <i>only</i> reason to use labels in Java is when you have nested loops and you want to <b>break</b> or <b>continue</b> through more than one nested level. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_619" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In Dijkstra&#146;s &#147;goto considered harmful&#148; paper, what he specifically objected to was the labels, not the goto. He observed that the number of bugs seems to increase with the number of labels in a program. Labels and gotos make programs difficult to analyze statically, since it introduces cycles in the program execution graph. Note that Java labels don&#146;t suffer from this problem, since they are constrained in their placement and can&#146;t be used to transfer control in an ad hoc manner. It&#146;s also interesting to note that this is a case where a language feature is made more useful by restricting the power of the statement. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_620" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545271"></a><a name="_Toc24775596"></a><a name="Heading3206"></a>switch<br></h3>
+<p><a name="Index318"></a>The <b>switch</b> is sometimes classified as a <i>selection statement</i>. The <b>switch </b>statement selects from among pieces of code based on the value of an integral expression. Its form is: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_621" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>switch</font>(integral-selector) {
+  <font color=#0000ff>case</font> integral-value1 : statement; <font color=#0000ff>break</font>; 
+  <font color=#0000ff>case</font> integral-value2 : statement; <font color=#0000ff>break</font>;
+  <font color=#0000ff>case</font> integral-value3 : statement; <font color=#0000ff>break</font>;
+  <font color=#0000ff>case</font> integral-value4 : statement; <font color=#0000ff>break</font>;
+  <font color=#0000ff>case</font> integral-value5 : statement; <font color=#0000ff>break</font>;
+  <font color=#009900>// ...</font>
+  <font color=#0000ff>default</font>: statement;
+}</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p><i>Integral-selector</i> is an expression that produces an integral value. The <b>switch</b> compares the result of <i>integral-selector</i> to each<i> integral-value</i>. If it finds a match, the corresponding <i>statement</i> (simple or compound) executes. If no match occurs, the <b>default</b> <i>statement</i><a name="Index319"></a> executes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_622" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You will notice in the preceding definition that each <b>case</b> ends with a <a name="Index320"></a><b>break</b>, which causes execution to jump to the end of the <b>switch</b> body. This is the conventional way to build a <b>switch</b> statement, but the <b>break</b> is optional. If it is missing, the code for the following case statements execute until a <b>break</b> is encountered. Although you don&#146;t usually want this kind of behavior, it can be useful to an experienced programmer. Note that the last statement, following the <b>default</b>, doesn&#146;t have a <b>break</b> because the execution just falls through to where the <b>break</b> would have taken it anyway. You could put a <b>break</b> at the end of the <b>default</b> statement with no harm if you considered it important for style&#146;s sake. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_623" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The <b>switch</b> statement is a clean way to implement multiway selection (i.e., selecting from among a number of different execution paths), but it requires a selector that evaluates to an integral value, such as <b>int</b> or <b>char</b>. If you want to use, for example, a string or a floating-point number as a selector, it won&#146;t work in a <b>switch</b> statement. For non-integral types, you must use a series of <b>if</b> statements. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_624" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Here&#146;s an example that creates letters randomly and determines whether they&#146;re vowels or consonants: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_625" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:VowelsAndConsonants.java</font>
+<font color=#009900>// Demonstrates the switch statement.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> VowelsAndConsonants {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; 100; i++) {
+      <font color=#0000ff>char</font> c = (<font color=#0000ff>char</font>)(Math.random() * 26 + 'a');
+      System.out.print(c + <font color=#004488>": "</font>);
+      <font color=#0000ff>switch</font>(c) {
+        <font color=#0000ff>case</font> 'a':
+        <font color=#0000ff>case</font> 'e':
+        <font color=#0000ff>case</font> 'i':
+        <font color=#0000ff>case</font> 'o':
+        <font color=#0000ff>case</font> 'u': System.out.println(<font color=#004488>"vowel"</font>);
+                  <font color=#0000ff>break</font>;
+        <font color=#0000ff>case</font> 'y':
+        <font color=#0000ff>case</font> 'w': System.out.println(<font color=#004488>"Sometimes a vowel"</font>);
+                  <font color=#0000ff>break</font>;
+        <font color=#0000ff>default</font>:  System.out.println(<font color=#004488>"consonant"</font>);
+      }
+      monitor.expect(<font color=#0000ff>new</font> String[] {
+        <font color=#004488>"%% [aeiou]: vowel|[yw]: Sometimes a vowel|"</font> +
+          <font color=#004488>"[^aeiouyw]: consonant"</font>
+      }, Test.AT_LEAST);
+    }
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Since <b>Math.random(&#160;)</b> generates a value between 0 and 1, you need only multiply it by the upper bound of the range of numbers you want to produce (26 for the letters in the alphabet) and add an offset to establish the lower bound. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_626" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Although it appears you&#146;re switching on a character here, the <b>switch</b> statement is actually using the integral value of the character. The single-quoted characters in the <b>case</b> statements also produce integral values that are used for comparison. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_627" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Notice how the <b>case</b>s can be &#147;stacked&#148; on top of each other to provide multiple matches for a particular piece of code. You should also be aware that it&#146;s essential to put the <b>break</b> statement at the end of a particular case; otherwise, control will simply drop through and continue processing on the next case. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_628" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In the regular expression in this <b>expect(&#160;)</b> statement, the &#145;<b>|</b>&#146; is used to indicate three different possibilities. The &#145;<b>[]</b>&#146; encloses a &#147;set&#148; of characters in a regular expression, so the first part says &#147;one of a, e, i, o, or u, followed by a colon and the word &#145;vowel&#146;.&#148; The second possibility indicates either y or w and: &#147;Sometimes a vowel.&#148; The set in the third possibility begins with a &#145;^&#146;, which means &#147;<i>not</i> any of the characters in this set,&#148; so it indicates anything other than a vowel will match. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0459" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h4>
+<a name="Heading3256"></a>Calculation details</h4>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>The statement:
+<font color=#0000ff>char</font> c = (<font color=#0000ff>char</font>)(Math.random() * 26 + 'a');</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>deserves a closer look. <b>Math.random(&#160;)</b> produces a <b>double</b>, so the value 26 is converted to a <b>double</b> to perform the multiplication, which also produces a <b>double</b>. This means that <b>&#145;a&#146;</b> must be converted to a <b>double</b> to perform the addition. The <b>double</b> result is turned back into a <b>char</b> with a cast. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_629" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>What does the cast to <b>char</b> do? That is, if you have the value 29.7 and you cast it to a <b>char</b>, is the resulting value 30 or 29? The answer to this can be seen in this example: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_630" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:CastingNumbers.java</font>
+<font color=#009900>// What happens when you cast a float</font>
+<font color=#009900>// or double to an integral value?</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> CastingNumbers {
+  <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>double</font>
+      above = 0.7,
+      below = 0.4;
+    System.out.println(<font color=#004488>"above: "</font> + above);
+    System.out.println(<font color=#004488>"below: "</font> + below);
+    System.out.println(<font color=#004488>"(int)above: "</font> + (<font color=#0000ff>int</font>)above);
+    System.out.println(<font color=#004488>"(int)below: "</font> + (<font color=#0000ff>int</font>)below);
+    System.out.println(<font color=#004488>"(char)('a' + above): "</font> +
+      (<font color=#0000ff>char</font>)('a' + above));
+    System.out.println(<font color=#004488>"(char)('a' + below): "</font> +
+      (<font color=#0000ff>char</font>)('a' + below));
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"above: 0.7"</font>,
+      <font color=#004488>"below: 0.4"</font>,
+      <font color=#004488>"(int)above: 0"</font>,
+      <font color=#004488>"(int)below: 0"</font>,
+      <font color=#004488>"(char)('a' + above): a"</font>,
+      <font color=#004488>"(char)('a' + below): a"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>So the answer is that casting from a <a name="Index321"></a><b>float</b> or <b>double</b> to an integral value always truncates the number. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_632" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A second question concerns <a name="Index322"></a><a name="Index323"></a><b>Math.random(&#160;)</b>. Does it produce a value from zero to one, inclusive or exclusive of the value &#145;1&#146;? In math lingo, is it (0,1), or [0,1], or (0,1] or [0,1)? (The square bracket means &#147;includes,&#148; whereas the parenthesis means &#147;doesn&#146;t include.&#148;) Again, a test program <i>might</i> provide the answer: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_633" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c03:RandomBounds.java</font>
+<font color=#009900>// Does Math.random() produce 0.0 and 1.0?</font>
+<font color=#009900>// {RunByHand}</font>
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> RandomBounds {
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> usage() {
+    System.out.println(<font color=#004488>"Usage: \n\t"</font> +
+      <font color=#004488>"RandomBounds lower\n\tRandomBounds upper"</font>);
+    System.exit(1);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>if</font>(args.length != 1) usage();
+    <font color=#0000ff>if</font>(args[0].equals(<font color=#004488>"lower"</font>)) {
+      <font color=#0000ff>while</font>(Math.random() != 0.0)
+        ; <font color=#009900>// Keep trying</font>
+      System.out.println(<font color=#004488>"Produced 0.0!"</font>);
+    }
+    <font color=#0000ff>else</font> <font color=#0000ff>if</font>(args[0].equals(<font color=#004488>"upper"</font>)) {
+      <font color=#0000ff>while</font>(Math.random() != 1.0)
+        ; <font color=#009900>// Keep trying</font>
+      System.out.println(<font color=#004488>"Produced 1.0!"</font>);
+    }
+    <font color=#0000ff>else</font>
+      usage();
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>To run the program, you type a command line of either: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_634" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>java RandomBounds lower</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>or<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>java RandomBounds upper</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In both cases you are forced to break out of the program manually, so it would <i>appear</i> that <b>Math.random(&#160;)</b> never produces either 0.0 or 1.0. But this is where such an experiment can be deceiving. If you consider<sup><a name="fnB18" href="#fn18">[18]</a></sup> that there are about 2<sup>62</sup> different double fractions between 0 and 1, the likelihood of reaching any one value experimentally might exceed the lifetime of one computer, or even one experimenter. It turns out that 0.0 <i>is</i> included in the output of <b>Math.random(&#160;)</b>. Or, in math lingo, it is [0,1). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_635" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545272"></a><a name="_Toc24775597"></a><a name="Heading3329"></a>Summary</h2>
+<p>This chapter concludes the study of fundamental features that appear in most programming languages: calculation, operator precedence, type casting, and selection and iteration. Now you&#146;re ready to begin taking steps that move you closer to the world of object-oriented programming. The next chapter will cover the important issues of initialization and cleanup of objects, followed in the subsequent chapter by the essential concept of implementation hiding. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_636" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545273"></a><a name="_Toc24775598"></a><a name="Heading3331"></a>Exercises</h2>
+<p>Solutions to selected exercises can be found in the electronic document <i>The Thinking in Java Annotated Solution Guide</i>, available for a small fee from <i>www.BruceEckel.com</i>.<br></p>
+<ol>
+<li>	There are two expressions in the section labeled &#147;precedence&#148;
+early in this chapter. Put these expressions into a program and demonstrate that
+they produce different results. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_637" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Put the methods <b>ternary(&#160;)</b> and <b>alternative(&#160;)</b> into
+a working program. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_638" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	From the sections labeled &#147;if-else&#148; and &#147;return,&#148;
+modify the two <b>test(&#160;)</b> methods so that <b>testval</b> is tested to
+see if it is within the range between (and including) the arguments <b>begin</b>
+and <b>end</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_639" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Write a program that prints values from 1 to 100. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_640" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify Exercise 4 so that the program exits by using the <b>break</b>
+keyword at value 47. Try using <b>return</b> instead. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_641" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Write a method that takes two <b>String</b> arguments and uses all the
+<b>boolean</b> comparisons to compare the two <b>String</b>s and print the
+results. For the <b>==</b> and <b>!=</b>, also perform the <b>equals(&#160;)</b>
+test. In <b>main(&#160;)</b>, call your method with some different <b>String</b>
+objects. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_642" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Write a program that generates 25 random <b>int</b> values. For each value,
+use an <b>if</b>-<b>else</b> statement to classify it as greater than, less
+than, or equal to a second randomly-generated value. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_643" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify Exercise 7 so that your code is surrounded by an
+&#147;infinite&#148; <b>while</b> loop. It will then run until you interrupt
+it from the keyboard (typically by pressing Control-C). <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_644" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Write a program that uses two nested <b>for</b> loops and the modulus
+operator (<b>%</b>) to detect and print prime numbers (integral numbers that are
+not evenly divisible by any other numbers except for themselves and 1). <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_645"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Create a <b>switch</b> statement that prints a message for each
+<b>case</b>, and put the <b>switch</b> inside a <b>for</b> loop that tries each
+<b>case</b>. Put a <b>break</b> after each <b>case</b> and test it, then remove
+the <b>break</b>s and see what happens. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap03_646" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><hr><p class="footnote text"><sup><a name="fn17" href="#fnB17">[17]</a></sup> John Kirkham writes, &#147;I started computing in 1962 using FORTRAN II on an IBM 1620. At that time, and throughout the 1960s and into the 1970s, FORTRAN was an all uppercase language. This probably started because many of the early input devices were old teletype units that used 5 bit Baudot code, which had no lowercase capability. The &#145;E&#146; in the exponential notation was also always upper case and was never confused with the natural logarithm base &#145;e&#146;, which is always lowercase. The &#145;E&#146; simply stood for exponential, which was for the base of the number system used&#151;usually 10. At the time octal was also widely used by programmers. Although I never saw it used, if I had seen an octal number in exponential notation I would have considered it to be base 8. The first time I remember seeing an exponential using a lowercase &#145;e&#146; was in the late 1970s and I also found it confusing. The problem arose as lowercase crept into FORTRAN, not at its beginning. We actually had functions to use if you really wanted to use the natural logarithm base, but they were all uppercase.&#148;<br></p>
+<p class="footnote text"><sup><a name="fn18" href="#fnB18">[18]</a></sup> Chuck Allison writes: The total number of numbers in a floating-point number system is<br><b>2(M-m+1)b^(p-1) + 1</b><br>where <b>b</b> is the base (usually 2), <b>p</b> is the precision (digits in the mantissa), <b>M</b> is the largest exponent, and <b>m</b> is the smallest exponent. IEEE 754 uses:<br><b>M = 1023, m = -1022, p = 53, b = 2</b><br>so the total number of numbers is<br><b>2(1023+1022+1)2^52</b><br><b>= 2((2^10-1) + (2^10-1))2^52</b><br><b>= (2^10-1)2^54</b><br><b>= 2^64 - 2^54</b><br>Half of these numbers (corresponding to exponents in the range [-1022, 0]) are less than 1 in magnitude (both positive and negative), so 1/4 of that expression, or 2^62 - 2^52 + 1 (approximately 2^62) is in the range [0,1). See my paper at http://www.freshsources.com/1995006a.htm (last of text).<br></p>
+
+<!-- <hr><b>Placeholder</b> -->
+
+<hr>
+
+<div align="CENTER"><a href="TIJ304.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ306.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+
+</font></body>
+
+</html>

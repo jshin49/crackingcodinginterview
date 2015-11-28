@@ -1,0 +1,968 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en">
+<!--
+This document was converted from RTF source: 
+By r2net 5.8 r2netcmd Windows 
+See http://www.logictran.com
+-->
+<head><meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Thinking in Java, 3rd ed. Revision 4.0: 7: Polymorphism</title>
+<link rel="stylesheet" href="stylesheet.css" type="text/css"></head>
+
+<body >
+   <CENTER>     <a href="http://www.MindView.net">     <img src="mindview.gif" alt="MindView Inc." BORDER = "0"></a>     <Font FACE="Verdana, Tahoma, Arial, Helvetica, Sans">     <h2>Thinking in Java, 3<sup>rd</sup> ed. Revision 4.0</h2>     <FONT size = "-1"><br>     [ <a href="README.txt">Viewing Hints</a> ]     [ <a href="http://www.mindview.net/Books/TIJ/">Book Home Page</a> ]     [ <a href="http://www.mindview.net/Etc/MailingList.html">Free Newsletter</a> ] <br>     [ <a href="http://www.mindview.net/Seminars">Seminars</a> ]     [ <a href="http://www.mindview.net/CDs">Seminars on CD ROM</a> ]     [ <a href="http://www.mindview.net/Services">Consulting</a> ] <br><br>     </FONT></FONT>   </CENTER> 
+<font face="Georgia"><div align="CENTER"><a href="TIJ308.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ310.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+<hr>
+
+<h1>
+<a name="_Toc375545326"></a><a name="_Toc24272646"></a><a name="_Toc24775655"></a><a name="Heading5982"></a>7:
+Polymorphism<br></h1>
+<p class="Intro"><a name="Index607"></a>Polymorphism is the third essential feature of an object-oriented programming language, after data abstraction and inheritance. <br></p>
+<p>It provides another dimension of separation of interface from implementation, to decouple <i>what</i> from <i>how</i>. Polymorphism allows improved code organization and readability as well as the creation of <i>extensible</i> programs that can be &#147;grown&#148; not only during the original creation of the project, but also when new features are desired. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1019" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Encapsulation creates new data types by combining characteristics and behaviors. Implementation hiding separates the interface from the implementation by making the details <b>private</b>. This sort of mechanical organization makes ready sense to someone with a procedural programming background. But polymorphism deals with decoupling in terms of <a name="Index608"></a><i>types</i>. In the last chapter, you saw how inheritance allows the treatment of an object as its own type <a name="Index609"></a><i>or</i> its base type. This ability is critical because it allows many types (derived from the same base type) to be treated as if they were one type, and a single piece of code to work on all those different types equally. The polymorphic method call allows one type to express its distinction from another, similar type, as long as they&#146;re both derived from the same base type. This distinction is expressed through differences in behavior of the methods that you can call through the base class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1020" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index610"></a>In this chapter, you&#146;ll learn about polymorphism (also called <a name="Index611"></a><a name="Index612"></a><a name="Index613"></a><a name="Index614"></a><i>dynamic binding</i> or <i>late binding</i> or <i>run-time binding</i>)<i> </i>starting from the basics, with simple examples that strip away everything but the polymorphic behavior of the program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1021" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc305593263"></a><a name="_Toc305628735"></a><a name="_Toc312374040"></a><a name="_Toc375545327"></a><a name="_Toc24775656"></a><a name="Heading5987"></a>Upcasting
+revisited</h2>
+<p>In Chapter 6 you saw how an object can be used as its own type or as an object of its base type. Taking an object reference and treating it as a reference to its base type is called <i>upcasting</i> because of the way inheritance trees are drawn with the base class at the top. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1022" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index615"></a>You also saw a problem arise, which is embodied in the following example about musical instruments. Since several examples play <b>Note</b>s, we should create the <b>Note</b> class separately, in a package:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:music:Note.java</font>
+<font color=#009900>// Notes to play on musical instruments.</font>
+<font color=#0000ff>package</font> c07.music;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Note {
+  <font color=#0000ff>private</font> String noteName;
+  <font color=#0000ff>private</font> Note(String noteName) {
+    <font color=#0000ff>this</font>.noteName = noteName;
+  }
+  <font color=#0000ff>public</font> String toString() { <font color=#0000ff>return</font> noteName; }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>final</font> Note
+    MIDDLE_C = <font color=#0000ff>new</font> Note(<font color=#004488>"Middle C"</font>),
+    C_SHARP  = <font color=#0000ff>new</font> Note(<font color=#004488>"C Sharp"</font>),
+    B_FLAT   = <font color=#0000ff>new</font> Note(<font color=#004488>"B Flat"</font>);
+    <font color=#009900>// Etc.</font>
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This is an &#147;enumeration&#148; class, which has a fixed number of constant objects to choose from. You can&#146;t make additional objects because the constructor is private. <br></p>
+<p>In the following example, <b>Wind</b> is a type of <b>Instrument</b>, therefore <b>Wind</b> is inherited from <b>Instrument</b>:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:music:Music.java</font>
+<font color=#009900>// Inheritance &amp; upcasting.</font>
+<font color=#0000ff>package</font> c07.music;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Music {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> tune(Instrument i) {
+    <font color=#009900>// ...</font>
+    i.play(Note.MIDDLE_C);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Wind flute = <font color=#0000ff>new</font> Wind();
+    tune(flute); <font color=#009900>// Upcasting</font>
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Wind.play() Middle C"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:music:Wind.java</font>
+<font color=#0000ff>package</font> c07.music;
+
+<font color=#009900>// Wind objects are instruments</font>
+<font color=#009900>// because they have the same interface:</font>
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Wind <font color=#0000ff>extends</font> Instrument {
+  <font color=#009900>// Redefine interface method:</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Wind.play() "</font> + n);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:music:Music.java</font>
+<font color=#009900>// Inheritance &amp; upcasting.</font>
+<font color=#0000ff>package</font> c07.music;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Music {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> tune(Instrument i) {
+    <font color=#009900>// ...</font>
+    i.play(Note.MIDDLE_C);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Wind flute = <font color=#0000ff>new</font> Wind();
+    tune(flute); <font color=#009900>// Upcasting</font>
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Wind.play() Middle C"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The method <b>Music.tune(&#160;)</b> accepts an <b>Instrument </b>reference, but also anything derived from <b>Instrument</b>. In <b>main(&#160;)</b>, you can see this happening as a <b>Wind</b> reference is passed to <b>tune(&#160;)</b>, with no cast necessary. This is acceptable&#151;the interface in <b>Instrument</b> must exist in <b>Wind</b>, because <b>Wind</b> is inherited from <b>Instrument</b>. Upcasting from <b>Wind</b> to <b>Instrument</b> may &#147;narrow&#148; that interface, but it cannot make it anything less than the full interface to <b>Instrument</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1023" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775657"></a><a name="Heading6063"></a>Forgetting the object
+type</h3>
+<p><b>Music.java</b> might seem strange to you. Why should anyone intentionally <i>forget</i> the type of an object? This is what happens when you upcast, and it seems like it could be much more straightforward if <b>tune(&#160;)</b> simply takes a <b>Wind</b> reference as its argument. This brings up an essential point: If you did that, you&#146;d need to write a new <b>tune(&#160;)</b> for every type of <b>Instrument</b> in your system. Suppose we follow this reasoning and add <b>Stringed</b> and <b>Brass</b> instruments: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0114" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:music:Music2.java</font>
+<font color=#009900>// Overloading instead of upcasting.</font>
+<font color=#0000ff>package</font> c07.music;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Stringed <font color=#0000ff>extends</font> Instrument {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Stringed.play() "</font> + n);
+  }
+}
+
+<font color=#0000ff>class</font> Brass <font color=#0000ff>extends</font> Instrument {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Brass.play() "</font> + n);
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Music2 {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> tune(Wind i) {
+    i.play(Note.MIDDLE_C);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> tune(Stringed i) {
+    i.play(Note.MIDDLE_C);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> tune(Brass i) {
+    i.play(Note.MIDDLE_C);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Wind flute = <font color=#0000ff>new</font> Wind();
+    Stringed violin = <font color=#0000ff>new</font> Stringed();
+    Brass frenchHorn = <font color=#0000ff>new</font> Brass();
+    tune(flute); <font color=#009900>// No upcasting</font>
+    tune(violin);
+    tune(frenchHorn);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Wind.play() Middle C"</font>,
+      <font color=#004488>"Stringed.play() Middle C"</font>,
+      <font color=#004488>"Brass.play() Middle C"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This works, but there&#146;s a major drawback: you must write type-specific methods for each new <b>Instrument</b> class you add. This means more programming in the first place, but it also means that if you want to add a new method like <b>tune(&#160;)</b> or a new type of <b>Instrument</b>, you&#146;ve got a lot of work to do. Add the fact that the compiler won&#146;t give you any error messages if you forget to overload one of your methods and the whole process of working with types becomes unmanageable. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1024" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Wouldn&#146;t it be much nicer if you could just write a single method that takes the base class as its argument, and not any of the specific derived classes? That is, wouldn&#146;t it be nice if you could forget that there are derived classes, and write your code to talk only to the base class? <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1025" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index616"></a><a name="Index617"></a><a name="Index618"></a><a name="Index619"></a>That&#146;s exactly what polymorphism allows you to do. However, most programmers who come from a procedural programming background have a bit of trouble with the way polymorphism works. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1026" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc305593264"></a><a name="_Toc305628736"></a><a name="_Toc312374041"></a><a name="_Toc375545329"></a><a name="_Toc24775658"></a><a name="Heading6111"></a>The
+twist</h2>
+<p>The difficulty with <b>Music</b>.<b>java</b> can be seen by running the program. The output is <b>Wind.play(&#160;)</b>. This is clearly the desired output, but it doesn&#146;t seem to make sense that it would work that way. Look at the <b>tune(&#160;)</b> method:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> tune(Instrument i) {
+    <font color=#009900>// ...</font>
+    i.play(Note.MIDDLE_C);
+  }</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>It receives an <b>Instrument</b> reference. So how can the compiler possibly know that this <b>Instrument</b> reference points to a <b>Wind</b> in this case and not a <b>Brass </b>or <b>Stringed</b>? The compiler can&#146;t. To get a deeper understanding of the issue, it&#146;s helpful to examine the subject of <i>binding</i>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1027" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc312374042"></a><a name="_Toc375545330"></a><a name="_Toc24775659"></a><a name="Heading6119"></a>Method-call
+binding<br></h3>
+<p><a name="Index620"></a><a name="Index621"></a>Connecting a method call to a method body is called <i>binding</i>. When binding is performed before the program is run (by the compiler and linker, if there is one), it&#146;s called <i>early binding</i><a name="Index622"></a>. You might not have heard the term before because it has never been an option with procedural languages. C compilers have only one kind of method call, and that&#146;s early binding. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1028" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The confusing part of the preceding program revolves around early binding, because the compiler cannot know the correct method to call when it has only an <b>Instrument</b> reference. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1029" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The solution is called <i>late binding</i>, which means that the binding occurs at run time, based on the type of object. Late binding is also called <a name="Index623"></a><a name="Index624"></a><i>dynamic binding</i><a name="Index625"></a><a name="Index626"></a> or <i>run-time binding</i><a name="Index627"></a><a name="Index628"></a>. When a language implements late binding, there must be some mechanism to determine the type of the object at run time and to call the appropriate method. That is, the compiler still doesn&#146;t know the object type, but the method-call mechanism finds out and calls the correct method body. The late-binding mechanism varies from language to language, but you can imagine that some sort of type information must be installed in the objects. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1030" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>All method binding in Java uses late binding unless the method is <b>static</b> or <a name="Index629"></a><a name="Index630"></a><a name="Index631"></a><a name="Index632"></a><b>final </b>(<b>private</b> methods are implicitly <b>final</b>). This means that ordinarily you don&#146;t need to make any decisions about whether late binding will occur&#151;it happens automatically. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1031" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Why would you declare a method <b>final</b>? As noted in the last chapter, it prevents anyone from overriding that method. Perhaps more important, it effectively &#147;turns off&#148; dynamic binding, or rather it tells the compiler that dynamic binding isn&#146;t necessary. This allows the compiler to generate slightly more efficient code for <b>final</b> method calls. However, in most cases it won&#146;t make any overall performance difference in your program, so it&#146;s best to only use <b>final</b> as a design decision, and not as an attempt to improve performance. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1032" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545331"></a><a name="_Toc24775660"></a><a name="Heading6125"></a>Producing
+the right behavior</h3>
+<p>Once you know that all method binding in Java happens polymorphically via late binding, you can write your code to talk to the base class and know that all the derived-class cases will work correctly using the same code. Or to put it another way, you &#147;send a message to an object and let the object figure out the right thing to do.&#148; <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1033" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The classic example in OOP is the &#147;shape&#148; example. This is commonly used because it is easy to visualize, but unfortunately it can confuse novice programmers into thinking that OOP is just for graphics programming, which is of course not the case. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1034" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index633"></a>The shape example has a base class called <b>Shape </b>and various derived types: <b>Circle</b>, <b>Square</b>, <b>Triangle</b>, etc. The reason the example works so well is that it&#146;s easy to say &#147;a circle is a type of shape&#148; and be understood.<b> </b>The inheritance diagram shows the relationships: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0115" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p align="center"><img src="TIJ314.png" 	alt="TIJ314.png" border="0" ><br></p>
+<p>The upcast could occur in a statement as simple as:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>Shape s = <font color=#0000ff>new</font> Circle();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Here, a <b>Circle</b> object is created, and the resulting reference is immediately assigned to a <b>Shape</b>, which would seem to be an error (assigning one type to another); and yet it&#146;s fine because a <b>Circle</b> <i>is</i> a <b>Shape</b> by inheritance. So the compiler agrees with the statement and doesn&#146;t issue an error message. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1035" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Suppose you call one of the base-class methods (that have been overridden in the derived classes):<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE>s.draw();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Again, you might expect that <b>Shape</b>&#146;s <b>draw(&#160;)</b> is called because this is, after all, a <b>Shape</b> reference&#151;so how could the compiler know to do anything else? And yet the proper <b>Circle.draw(&#160;)</b> is called because of late binding (polymorphism). <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1036" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The following example puts it a slightly different way:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:Shapes.java</font>
+<font color=#009900>// Polymorphism in Java.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+
+<font color=#0000ff>class</font> Shape {
+  <font color=#0000ff>void</font> draw() {}
+  <font color=#0000ff>void</font> erase() {}
+}
+
+<font color=#0000ff>class</font> Circle <font color=#0000ff>extends</font> Shape {
+  <font color=#0000ff>void</font> draw() {
+    System.out.println(<font color=#004488>"Circle.draw()"</font>);
+  }
+  <font color=#0000ff>void</font> erase() {
+    System.out.println(<font color=#004488>"Circle.erase()"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Square <font color=#0000ff>extends</font> Shape {
+  <font color=#0000ff>void</font> draw() {
+    System.out.println(<font color=#004488>"Square.draw()"</font>);
+  }
+  <font color=#0000ff>void</font> erase() {
+    System.out.println(<font color=#004488>"Square.erase()"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Triangle <font color=#0000ff>extends</font> Shape {
+  <font color=#0000ff>void</font> draw() {
+    System.out.println(<font color=#004488>"Triangle.draw()"</font>);
+  }
+  <font color=#0000ff>void</font> erase() {
+    System.out.println(<font color=#004488>"Triangle.erase()"</font>);
+  }
+}
+
+<font color=#009900>// A "factory" that randomly creates shapes:</font>
+<font color=#0000ff>class</font> RandomShapeGenerator {
+  <font color=#0000ff>private</font> Random rand = <font color=#0000ff>new</font> Random();
+  <font color=#0000ff>public</font> Shape next() {
+    <font color=#0000ff>switch</font>(rand.nextInt(3)) {
+      <font color=#0000ff>default</font>:
+      <font color=#0000ff>case</font> 0: <font color=#0000ff>return</font> <font color=#0000ff>new</font> Circle();
+      <font color=#0000ff>case</font> 1: <font color=#0000ff>return</font> <font color=#0000ff>new</font> Square();
+      <font color=#0000ff>case</font> 2: <font color=#0000ff>return</font> <font color=#0000ff>new</font> Triangle();
+    }
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Shapes {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> RandomShapeGenerator gen =
+    <font color=#0000ff>new</font> RandomShapeGenerator();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Shape[] s = <font color=#0000ff>new</font> Shape[9];
+    <font color=#009900>// Fill up the array with shapes:</font>
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; s.length; i++)
+      s[i] = gen.next();
+    <font color=#009900>// Make polymorphic method calls:</font>
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; s.length; i++)
+      s[i].draw();
+    monitor.expect(<font color=#0000ff>new</font> Object[] {
+      <font color=#0000ff>new</font> TestExpression(<font color=#004488>"%% (Circle|Square|Triangle)"</font>
+        + <font color=#004488>"\\.draw\\(\\)"</font>, s.length)
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The base class <b>Shape</b> establishes the common interface to anything inherited from <b>Shape</b>&#151;that is, all shapes can be drawn and erased. The derived classes override these definitions to provide unique behavior for each specific type of shape. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1037" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><b>RandomShapeGenerator</b> is a kind of &#147;factory&#148; that produces a reference to a randomly-selected <b>Shape</b> object each time you call its <b>next(&#160;)</b> method. Note that the upcasting happens in the <b>return</b> statements, each of which takes a reference to a <b>Circle</b>, <b>Square</b>, or <b>Triangle</b> and sends it out of <b>next(&#160;)</b> as the return type, <b>Shape</b>. So whenever you call <b>next(&#160;)</b>, you never get a chance to see what specific type it is, since you always get back a plain <b>Shape</b> reference. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1038" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><b>main(&#160;)</b> contains an array of <b>Shape</b> references filled through calls to <b>RandomShapeGenerator.next(&#160;)</b>. At this point you know you have <b>Shape</b>s, but you don&#146;t know anything more specific than that (and neither does the compiler). However, when you step through this array and call <b>draw(&#160;)</b> for each one, the correct type-specific behavior magically occurs, as you can see from the output when you run the program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0116" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The point of choosing the shapes randomly is to drive home the understanding that the compiler can have no special knowledge that allows it to make the correct calls at compile time. All the calls to <b>draw(&#160;)</b> must be made through dynamic binding. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1039" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545332"></a><a name="_Toc24775661"></a><a name="Heading6212"></a>Extensibility</h3>
+<p>Now let&#146;s return to the musical instrument example. Because of polymorphism, you can add as many new types as you want to the system without changing the <b>tune(&#160;)</b> method. In a well-designed OOP program, most or all of your methods will follow the model of <b>tune(&#160;)</b> and communicate only with the base-class interface. Such a program is <a name="Index634"></a><a name="Index635"></a><i>extensible</i><a name="Index636"></a> because you can add new functionality by inheriting new data types from the common base class. The methods that manipulate the base-class interface will not need to be changed at all to accommodate the new classes. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1040" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Consider what happens if you take the instrument example and add more methods in the base class and a number of new classes. Here&#146;s the diagram:<br></p>
+<p align="center"><img src="TIJ315.png" 	alt="TIJ315.png" border="0" ><br></p>
+<p>All these new classes work correctly with the old, unchanged <b>tune(&#160;)</b> method. Even if <b>tune(&#160;)</b> is in a separate file and new methods are added to the interface of <b>Instrument</b>, <b>tune(&#160;)</b> will still work correctly, even without recompiling it. Here is the implementation of the diagram: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0117" title="Send BackTalk Comment">Feedback</a></font><br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:music3:Music3.java</font>
+<font color=#009900>// An extensible program.</font>
+<font color=#0000ff>package</font> c07.music3;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> c07.music.Note;
+
+<font color=#0000ff>class</font> Instrument {
+  <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Instrument.play() "</font> + n);
+  }
+  String what() { <font color=#0000ff>return</font> <font color=#004488>"Instrument"</font>; }
+  <font color=#0000ff>void</font> adjust() {}
+}
+
+<font color=#0000ff>class</font> Wind <font color=#0000ff>extends</font> Instrument {
+  <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Wind.play() "</font> + n);
+  }
+  String what() { <font color=#0000ff>return</font> <font color=#004488>"Wind"</font>; }
+  <font color=#0000ff>void</font> adjust() {}
+}
+
+<font color=#0000ff>class</font> Percussion <font color=#0000ff>extends</font> Instrument {
+  <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Percussion.play() "</font> + n);
+  }
+  String what() { <font color=#0000ff>return</font> <font color=#004488>"Percussion"</font>; }
+  <font color=#0000ff>void</font> adjust() {}
+}
+
+<font color=#0000ff>class</font> Stringed <font color=#0000ff>extends</font> Instrument {
+  <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Stringed.play() "</font> + n);
+  }
+  String what() { <font color=#0000ff>return</font> <font color=#004488>"Stringed"</font>; }
+  <font color=#0000ff>void</font> adjust() {}
+}
+
+<font color=#0000ff>class</font> Brass <font color=#0000ff>extends</font> Wind {
+  <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Brass.play() "</font> + n);
+  }
+  <font color=#0000ff>void</font> adjust() {
+    System.out.println(<font color=#004488>"Brass.adjust()"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Woodwind <font color=#0000ff>extends</font> Wind {
+  <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Woodwind.play() "</font> + n);
+  }
+  String what() { <font color=#0000ff>return</font> <font color=#004488>"Woodwind"</font>; }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Music3 {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#009900>// Doesn't care about type, so new types</font>
+  <font color=#009900>// added to the system still work right:</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> tune(Instrument i) {
+    <font color=#009900>// ...</font>
+    i.play(Note.MIDDLE_C);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> tuneAll(Instrument[] e) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; e.length; i++)
+      tune(e[i]);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#009900>// Upcasting during addition to the array:</font>
+    Instrument[] orchestra = {
+      <font color=#0000ff>new</font> Wind(),
+      <font color=#0000ff>new</font> Percussion(),
+      <font color=#0000ff>new</font> Stringed(),
+      <font color=#0000ff>new</font> Brass(),
+      <font color=#0000ff>new</font> Woodwind()
+    };
+    tuneAll(orchestra);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Wind.play() Middle C"</font>,
+      <font color=#004488>"Percussion.play() Middle C"</font>,
+      <font color=#004488>"Stringed.play() Middle C"</font>,
+      <font color=#004488>"Brass.play() Middle C"</font>,
+      <font color=#004488>"Woodwind.play() Middle C"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>The new methods are <b>what(&#160;)</b>, which returns a <b>String</b> reference with a description of the class, and <b>adjust(&#160;)</b>, which provides some way to adjust each instrument. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1041" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In <b>main(&#160;)</b>, when you place something inside the <b>orchestra </b>array, you automatically upcast to <b>Instrument</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1042" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can see that the <b>tune(&#160;)</b> method is blissfully ignorant of all the code changes that have happened around it, and yet it works correctly. This is exactly what polymorphism is supposed to provide. Changes in your code don&#146;t cause damage to parts of the program that should not be affected. Put another way, polymorphism is an important technique for the programmer to &#147;separate the things that change from the things that stay the same.&#148; <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1043" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545334"></a><a name="_Toc24775662"></a><a name="Heading6306"></a>Pitfall:
+&#147;overriding&#148; private methods</h3>
+<p>Here&#146;s something you might innocently try to do:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:PrivateOverride.java</font>
+<font color=#009900>// Abstract classes and methods.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> PrivateOverride {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> <font color=#0000ff>void</font> f() {
+    System.out.println(<font color=#004488>"private f()"</font>);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    PrivateOverride po = <font color=#0000ff>new</font> Derived();
+    po.f();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"private f()"</font>
+    });
+  }
+}
+
+<font color=#0000ff>class</font> Derived <font color=#0000ff>extends</font> PrivateOverride {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {
+    System.out.println(<font color=#004488>"public f()"</font>);
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You might reasonably expect the output to be &#147;<b>public f(&#160;)</b>&#148;, but a <b>private</b> method is automatically final, and is also hidden from the derived class. So <b>Derived</b>&#146;s <b>f(&#160;)</b> in this case is a brand new method; it&#146;s not even overloaded, since the base-class version of <b>f(&#160;)</b> isn&#146;t visible in <b>Derived</b>. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0466" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The result of this is that only non-<b>private</b> methods may be overridden, but you should watch out for the appearance of overriding <b>private</b> methods, which generates no compiler warnings, but doesn&#146;t do what you might expect. To be clear, you should use a different name from a <b>private</b> base-class method in your derived class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0467" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc24775663"></a><a name="Heading6334"></a>Abstract classes <br>and
+methods</h2>
+<p>In all the instrument examples, the methods in the base class <b>Instrument</b> were always &#147;dummy&#148; methods. If these methods are ever called, you&#146;ve done something wrong. That&#146;s because the intent of <b>Instrument</b> is to create a <i>common interface</i> for all the classes derived from it. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1047" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The only reason to establish this common interface is so it can be expressed differently for each different subtype. It establishes a basic form, so you can say what&#146;s in common with all the derived classes. Another way of saying this is to call <a name="Index640"></a><a name="Index641"></a><b>Instrument</b> an <i>abstract base class</i> (or simply an <a name="Index642"></a><a name="Index643"></a><a name="Index644"></a><i>abstract class</i>). You create an abstract class when you want to manipulate a set of classes through this common interface. All derived-class methods that match the signature of the base-class declaration will be called using the dynamic binding mechanism. (However, as seen in the last section, if the method&#146;s name is the same as the base class but the arguments are different, you&#146;ve got overloading, which probably isn&#146;t what you want.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1048" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you have an abstract class like <b>Instrument</b>, objects of that class almost always have no meaning. That is, <b>Instrument</b> is meant to express only the interface, and not a particular implementation, so creating an <b>Instrument</b> object makes no sense, and you&#146;ll probably want to prevent the user from doing it. This can be accomplished by making all the methods in <b>Instrument</b> print error messages, but that delays the information until run time and requires reliable exhaustive testing on the user&#146;s part. It&#146;s better to catch problems at compile time. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1049" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Java provides a mechanism for doing this called the <i>abstract method</i>.<sup><a name="fnB32" href="#fn32">[32]</a></sup> This is a method that is incomplete; it has only a declaration and no method body. Here is the syntax for an abstract method declaration:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#0000ff>abstract</font> <font color=#0000ff>void</font> f();</PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>A class containing abstract methods is called an <i>abstract class</i>. If a class contains one or more abstract methods, the class itself must be qualified as <b>abstract</b>. (Otherwise, the compiler gives you an error message.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1050" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If an abstract class is incomplete, what is the compiler supposed to do when someone tries to make an object of that class? It cannot safely create an object of an abstract class, so you get an error message from the compiler. This way, the compiler ensures the purity of the abstract class, and you don&#146;t need to worry about misusing it. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1051" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you inherit from an abstract class and you want to make objects of the new type, you must provide method definitions for all the abstract methods in the base class. If you don&#146;t (and you may choose not to), then the derived class is also abstract, and the compiler will force you to qualify <a name="Index645"></a><a name="Index646"></a><a name="Index647"></a><i>that</i> class with the <a name="Index648"></a><b>abstract</b> keyword. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1052" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>It&#146;s possible to create a class as <b>abstract</b> without including any <b>abstract</b> methods. This is useful when you&#146;ve got a class in which it doesn&#146;t make sense to have any <b>abstract</b> methods, and yet you want to prevent any instances of that class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1053" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The <b>Instrument</b> class can easily be turned into an <b>abstract</b> class. Only some of the methods will be <b>abstract</b>, since making a class abstract doesn&#146;t force you to make all the methods <b>abstract</b>.<b> </b>Here&#146;s what it looks like:<br></p>
+<p align="center"><img src="TIJ316.png" 	alt="TIJ316.png" border="0" ><br></p>
+<p>Here&#146;s the orchestra example modified to use <b>abstract</b> classes and methods:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:music4:Music4.java</font>
+<font color=#009900>// Abstract classes and methods.</font>
+<font color=#0000ff>package</font> c07.music4;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+<font color=#0000ff>import</font> java.util.*;
+<font color=#0000ff>import</font> c07.music.Note;
+
+<font color=#0000ff>abstract</font> <font color=#0000ff>class</font> Instrument {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> i; <font color=#009900>// Storage allocated for each</font>
+  <font color=#0000ff>public</font> <font color=#0000ff>abstract</font> <font color=#0000ff>void</font> play(Note n);
+  <font color=#0000ff>public</font> String what() {
+    <font color=#0000ff>return</font> <font color=#004488>"Instrument"</font>;
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>abstract</font> <font color=#0000ff>void</font> adjust();
+}
+
+<font color=#0000ff>class</font> Wind <font color=#0000ff>extends</font> Instrument {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Wind.play() "</font> + n);
+  }
+  <font color=#0000ff>public</font> String what() { <font color=#0000ff>return</font> <font color=#004488>"Wind"</font>; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> adjust() {}
+}
+
+<font color=#0000ff>class</font> Percussion <font color=#0000ff>extends</font> Instrument {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Percussion.play() "</font> + n);
+  }
+  <font color=#0000ff>public</font> String what() { <font color=#0000ff>return</font> <font color=#004488>"Percussion"</font>; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> adjust() {}
+}
+
+<font color=#0000ff>class</font> Stringed <font color=#0000ff>extends</font> Instrument {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Stringed.play() "</font> + n);
+  }
+  <font color=#0000ff>public</font> String what() { <font color=#0000ff>return</font> <font color=#004488>"Stringed"</font>; }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> adjust() {}
+}
+
+<font color=#0000ff>class</font> Brass <font color=#0000ff>extends</font> Wind {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Brass.play() "</font> + n);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> adjust() {
+    System.out.println(<font color=#004488>"Brass.adjust()"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Woodwind <font color=#0000ff>extends</font> Wind {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> play(Note n) {
+    System.out.println(<font color=#004488>"Woodwind.play() "</font> + n);
+  }
+  <font color=#0000ff>public</font> String what() { <font color=#0000ff>return</font> <font color=#004488>"Woodwind"</font>; }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Music4 {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#009900>// Doesn't care about type, so new types</font>
+  <font color=#009900>// added to the system still work right:</font>
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> tune(Instrument i) {
+    <font color=#009900>// ...</font>
+    i.play(Note.MIDDLE_C);
+  }
+  <font color=#0000ff>static</font> <font color=#0000ff>void</font> tuneAll(Instrument[] e) {
+    <font color=#0000ff>for</font>(<font color=#0000ff>int</font> i = 0; i &lt; e.length; i++)
+      tune(e[i]);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#009900>// Upcasting during addition to the array:</font>
+    Instrument[] orchestra = {
+      <font color=#0000ff>new</font> Wind(),
+      <font color=#0000ff>new</font> Percussion(),
+      <font color=#0000ff>new</font> Stringed(),
+      <font color=#0000ff>new</font> Brass(),
+      <font color=#0000ff>new</font> Woodwind()
+    };
+    tuneAll(orchestra);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Wind.play() Middle C"</font>,
+      <font color=#004488>"Percussion.play() Middle C"</font>,
+      <font color=#004488>"Stringed.play() Middle C"</font>,
+      <font color=#004488>"Brass.play() Middle C"</font>,
+      <font color=#004488>"Woodwind.play() Middle C"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>You can see that there&#146;s really no change except in the base class. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1054" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>It&#146;s helpful to create <b>abstract </b>classes and methods because they make the abstractness of a class explicit, and tell both the user and the compiler how it was intended to be used. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1055" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545338"></a><a name="_Toc24775664"></a><a name="Heading6439"></a>Constructors
+and polymorphism</h2>
+<p>As usual, constructors are different from other kinds of methods. This is also true when polymorphism is involved. Even though constructors are not polymorphic (they&#146;re actually <a name="Index649"></a><a name="Index650"></a><b>static</b> methods, but the <b>static</b> declaration is implicit), it&#146;s important to understand the way constructors work in complex hierarchies and with polymorphism. This understanding will help you avoid unpleasant entanglements. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1056" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545339"></a><a name="_Toc24775665"></a><a name="Heading6441"></a>Order
+of constructor calls<br></h3>
+<p><a name="Index651"></a><a name="Index652"></a>The order of constructor calls was briefly discussed in Chapter 4 and again in Chapter 6, but that was before polymorphism was introduced. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1057" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A constructor for the base class is always called during the construction process for a derived class, chaining up the inheritance hierarchy so that a constructor for every base class is called. This makes sense because the constructor has a special job: to see that the object is built properly. A derived class has access to its own members only, and not to those of the base class (whose members are typically <b>private</b>). Only the base-class constructor has the proper knowledge and access to initialize its own elements. Therefore, it&#146;s essential that all constructors get called, otherwise the entire object wouldn&#146;t be constructed. That&#146;s why the compiler enforces a constructor call for every portion of a derived class. It will silently call the default constructor if you don&#146;t explicitly call a base-class constructor in the derived-class constructor body. If there is no default constructor, the compiler will complain. (In the case where a class has no constructors, the compiler will automatically synthesize a default constructor.) <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1058" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Let&#146;s take a look at an example that shows the effects of composition, inheritance, and polymorphism on the order of construction:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:Sandwich.java</font>
+<font color=#009900>// Order of constructor calls.</font>
+<font color=#0000ff>package</font> c07;
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Meal {
+  Meal() { System.out.println(<font color=#004488>"Meal()"</font>); }
+}
+
+<font color=#0000ff>class</font> Bread {
+  Bread() { System.out.println(<font color=#004488>"Bread()"</font>); }
+}
+
+<font color=#0000ff>class</font> Cheese {
+  Cheese() { System.out.println(<font color=#004488>"Cheese()"</font>); }
+}
+
+<font color=#0000ff>class</font> Lettuce {
+  Lettuce() { System.out.println(<font color=#004488>"Lettuce()"</font>); }
+}
+
+<font color=#0000ff>class</font> Lunch <font color=#0000ff>extends</font> Meal {
+  Lunch() { System.out.println(<font color=#004488>"Lunch()"</font>); }
+}
+
+<font color=#0000ff>class</font> PortableLunch <font color=#0000ff>extends</font> Lunch {
+  PortableLunch() { System.out.println(<font color=#004488>"PortableLunch()"</font>);}
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Sandwich <font color=#0000ff>extends</font> PortableLunch {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> Bread b = <font color=#0000ff>new</font> Bread();
+  <font color=#0000ff>private</font> Cheese c = <font color=#0000ff>new</font> Cheese();
+  <font color=#0000ff>private</font> Lettuce l = <font color=#0000ff>new</font> Lettuce();
+  <font color=#0000ff>public</font> Sandwich() {
+    System.out.println(<font color=#004488>"Sandwich()"</font>);
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>new</font> Sandwich();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Meal()"</font>,
+      <font color=#004488>"Lunch()"</font>,
+      <font color=#004488>"PortableLunch()"</font>,
+      <font color=#004488>"Bread()"</font>,
+      <font color=#004488>"Cheese()"</font>,
+      <font color=#004488>"Lettuce()"</font>,
+      <font color=#004488>"Sandwich()"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>This example creates a complex class out of other classes, and each class has a constructor that announces itself. The important class is <b>Sandwich</b>, which reflects three levels of inheritance (four, if you count the implicit inheritance from <b>Object</b>) and three member objects. You can see the output when a <b>Sandwich</b> object is created in <b>main(&#160;)</b>. This means that the order of constructor calls for a complex object is as follows: <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1059" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<ol>
+<li><a name="Index653"></a><a name="Index654"></a><a name="Index655"></a><a name="Index656"></a>The
+base-class constructor is called. This step is repeated recursively such that
+the root of the hierarchy is constructed first, followed by the next-derived
+class, etc., until the most-derived class is reached. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1060" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>Member initializers are called in the order of declaration. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1061"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>The body of the derived-class constructor is called. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1062" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><p>The order of the constructor calls is important. When you inherit, you know all about the base class and can access any <b>public</b> and <b>protected</b> members of the base class. This means that you must be able to assume that all the members of the base class are valid when you&#146;re in the derived class. In a normal method, construction has already taken place, so all the members of all parts of the object have been built. Inside the constructor, however, you must be able to assume that all members that you use have been built. The only way to guarantee this is for the base-class constructor to be called first. Then when you&#146;re in the derived-class constructor, all the members you can access in the base class have been initialized. Knowing that all members are valid inside the constructor is also the reason that, whenever possible, you should initialize all member objects (that is, objects placed in the class using composition) at their point of definition in the class (e.g., <b>b</b>, <b>c,</b> and <b>l</b> in the preceding example). If you follow this practice, you will help ensure that all base class members <i>and</i> member objects of the current object have been initialized. Unfortunately, this doesn&#146;t handle every case, as you will see in the next section. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1063" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc24775666"></a><a name="Heading6501"></a>Inheritance and
+cleanup</h3>
+<p>When using composition and inheritance to create a new class, most of the time you won&#146;t have to worry about cleaning up; subobjects can usually be left to the garbage collector. If you do have cleanup issues, you must be diligent and create a <b>dispose(&#160;) </b>method (the name I have chosen to use here; you may come up with something better) for your new class. And with inheritance, you must override <a name="Index657"></a><a name="Index658"></a><b>dispose(&#160;)</b> in the derived class if you have any special cleanup that must happen as part of garbage collection. When you override <b>dispose(&#160;)</b> in an inherited class, it&#146;s important to remember to call the base-class version of <b>dispose(&#160;)</b>, since otherwise the base-class cleanup will not happen. The following example demonstrates this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:Frog.java</font>
+<font color=#009900>// Cleanup and inheritance.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>class</font> Characteristic {
+  <font color=#0000ff>private</font> String s;
+  Characteristic(String s) {
+    <font color=#0000ff>this</font>.s = s;
+    System.out.println(<font color=#004488>"Creating Characteristic "</font> + s);
+  }
+  <font color=#0000ff>protected</font> <font color=#0000ff>void</font> dispose() {
+    System.out.println(<font color=#004488>"finalizing Characteristic "</font> + s);
+  }
+}
+
+<font color=#0000ff>class</font> Description {
+  <font color=#0000ff>private</font> String s;
+  Description(String s) {
+    <font color=#0000ff>this</font>.s = s;
+    System.out.println(<font color=#004488>"Creating Description "</font> + s);
+  }
+  <font color=#0000ff>protected</font> <font color=#0000ff>void</font> dispose() {
+    System.out.println(<font color=#004488>"finalizing Description "</font> + s);
+  }
+}
+
+<font color=#0000ff>class</font> LivingCreature {
+  <font color=#0000ff>private</font> Characteristic p = <font color=#0000ff>new</font> Characteristic(<font color=#004488>"is alive"</font>);
+  <font color=#0000ff>private</font> Description t =
+    <font color=#0000ff>new</font> Description(<font color=#004488>"Basic Living Creature"</font>);
+  LivingCreature() {
+    System.out.println(<font color=#004488>"LivingCreature()"</font>);
+  }
+  <font color=#0000ff>protected</font> <font color=#0000ff>void</font> dispose() {
+    System.out.println(<font color=#004488>"LivingCreature dispose"</font>);
+    t.dispose();
+    p.dispose();
+  }
+}
+
+<font color=#0000ff>class</font> Animal <font color=#0000ff>extends</font> LivingCreature {
+  <font color=#0000ff>private</font> Characteristic p= <font color=#0000ff>new</font> Characteristic(<font color=#004488>"has heart"</font>);
+  <font color=#0000ff>private</font> Description t =
+    <font color=#0000ff>new</font> Description(<font color=#004488>"Animal not Vegetable"</font>);
+  Animal() {
+    System.out.println(<font color=#004488>"Animal()"</font>);
+  }
+  <font color=#0000ff>protected</font> <font color=#0000ff>void</font> dispose() {
+    System.out.println(<font color=#004488>"Animal dispose"</font>);
+    t.dispose();
+    p.dispose();
+    <font color=#0000ff>super</font>.dispose();
+  }
+}
+
+<font color=#0000ff>class</font> Amphibian <font color=#0000ff>extends</font> Animal {
+  <font color=#0000ff>private</font> Characteristic p =
+    <font color=#0000ff>new</font> Characteristic(<font color=#004488>"can live in water"</font>);
+  <font color=#0000ff>private</font> Description t =
+    <font color=#0000ff>new</font> Description(<font color=#004488>"Both water and land"</font>);
+  Amphibian() {
+    System.out.println(<font color=#004488>"Amphibian()"</font>);
+  }
+  <font color=#0000ff>protected</font> <font color=#0000ff>void</font> dispose() {
+    System.out.println(<font color=#004488>"Amphibian dispose"</font>);
+    t.dispose();
+    p.dispose();
+    <font color=#0000ff>super</font>.dispose();
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Frog <font color=#0000ff>extends</font> Amphibian {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>private</font> Characteristic p = <font color=#0000ff>new</font> Characteristic(<font color=#004488>"Croaks"</font>);
+  <font color=#0000ff>private</font> Description t = <font color=#0000ff>new</font> Description(<font color=#004488>"Eats Bugs"</font>);
+  <font color=#0000ff>public</font> Frog() {
+    System.out.println(<font color=#004488>"Frog()"</font>);
+  }
+  <font color=#0000ff>protected</font> <font color=#0000ff>void</font> dispose() {
+    System.out.println(<font color=#004488>"Frog dispose"</font>);
+    t.dispose();
+    p.dispose();
+    <font color=#0000ff>super</font>.dispose();
+  }
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Frog frog = <font color=#0000ff>new</font> Frog();
+    System.out.println(<font color=#004488>"Bye!"</font>);
+    frog.dispose();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Creating Characteristic is alive"</font>,
+      <font color=#004488>"Creating Description Basic Living Creature"</font>,
+      <font color=#004488>"LivingCreature()"</font>,
+      <font color=#004488>"Creating Characteristic has heart"</font>,
+      <font color=#004488>"Creating Description Animal not Vegetable"</font>,
+      <font color=#004488>"Animal()"</font>,
+      <font color=#004488>"Creating Characteristic can live in water"</font>,
+      <font color=#004488>"Creating Description Both water and land"</font>,
+      <font color=#004488>"Amphibian()"</font>,
+      <font color=#004488>"Creating Characteristic Croaks"</font>,
+      <font color=#004488>"Creating Description Eats Bugs"</font>,
+      <font color=#004488>"Frog()"</font>,
+      <font color=#004488>"Bye!"</font>,
+      <font color=#004488>"Frog dispose"</font>,
+      <font color=#004488>"finalizing Description Eats Bugs"</font>,
+      <font color=#004488>"finalizing Characteristic Croaks"</font>,
+      <font color=#004488>"Amphibian dispose"</font>,
+      <font color=#004488>"finalizing Description Both water and land"</font>,
+      <font color=#004488>"finalizing Characteristic can live in water"</font>,
+      <font color=#004488>"Animal dispose"</font>,
+      <font color=#004488>"finalizing Description Animal not Vegetable"</font>,
+      <font color=#004488>"finalizing Characteristic has heart"</font>,
+      <font color=#004488>"LivingCreature dispose"</font>,
+      <font color=#004488>"finalizing Description Basic Living Creature"</font>,
+      <font color=#004488>"finalizing Characteristic is alive"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>Each class in the hierarchy also contains a member objects of types <b>Characteristic</b> and <b>Description</b>, which must also be disposed. The order of disposal should be the reverse of the order of initialization, in case one subobject is dependent on another. For fields, this means the reverse of the order of declaration (since fields are initialized in declaration order). For base classes (following the form that&#146;s used in C++ for destructors), you should perform the derived-class cleanup first, then the base-class cleanup. That&#146;s because the derived-class cleanup could call some methods in the base class that require the base-class components to be alive, so you must not destroy them prematurely. From the output you can see that all parts of the <b>Frog </b>object are disposed in reverse order of creation. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1067" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>From this example, you can see that although you don&#146;t always need to perform cleanup, when you do, the process requires care and awareness. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]A0468" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc312374057"></a><a name="_Toc375545340"></a><a name="_Toc24775667"></a><a name="Heading6623"></a>Behavior
+of polymorphic methods <br>inside constructors<br></h3>
+<p><a name="Index659"></a><a name="Index660"></a><a name="Index661"></a>The hierarchy of constructor calls brings up an interesting dilemma. What happens if you&#146;re inside a constructor and you call a dynamically-bound method of the object being constructed? Inside an ordinary method, you can imagine what will happen: The dynamically-bound call is resolved at run time, because the object cannot know whether it belongs to the class that the method is in or some class derived from it. For consistency, you might think this is what should happen inside constructors. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1068" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This is not exactly the case. If you call a dynamically-bound method inside a constructor, the overridden definition for that method is used. However, the <i>effect</i> can be rather unexpected and can conceal some difficult-to-find bugs. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1069" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>Conceptually, the constructor&#146;s job is to bring the object into existence (which is hardly an ordinary feat). Inside any constructor, the entire object might be only partially formed&#151;you can know only that the base-class objects have been initialized, but you cannot know which classes are inherited from you. A dynamically bound method call, however, reaches &#147;outward&#148; into the inheritance hierarchy. It calls a method in a derived class. If you do this inside a constructor, you call a method that might manipulate members that haven&#146;t been initialized yet&#151;a sure recipe for disaster. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1070" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>You can see the problem in the following example:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:PolyConstructors.java</font>
+<font color=#009900>// Constructors and polymorphism</font>
+<font color=#009900>// don't produce what you might expect.</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>abstract</font> <font color=#0000ff>class</font> Glyph {
+  <font color=#0000ff>abstract</font> <font color=#0000ff>void</font> draw();
+  Glyph() {
+    System.out.println(<font color=#004488>"Glyph() before draw()"</font>);
+    draw();
+    System.out.println(<font color=#004488>"Glyph() after draw()"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> RoundGlyph <font color=#0000ff>extends</font> Glyph {
+  <font color=#0000ff>private</font> <font color=#0000ff>int</font> radius = 1;
+  RoundGlyph(<font color=#0000ff>int</font> r) {
+    radius = r;
+    System.out.println(
+      <font color=#004488>"RoundGlyph.RoundGlyph(), radius = "</font> + radius);
+  }
+  <font color=#0000ff>void</font> draw() {
+    System.out.println(
+      <font color=#004488>"RoundGlyph.draw(), radius = "</font> + radius);
+  }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> PolyConstructors {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    <font color=#0000ff>new</font> RoundGlyph(5);
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"Glyph() before draw()"</font>,
+      <font color=#004488>"RoundGlyph.draw(), radius = 0"</font>,
+      <font color=#004488>"Glyph() after draw()"</font>,
+      <font color=#004488>"RoundGlyph.RoundGlyph(), radius = 5"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>In <b>Glyph</b>, the <b>draw(&#160;)</b> method is <b>abstract</b>, so it is designed to be overridden. Indeed, you are forced to override it in <b>RoundGlyph</b>. But the <b>Glyph</b> constructor calls this method, and the call ends up in <b>RoundGlyph.draw(&#160;)</b>, which would seem to be the intent. But if you look at the output, you can see that when <b>Glyph</b>&#146;s constructor calls <b>draw(&#160;)</b>, the value of <b>radius</b> isn&#146;t even the default initial value 1. It&#146;s 0. This would probably result in either a dot or nothing at all being drawn on the screen, and you&#146;d be left staring, trying to figure out why the program won&#146;t work. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1071" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>The order of initialization described in the earlier section isn&#146;t quite complete, and that&#146;s the key to solving the mystery. The actual process of initialization is:<br></p>
+<ol>
+<li><a name="Index662"></a><a name="Index663"></a>The storage allocated for the
+object is initialized to binary zero before anything else happens. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1072"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>The base-class constructors are called as described previously. At this
+point, the overridden <b>draw(&#160;)</b> method is called (yes, <i>before
+</i>the <b>RoundGlyph </b>constructor is called), which discovers a
+<b>radius</b> value of zero, due to Step 1. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1073" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>Member initializers are called in the order of declaration. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1074"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>The body of the derived-class constructor is called. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1075" title="Send BackTalk
+Comment">Feedback</a></font></li></ol><p>There&#146;s an upside to this, which is that everything is at least initialized to zero (or whatever zero means for that particular data type) and not just left as garbage. This includes object references that are embedded inside a class via composition, which become <b>null</b>. So if you forget to initialize that reference, you&#146;ll get an exception at run time. Everything else gets zero, which is usually a telltale value when looking at output. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1076" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>On the other hand, you should be pretty horrified at the outcome of this program. You&#146;ve done a perfectly logical thing, and yet the behavior is mysteriously wrong, with no complaints from the compiler. (C++ produces more rational behavior in this situation.) Bugs like this could easily be buried and take a long time to discover. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1077" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>As a result, a good guideline for constructors is, &#147;Do as little as possible to set the object into a good state, and if you can possibly avoid it, don&#146;t call any methods.&#148; The only safe methods to call inside a constructor are those that are <a name="Index664"></a><b>final</b> in the base class. (This also applies to <a name="Index665"></a><a name="Index666"></a><a name="Index667"></a><b>private</b> methods, which are automatically <b>final</b>.) These cannot be overridden and thus cannot produce this kind of surprise. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1078" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545341"></a><a name="_Toc24775668"></a><a name="Heading6677"></a>Designing
+with inheritance<br></h2>
+<p><a name="Index668"></a><a name="Index669"></a>Once you learn about polymorphism, it can seem that everything ought to be inherited, because polymorphism is such a clever tool. This can burden your designs; in fact, if you choose inheritance first when you&#146;re using an existing class to make a new class, things can become needlessly complicated. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1079" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>A better approach is to choose composition first, especially when it&#146;s not obvious which one you should use. Composition does not force a design into an inheritance hierarchy. But composition is also more flexible since it&#146;s possible to dynamically choose a type (and thus behavior) when using composition, whereas inheritance requires an exact type to be known at compile time. The following example illustrates this:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:Transmogrify.java</font>
+<font color=#009900>// Dynamically changing the behavior of an object</font>
+<font color=#009900>// via composition (the "State" design pattern).</font>
+<font color=#0000ff>import</font> com.bruceeckel.simpletest.*;
+
+<font color=#0000ff>abstract</font> <font color=#0000ff>class</font> Actor {
+  <font color=#0000ff>public</font> <font color=#0000ff>abstract</font> <font color=#0000ff>void</font> act();
+}
+
+<font color=#0000ff>class</font> HappyActor <font color=#0000ff>extends</font> Actor {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> act() {
+    System.out.println(<font color=#004488>"HappyActor"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> SadActor <font color=#0000ff>extends</font> Actor {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> act() {
+    System.out.println(<font color=#004488>"SadActor"</font>);
+  }
+}
+
+<font color=#0000ff>class</font> Stage {
+  <font color=#0000ff>private</font> Actor actor = <font color=#0000ff>new</font> HappyActor();
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> change() { actor = <font color=#0000ff>new</font> SadActor(); }
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> performPlay() { actor.act(); }
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> Transmogrify {
+  <font color=#0000ff>private</font> <font color=#0000ff>static</font> Test monitor = <font color=#0000ff>new</font> Test();
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Stage stage = <font color=#0000ff>new</font> Stage();
+    stage.performPlay();
+    stage.change();
+    stage.performPlay();
+    monitor.expect(<font color=#0000ff>new</font> String[] {
+      <font color=#004488>"HappyActor"</font>,
+      <font color=#004488>"SadActor"</font>
+    });
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>A <b>Stage</b> object contains a reference to an <b>Actor</b>, which is initialized to a <b>HappyActor</b> object. This means <b>performPlay(&#160;)</b> produces a particular behavior. But since a reference can be rebound to a different object at run time, a reference for a <b>SadActor</b> object can be substituted in <b>actor</b>, and then the behavior produced by <b>performPlay(&#160;)</b> changes. Thus you gain dynamic flexibility at run time. (This is also called the <i>State Pattern.</i> See <i>Thinking in Patterns (with Java)</i> at <i>www.BruceEckel.com.</i>) In contrast, you can&#146;t decide to inherit differently at run time; that must be completely determined at compile time.  <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1080" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index672"></a><a name="Index673"></a>A general guideline is &#147;Use inheritance to express differences in behavior, and fields to express variations in state.&#148; In the preceding example, both are used; two different classes are inherited to express the difference in the <b>act(&#160;)</b> method, and <b>Stage</b> uses composition to allow its state to be changed. In this case, that change in state happens to produce a change in behavior. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1081" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545342"></a><a name="_Toc24775669"></a><a name="Heading6723"></a>Pure
+inheritance vs. extension<br></h3>
+<p><a name="Index674"></a><a name="Index675"></a><a name="Index676"></a>When studying inheritance, it would seem that the cleanest way to create an inheritance hierarchy is to take the &#147;pure&#148; approach. That is, only methods that have been established in the base class or <b>interface</b> are to be overridden in the derived class, as seen in this diagram:<br></p>
+<p align="center"><img src="TIJ317.png" 	alt="TIJ317.png" border="0" ><br></p>
+<p>This can be called a pure &#147;is-a&#148; relationship because the interface of a class establishes what it is. Inheritance guarantees that any derived class will have the interface of the base class and nothing less. If you follow this diagram, derived classes will also have <a name="Index677"></a><i>no more</i> than the base-class interface. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1082" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>This can be thought of as <a name="Index678"></a><i>pure substitution</i>, because derived class objects can be perfectly substituted for the base class, and you never need to know any extra information about the subclasses when you&#146;re using them:<br></p>
+<p align="center"><img src="TIJ318.png" 	alt="TIJ318.png" border="0" ><br></p>
+<p>That is, the base class can receive any message you can send to the derived class because the two have exactly the same interface. All you need to do is upcast from the derived class and never look back to see what exact type of object you&#146;re dealing with. Everything is handled through polymorphism. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1083" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>When you see it this way, it seems like a pure is-a relationship is the only sensible way to do things, and any other design indicates muddled thinking and is by definition broken. This too is a trap. As soon as you start thinking this way, you&#146;ll turn around and discover that extending the interface (which, unfortunately, the keyword <a name="Index679"></a><a name="Index680"></a><b>extends</b> seems to encourage) is the perfect solution to a particular problem. This could be termed an &#147;is-like-a&#148; relationship, because the derived class is <a name="Index681"></a><i>like</i> the base class&#151;it has the same fundamental interface&#151;but it has other features that require additional methods to implement:<br></p>
+<p align="center"><img src="TIJ319.png" 	alt="TIJ319.png" border="0" ><br></p>
+<p>While this is also a useful and sensible approach (depending on the situation), it has a drawback. The extended part of the interface in the derived class is not available from the base class, so once you upcast, you can&#146;t call the new methods:<br></p>
+<p align="center"><img src="TIJ320.png" 	alt="TIJ320.png" border="0" ><br></p>
+<p>If you&#146;re not upcasting in this case, it won&#146;t bother you, but often you&#146;ll get into a situation in which you need to rediscover the exact type of the object so you can access the extended methods of that type. The following section shows how this is done. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1084" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h3>
+<a name="_Toc375545343"></a><a name="_Toc24775670"></a><a name="Heading6735"></a>Downcasting
+and run-time <br>type identification</h3>
+<p>Since you lose the specific type information via an <i>upcast</i> (moving up the inheritance hierarchy), it makes sense that to retrieve the type information&#151;that is, to move back down the inheritance hierarchy&#151;you use a <a name="Index682"></a><i>downcast</i>. However, you know an upcast is always safe; the base class cannot have a bigger interface than the derived class. Therefore, every message you send through the base class interface is guaranteed to be accepted. But with a downcast, you don&#146;t really know that a shape (for example) is actually a circle. It could instead be a triangle or square or some other type. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1085" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p align="center"><img src="TIJ321.png" 	alt="TIJ321.png" border="0" ><br></p>
+<p>To solve this problem, there must be some way to guarantee that a downcast is correct, so that you won&#146;t accidentally cast to the wrong type and then send a message that the object can&#146;t accept. This would be quite unsafe. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1086" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>In some languages (like C++) you must perform a special operation in order to get a type-safe downcast, but in Java, <i>every </i>cast is checked! So even though it looks like you&#146;re just performing an ordinary parenthesized cast, at run time this cast is checked to ensure that it is in fact the type you think it is. If it isn&#146;t, you get a <b>ClassCastException</b>. This act of checking types at run time is called <a name="Index683"></a><a name="Index684"></a><i>run-time type identification </i>(RTTI). The following example demonstrates the behavior of RTTI:<br></p>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: c07:RTTI.java</font>
+<font color=#009900>// Downcasting &amp; Run-Time Type Identification (RTTI).</font>
+<font color=#009900>// {ThrowsException}</font>
+
+<font color=#0000ff>class</font> Useful {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> g() {}
+}
+
+<font color=#0000ff>class</font> MoreUseful <font color=#0000ff>extends</font> Useful {
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> f() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> g() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> u() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> v() {}
+  <font color=#0000ff>public</font> <font color=#0000ff>void</font> w() {}
+}
+
+<font color=#0000ff>public</font> <font color=#0000ff>class</font> RTTI {
+  <font color=#0000ff>public</font> <font color=#0000ff>static</font> <font color=#0000ff>void</font> main(String[] args) {
+    Useful[] x = {
+      <font color=#0000ff>new</font> Useful(),
+      <font color=#0000ff>new</font> MoreUseful()
+    };
+    x[0].f();
+    x[1].g();
+    <font color=#009900>// Compile time: method not found in Useful:</font>
+    <font color=#009900>//! x[1].u();</font>
+    ((MoreUseful)x[1]).u(); <font color=#009900>// Downcast/RTTI</font>
+    ((MoreUseful)x[0]).u(); <font color=#009900>// Exception thrown</font>
+  }
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE><p><br></p>
+<p>As in the diagram, <b>MoreUseful</b> extends the interface of <b>Useful</b>. But since it&#146;s inherited, it can also be upcast to a <b>Useful</b>. You can see this happening in the initialization of the array <b>x</b> in <b>main(&#160;)</b>. Since both objects in the array are of class <b>Useful</b>, you can send the <b>f(&#160;)</b> and <b>g(&#160;)</b> methods to both, and if you try to call <b>u(&#160;)</b> (which exists only in <b>MoreUseful</b>), you&#146;ll get a compile-time error message. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1087" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>If you want to access the extended interface of a <b>MoreUseful</b> object, you can try to downcast. If it&#146;s the correct type, it will be successful. Otherwise, you&#146;ll get a <a name="Index685"></a><b>ClassCastException</b>. You don&#146;t need to write any special code for this exception, since it indicates a programmer error that could happen anywhere in a program. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1088" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>There&#146;s more to RTTI than a simple cast. For example, there&#146;s a way to see what type you&#146;re dealing with <i>before</i> you try to downcast it. All of Chapter 10 is devoted to the study of different aspects of Java run-time type identification. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1089" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545344"></a><a name="_Toc24775671"></a><a name="Heading6775"></a>Summary</h2>
+<p>Polymorphism means &#147;different forms.&#148; In object-oriented programming, you have the same face (the common interface in the base class) and different forms using that face: the different versions of the dynamically bound methods. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1090" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p><a name="Index686"></a>You&#146;ve seen in this chapter that it&#146;s impossible to understand, or even create, an example of polymorphism without using data abstraction and inheritance. Polymorphism is a feature that cannot be viewed in isolation (like a <b>switch</b> statement can, for example), but instead works only in concert, as part of a &#147;big picture&#148; of class relationships. People are often confused by other, non-object-oriented features of Java, like method overloading, which are sometimes presented as object-oriented. Don&#146;t be fooled: If it isn&#146;t late binding, it isn&#146;t polymorphism. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1091" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<p>To use polymorphism&#151;and thus object-oriented techniques&#151;effectively in your programs, you must expand your view of programming to include not just members and messages of an individual class, but also the commonality among classes and their relationships with each other. Although this requires significant effort, it&#146;s a worthy struggle, because the results are faster program development, better code organization, extensible programs, and easier code maintenance. <font size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1092" title="Send BackTalk Comment">Feedback</a></font><br></p>
+<h2>
+<a name="_Toc375545345"></a><a name="_Toc24775672"></a><a name="Heading6779"></a>Exercises</h2>
+<p>Solutions to selected exercises can be found in the electronic document <i>The Thinking in Java Annotated Solution Guide</i>, available for a small fee from <i>www.BruceEckel.com</i>.<br></p>
+<ol>
+<li>	Add a new method in the base class of <b>Shapes.java</b> that prints a
+message, but don&#146;t override it in the derived classes. Explain what
+happens. Now override it in one of the derived classes but not the others, and
+see what happens. Finally, override it in all the derived classes. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1093"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Add a new type of <b>Shape</b> to <b>Shapes.java</b> and verify in
+<b>main(&#160;) </b>that polymorphism works for your new type as it does in the
+old types. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1094" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Change <b>Music3.java</b> so that <b>what(&#160;)</b> becomes the root
+<b>Object </b>method <b>toString(&#160;)</b>. Try printing the <b>Instrument</b>
+objects using <b>System.out.println(&#160;)</b> (without any casting). <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1095"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Add a new type of <b>Instrument</b> to <b>Music3.java</b> and verify that
+polymorphism works for your new type. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1096" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify <b>Music3.java</b> so that it randomly creates <b>Instrument</b>
+objects the way <b>Shapes.java</b> does. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1097" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create an inheritance hierarchy of <b>Rodent</b>: <b>Mouse</b>,
+<b>Gerbil</b>, <b>Hamster</b>, etc. In the base class, provide methods that are
+common to all <b>Rodent</b>s, and override these in the derived classes to
+perform different behaviors depending on the specific type of <b>Rodent</b>.
+Create an array of <b>Rodent</b>, fill it with different specific types of
+<b>Rodent</b>s, and call your base-class methods to see what happens. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1098"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Modify Exercise 6 so that <b>Rodent</b> is an <b>abstract</b> class. Make
+the methods of <b>Rodent</b> abstract whenever possible. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1099" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a class as <b>abstract</b> without including any <b>abstract</b>
+methods and verify that you cannot create any instances of that class. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1100"
+title="Send BackTalk Comment">Feedback</a></font></li>
+<li>	Add class <b>Pickle</b> to <b>Sandwich.java</b>. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1101" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Modify Exercise 6 so that it demonstrates the order of initialization of
+the base classes and derived classes. Now add member objects to both the base
+and derived classes and show the order in which their initialization occurs
+during construction. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1102" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a base class with two methods. In the first method, call the second
+method. Inherit a class and override the second method. Create an object of the
+derived class, upcast it to the base type, and call the first method. Explain
+what happens. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1104" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create a base class with an <b>abstract</b> <b>print(&#160;) </b>method
+that is overridden in a derived class. The overridden version of the method
+prints the value of an <b>int </b>variable defined in the derived class. At the
+point of definition of this variable, give it a nonzero value. In the base-class
+constructor, call this method. In <b>main(&#160;)</b>, create an object of the
+derived type, and then call its <b>print(&#160;)</b> method. Explain the
+results. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1105" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Following the example in <b>Transmogrify.java</b>, create a <b>Starship</b>
+class containing an <b>AlertStatus</b> reference that can indicate three
+different states. Include methods to change the states. <font size="-2"><a
+href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1106" title="Send BackTalk
+Comment">Feedback</a></font></li>
+<li>	Create an <b>abstract</b> class with no methods. Derive a class and add a
+method. Create a <b>static</b> method that takes a reference to the base class,
+downcasts it to the derived class, and calls the method. In <b>main(&#160;)</b>,
+demonstrate that it works. Now put the <b>abstract</b> declaration for the
+method in the base class, thus eliminating the need for the downcast. <font
+size="-2"><a href="mailto:TIJ3@MindView.net?Subject=[TIJ3]Chap07_1107"
+title="Send BackTalk Comment">Feedback</a></font></li></ol><p><br></p>
+<hr><p class="footnote text"><sup><a name="fn32" href="#fnB32">[32]</a></sup> For C++ programmers, this is the analogue of C++&#146;s <i>pure virtual function</i>.<br></p>
+
+<!-- <hr><b>Placeholder</b> -->
+
+<hr>
+
+<div align="CENTER"><a href="TIJ308.htm" target="RightFrame"><img src="./prev.gif" alt="Previous " border="0"></a>
+<a href="TIJ310.htm" target="RightFrame"><img src="./next.gif" alt="Next " border="0"></a>
+
+<a href="TIJ3_t.htm"><img src="./first.gif" alt="Title Page " border="0"></a>
+<a href="TIJ3_i.htm"><img src="./index.gif" alt="Index " border="0"></a>
+<a href="TIJ3_c.htm"><img src="./contents.gif" alt="Contents " border="0"></a>
+</div>
+
+</font></body>
+
+</html>

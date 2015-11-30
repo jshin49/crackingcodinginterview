@@ -2,10 +2,14 @@
 Cracking the Coding Interview
 
 ## Object Oriented
-http://stackoverflow.com/questions/15838978/polymorphism-vs-inheritance
-http://stackoverflow.com/questions/9359948/multiple-inheritance-whats-a-good-example
-http://programmers.stackexchange.com/questions/61376/aggregation-vs-composition
-http://stackoverflow.com/questions/9359948/multiple-inheritance-whats-a-good-example
+- http://stackoverflow.com/questions/15838978/polymorphism-vs-inheritance
+- http://stackoverflow.com/questions/9359948/multiple-inheritance-whats-a-good-example
+- http://programmers.stackexchange.com/questions/61376/aggregation-vs-composition
+- http://stackoverflow.com/questions/9359948/multiple-inheritance-whats-a-good-example
+
+## Java
+- http://www.tutorialspoint.com/java/java_using_iterator.htm
+- http://math.hws.edu/javanotes/c10/s5.html
 
 ## References
 - [Phone Screen Questions](https://sites.google.com/site/steveyegge2/five-essential-phone-screen-questions)

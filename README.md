@@ -1,6 +1,12 @@
 # crackingcodinginterview
 Cracking the Coding Interview
 
+## Algorithms and Data Structures
+- [MIT 6.00: Introduction to Computer Science and Programming](https://www.youtube.com/playlist?list=PL4C4720A6F225E074)
+- [MIT 6.006: Introduction to Algorithms](https://www.youtube.com/playlist?list=PLUl4u3cNGP61Oq3tWYp6V_F-5jb5L2iHb)
+- [MIT 6.046J: Introduction to Algorithms](https://www.youtube.com/playlist?list=PL8B24C31197EC371C)
+- [Princeton Algorithms Booksite](http://algs4.cs.princeton.edu/home/)
+
 ## Object Oriented
 - http://stackoverflow.com/questions/15838978/polymorphism-vs-inheritance
 - http://stackoverflow.com/questions/9359948/multiple-inheritance-whats-a-good-example

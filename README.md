@@ -1,6 +1,8 @@
 # crackingcodinginterview
 Cracking the Coding Interview
 
+[Development Guide](https://www.google.com/about/careers/students/guide-to-technical-development.html)
+
 ## Algorithms and Data Structures
 - [MIT 6.00: Introduction to Computer Science and Programming](https://www.youtube.com/playlist?list=PL4C4720A6F225E074)
 - [MIT 6.006: Introduction to Algorithms](https://www.youtube.com/playlist?list=PLUl4u3cNGP61Oq3tWYp6V_F-5jb5L2iHb)

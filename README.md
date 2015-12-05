@@ -19,6 +19,15 @@ Cracking the Coding Interview
 - http://www.tutorialspoint.com/java/java_using_iterator.htm
 - http://math.hws.edu/javanotes/c10/s5.html
 
+## Coding Practice
+- Write a function to reverse a string.
+- Write function to compute Nth fibonacci number.
+- Print out the grade-school multiplication table up to 12x12.
+- Write a function that sums up integers from a text file, one int per line.
+- Write function to print the odd numbers from 1 to 99.
+- Find the largest int value in an int array. 
+- Format an RGB value (three 1-byte numbers) as a 6-digit hexadecimal string.
+
 ## References
 - [Phone Screen Questions](https://sites.google.com/site/steveyegge2/five-essential-phone-screen-questions)
 - [Phone Screen Preparation](http://blog.codinghorror.com/getting-the-interview-phone-screen-right/)

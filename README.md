@@ -14,6 +14,7 @@ Author: Michael Baldwin
 - [Princeton Algorithms Booksite](http://algs4.cs.princeton.edu/home/)
 - [Time Complexity Cheat Sheet](http://bigocheatsheet.com/)
 - [A* algorithm](http://www.redblobgames.com/pathfinding/a-star/introduction.html)
+- [Minimax algorithm](http://neverstopbuilding.com/minimax)
 
 ### Object Oriented
 

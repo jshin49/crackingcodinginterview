@@ -11,6 +11,9 @@ class Solution {
 
 vector<vector<int> > Solution::generate(int A) {
     vector<vector<int> > pascal;
+    if (A < 1) {
+        return pascal;
+    }
     // base case, no previous row
     if (A == 1) {
         vector<int> row0 = {1};
@@ -40,7 +43,7 @@ vector<vector<int> > Solution::generate(int A) {
 
 int main () {
   Solution sol;
-  vector<vector<int> > s = sol.generate(3);
+  vector<vector<int> > s = sol.generate(5);
 
   cout << "[\n";
   for (int i = 0; i < s.size(); i++) {

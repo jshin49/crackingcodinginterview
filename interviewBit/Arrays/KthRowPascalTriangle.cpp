@@ -31,31 +31,7 @@ vector<int> Solution::getRow(int A) {
         }
         rowA.push_back(1);
         return rowA;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /*
-        vector<int> rowA;
-        rowA.push_back(1);
-        for(int j = 0; j < A - 1; j++) {
-            rowA.push_back(getRow(A - 1)[j] + getRow(A - 1)[j + 1]);
-        }
-        rowA.push_back(1);
-        return rowA;
-        */
-    }
+   }
 }
 
 int main () {

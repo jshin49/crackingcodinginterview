@@ -13,6 +13,8 @@ Author: Michael Baldwin
 - [MIT 6.046J: Introduction to Algorithms](https://www.youtube.com/playlist?list=PL8B24C31197EC371C)
 - [Princeton Algorithms Booksite](http://algs4.cs.princeton.edu/home/)
 - [Time Complexity Cheat Sheet](http://bigocheatsheet.com/)
+- [A* algorithm](http://www.redblobgames.com/pathfinding/a-star/introduction.html)
+- [Minimax algorithm](http://neverstopbuilding.com/minimax)
 
 ### Object Oriented
 

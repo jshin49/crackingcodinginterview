@@ -22,6 +22,31 @@ vector<int> Solution::getRow(int A) {
     }
     // recursive case
     else {
+        vector<int> prevRow = getRow(A - 1);
+
+        vector<int> rowA;
+        rowA.push_back(1);
+        for(int j = 1; j < A; j++) {
+            rowA.push_back(prevRow[j] + prevRow[j - 1]);
+        }
+        rowA.push_back(1);
+        return rowA;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /*
         vector<int> rowA;
         rowA.push_back(1);
         for(int j = 0; j < A - 1; j++) {
@@ -29,6 +54,7 @@ vector<int> Solution::getRow(int A) {
         }
         rowA.push_back(1);
         return rowA;
+        */
     }
 }
 
